@@ -1,0 +1,97 @@
+# Vem i rummet? – alla röstar på mobilen.
+# Format: kategori|fråga
+# Kategorier: casual (del 1), party (del 2), cheeky (del 3), dirty (del 4), framtid (alla delar)
+casual|Vem i rummet är sämst på att svara på sms?
+casual|Vem har sämst lokalsinne och går vilse med GPS?
+casual|Vem somnar på bussen och missar sin hållplats?
+casual|Vem lägger ner mest tid på att välja outfit inför en utgång?
+casual|Vem i rummet skulle klara sig sämst på en öde ö?
+casual|Vem har flest olästa aviseringar på sin telefon just nu?
+casual|Vem pratar mest men säger minst?
+casual|Vem glömmer bort sin kompis födelsedag?
+casual|Vem spenderar mest pengar på att onlineshoppa?
+casual|Vem skulle vinna i rysk roulette?
+casual|Vem tar längst tid på sig i badrummet?
+casual|Vem är sällskapets största tidsoptimist?
+casual|Vem skulle du aldrig vilja vara kollega med?
+casual|Vem skulle vara den hårdaste chefen?
+casual|Vem skulle starta en podd som ingen lyssnar på?
+party|Vem kommer däcka först ikväll?
+party|Vem tror du har hånglat med flest personer?
+party|Om någon ska bli utkastad från klubben ikväll, vem är det?
+party|Vem startar flest bråk i toakön?
+party|Vem försvinner alltid på fest?
+party|Vem har bäst öl-sinne men sämst tequila-sinne?
+party|Vem måste alltid ha fyllekäk?
+party|Vem är mest benägen att dansa på bordet efter tre drinkar?
+party|Vem blir mest aggressiv när man spelar sällskapsspel?
+party|Vem kommer att vara den mest pinsamma föräldern på fest?
+party|Vem är bäst på att snacka sig ur en jobbig situation med en dörrvakt?
+party|Vem har den sämsta musiksmaken i sällskapet?
+party|Vem är mest trolig att föreslå tequila-shots kl 04:00?
+party|Vem dricker upp alla slattar på fest?
+party|Vem tappar bort telefonen på fyllan?
+party|Vem är mest benägen att göra slut på hela sitt sparkonto under en utekväll?
+party|Vem har de pinsammaste fyllehistorierna?
+party|Vem vägrar att gå hem när festen är slut?
+party|Vem är mest trolig att vakna upp i en fyllecell?
+party|Vem gömmer sig i ett hörn med hunden/katten på en hemmafest?
+cheeky|Vem är mest trolig att smsa sitt ex klockan 03:00?
+cheeky|Vem är bäst på att ghosta?
+cheeky|Vem är snyggast här enligt dig? (det kön du attraheras av)
+cheeky|Vem har flest olästa matchningar på Tinder just nu?
+cheeky|Vem blir lättast kär efter bara en dejt?
+cheeky|Vem är mest trolig att ligga med en främling på en hemmafest?
+cheeky|Vem har högst body count i gruppen?
+cheeky|Vem har bäst chanser att bli en Sugar Baby?
+cheeky|Vem har bäst chanser att bli en Sugar Mommy/Daddy?
+cheeky|Vem är bäst på att ragga, som faktiskt lyckas?
+cheeky|Vem blir lättast svartsjuk i ett förhållande?
+cheeky|Vem stalkar sitt ex (och exets nya) mest på sociala medier?
+cheeky|Vem är mest benägen att ha ett hemligt förhållande?
+cheeky|Vem har ljugit mest på sin Tinder/Hinge-profil?
+cheeky|Vem i rummet blir lättast attraherad av toxic personer?
+cheeky|Vem är mest catfish på Tinder?
+cheeky|Vem har den mest sjuka sökhistoriken på sin telefon?
+cheeky|Vem skulle gå på en dejt för att få gratis mat?
+cheeky|Vem blir mest obekväm när man pratar om känslor?
+cheeky|Vem blir mest obekväm när man pratar om sex?
+cheeky|Vem i rummet har störst snopp, eller hade haft det om de var man?
+cheeky|Vem har gett det sämsta första intrycket till en partners föräldrar?
+dirty|Vem i rummet skulle kunna dejta en väns ex utan att skämmas?
+dirty|Vem skulle starta ett OnlyFans-konto i hemlighet?
+dirty|Vem kollar mest på porr?
+dirty|Vem har den absolut konstigaste fetischen?
+dirty|Vem har haft sex på den konstigaste platsen?
+dirty|Vem skulle kunna sälja sina använda strumpor/underkläder för pengar?
+dirty|Vem har hånglat med någon som är dubbelt så gammal?
+dirty|Vem har bäst pokerface när de ljuger om något grovt?
+dirty|Vem har blivit tagen av polisen eller nästan tagen?
+dirty|Vem i rummet litar du minst på med en hemlighet?
+dirty|Vem skulle kunna snatta med sig något från klubben?
+dirty|Vem har skapat mest drama i en kompisgrupp?
+dirty|Vem har den mest skruvade humorn?
+dirty|Vem har gett den absolut sämsta ursäkten för att dumpa någon?
+dirty|Vem skulle kunna gå med i en sekt utan att inse det själv?
+dirty|Vem är den största hycklaren i sällskapet?
+dirty|Vem stönar högst?
+dirty|Vem har haft en romans med en kollega eller chef?
+framtid|Vem i sällskapet kommer att bli rikast, men på det mest skumma sättet?
+framtid|Vem kommer att flytta till ett annat land helt spontant?
+framtid|Vem blir den första som skaffar barn?
+framtid|Vem kommer att ställa upp i en dokusåpa inom de närmsta två åren?
+framtid|Vem kommer att gifta sig enbart för pengar?
+framtid|Vem kommer att bli gripen av polisen i framtiden?
+framtid|Vem kommer att hamna i en politisk skandal?
+framtid|Vem kommer att bli en galen katt- eller hundmänniska i framtiden?
+framtid|Vem kommer att plastikoperera sig mest innan de fyller 50?
+framtid|Vem blir den som ordnar den absolut vildaste svensexan/möhippan?
+framtid|Vem kommer att glömma bort sina gamla vänner när de blir kända?
+framtid|Vem kommer att öppna en bar på en strand i Thailand?
+framtid|Vem kommer att bli en konspirationsteoretiker på äldre dar?
+framtid|Vem i rummet kommer att åldras bäst?
+framtid|Vem kommer att vinna på Triss men förlora alla pengar på en vecka?
+framtid|Vem kommer att bli sällskapets eviga singel?
+framtid|Vem kommer att jobba med något helt annat än vad de pluggade till?
+framtid|Vem kommer att starta ett eget framgångsrikt företag?
+framtid|Vem kommer att bli den som håller ihop kompisgänget om 20 år?

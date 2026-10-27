@@ -1,0 +1,82 @@
+# Utmaningar
+# Format: kategori|spelare|text
+# Kategori styr vilken del utmaningen tidigast kan dyka upp i:
+#   casual = del 1+, party = del 2+, cheeky = del 3+, dirty = del 4
+# Spelare:
+#   0 = gäller hela gruppen (visas hos alla)
+#   1 = solo-utmaning till den vars tur det är (används också som utmaningskort)
+#   2 = X och Y – appen fyller i två spelare
+#   3 = lag – LAG1 och LAG2 byts ut mot två slumpade lag
+# Antal klunkar i texten ökar automatiskt per del (2 i del 1, 3 i del 2, 4 i del 3, 5 i del 4).
+casual|0|Den som har mest skärmtid tar 2 klunkar.
+casual|0|Den kortaste personen delar ut 2 klunkar.
+casual|0|Den längsta personen delar ut 2 klunkar.
+casual|0|Den med störst skostorlek tar 2 klunkar.
+cheeky|0|Den med störst tuttar tar 2 klunkar.
+cheeky|0|Den med störst snopp tar 2 klunkar.
+casual|0|Den som använder flest emojis tar 2 klunkar.
+casual|0|Den som har flest bilder i kamerarullen tar 2 klunkar.
+casual|0|Den som har flest bokstäver i sitt namn delar ut 2 klunkar.
+casual|0|Den som har flest olästa notiser tar 2 klunkar.
+casual|0|Den som har flest skor hemma delar ut 2 klunkar.
+casual|0|Den som har flest syskon delar ut 2 klunkar.
+casual|0|Den som har lägst batteri tar 3 klunkar.
+casual|0|Den som har längst förnamn tar 2 klunkar.
+casual|0|Den som har rest längst idag delar ut 2 klunkar.
+casual|0|Den som senast bytte profilbild delar ut 2 klunkar.
+dirty|0|Den som senast onanerade tar 2 klunkar.
+cheeky|0|Den som senast hade sex delar ut 2 klunkar.
+casual|0|Den som senast reste utomlands delar ut 2 klunkar.
+casual|0|Den som senast var på bio delar ut 2 klunkar.
+casual|0|Den som tränade senast delar ut 2 klunkar.
+casual|0|Den som vaknade senast idag tar 2 klunkar.
+casual|0|Den yngsta personen delar ut 2 klunkar.
+party|0|Gruppen röstar fram den roligaste personen, som får dela ut 3 klunkar.
+party|0|Gruppen väljer en person som får dela ut 3 klunkar.
+casual|1|Gör en segerpose i 5 sekunder.
+casual|1|Hitta något blått i rummet på 10 sekunder.
+party|1|Härma ett djur. Gruppen röstar om det var godkänt, annars drick 2 klunkar.
+party|1|Läs upp din bästavänslista på Snapchat.
+casual|1|Nämn fem djur utan att säga hund eller katt.
+casual|1|Nämn fem länder på 10 sekunder.
+casual|1|Nämn fem saker som finns i ett klassrum.
+casual|1|Nämn fem saker som flyger.
+casual|1|Nämn fem sporter på 10 sekunder.
+casual|1|Nämn fyra bilmärken på 10 sekunder.
+dirty|1|Nämn fyra kondomsorter på 10 sekunder.
+casual|1|Nämn fyra röda saker.
+casual|1|Nämn fyra tv-serier på 10 sekunder.
+casual|1|Nämn tre saker man hittar i ett kök.
+casual|1|Nämn tre saker som börjar på B.
+casual|1|Nämn tre svenska städer på 5 sekunder, annars ta 2 klunkar.
+cheeky|1|Visa din kamerarulle för personen till vänster i 15 sekunder.
+cheeky|1|Visa din sökhistorik på Instagram för personen till höger.
+party|1|Visa dina mest spelade låtar på Spotify.
+party|1|Visa första bilden i kamerarullen.
+cheeky|1|Visa senaste bilden du fått skickad till dig.
+party|1|Visa senaste bilden där du själv är med.
+party|1|Visa senaste bilden i mappen Favoriter.
+party|1|Visa vem du senast skickade ett sms till.
+cheeky|1|Visa din senaste sökning på Google.
+party|1|Visa senaste videon i mobilen.
+party|1|Visa tredje bilden i kamerarullen.
+casual|1|Visa upp den senaste bilden du tog.
+cheeky|1|Visa din Tinder/Hinge-profil.
+dirty|1|Nämn en porrstjärna, annars drick 3 klunkar.
+casual|2|X och Y, berätta vilket år ni är födda. Den yngsta dricker.
+casual|2|X och Y, den som blinkar först tar 2 klunkar.
+party|2|X och Y, den som är mest nykter av er tar 3 klunkar.
+casual|2|X och Y, ge varandra ett smeknamn.
+casual|2|X och Y, håll en konversation i 20 sekunder där en av er bara får svara ja eller nej.
+casual|2|X och Y, nämn ett djur varannan gång tills någon misslyckas.
+casual|2|X och Y, nämn städer varannan gång tills någon förlorar.
+party|2|X och Y, sjung första versen i en låt ni båda kan. Blir det fel i texten tar ni 2 klunkar var.
+casual|2|X och Y, spela sten-sax-påse. Förloraren tar 2 klunkar.
+casual|2|X och Y, stirra på varandra i 15 sekunder. Den som skrattar först tar 2 klunkar.
+casual|2|X och Y, säg en huvudstad samtidigt. Olika = båda dricker 2 klunkar.
+casual|2|X och Y, säg en sport samtidigt. Olika = båda dricker 2 klunkar.
+casual|2|X och Y, säg ett land samtidigt. Olika = båda dricker 2 klunkar.
+party|2|X och Y, säg ett nummer mellan 1–5 samtidigt. Samma nummer = 3 klunkar var, olika nummer = dela ut 3 klunkar.
+party|3|LAG1 mot LAG2: armbrytning! Förlorarlaget tar 2 klunkar var.
+party|3|LAG1 mot LAG2: nämn så många artister ni kan på 30 sekunder. Laget med minst tar 2 klunkar var.
+cheeky|3|LAG1 mot LAG2: varje lag väljer en person i andra laget som måste dricka 3 klunkar.

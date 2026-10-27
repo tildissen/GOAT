@@ -1,0 +1,14 @@
+# Minigames och regler som gäller en tid. Visas hos alla.
+# Format: namn|beskrivning
+# Antal klunkar i texten ökar automatiskt per del.
+Vattenfall|Alla börjar dricka samtidigt. När du slutar dricka får personen till vänster om dig sluta dricka, eller fortsätta om hen vill.
+Tumregeln|Sätt tummen på bordet utan att säga något. Alla andra ska därefter sätta sin tumme på bordet. Den som är sist dricker 3 klunkar.
+Thunder|Sätt på låten Thunderstruck av AC/DC. En person/par börjar dricka när de sjunger "Thunder" första gången och slutar när nästa "Thunder" kommer – då börjar nästa person/par dricka.
+Viskleken|Personen till höger viskar en fråga i ditt öra. Du säger svaret högt och bestämmer hur många klunkar som behöver drickas för att få veta frågan. De andra kan välja att dricka för att få veta frågan. Vill ingen dricka viskar du en ny fråga i nästa persons öra.
+Kategorier|Personen vars tur det är väljer en kategori, till exempel bilmärken. Ni säger något i kategorin varannan gång medsols. Den som tar för lång tid eller upprepar något dricker 3 klunkar.
+Rimma|Säg ett ord. Nästa person medsols ska rimma på det, och så vidare. Den som inte kommer på något dricker 2 klunkar.
+Jag har aldrig|Alla håller upp tre fingrar. Säg i tur och ordning något du aldrig har gjort. De som har gjort det fäller ett finger. Den som först har noll fingrar kvar dricker 3 klunkar.
+Nej-förbud|Ny regel! Ingen får säga "nej" de kommande 5 korten. Den som gör det dricker 2 klunkar.
+Inga namn|Ny regel! Ingen får säga någons namn de kommande 5 korten. Bryter du mot regeln dricker du 2 klunkar.
+Vänsterhanden|Ny regel! Alla får bara dricka med vänster hand resten av den här delen. Den som dricker med höger tar 1 extra klunk.
+Frågemästaren|Ny regel! Personen vars tur det är blir frågemästare de kommande 5 korten. Svarar någon på en fråga från frågemästaren dricker hen 1 klunk.

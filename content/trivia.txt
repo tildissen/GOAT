@@ -1,0 +1,369 @@
+# Trivia – flerval, bara den vars tur det är svarar.
+# Format: svårighet|fråga|rätt svar|fel svar 1|fel svar 2|fel svar 3
+# Svårighet: 1 = lätt (del 1–2), 2 = mellan (del 2–3), 3 = svår (del 3–4)
+3|Vilket år sjönk Titanic?|1912|1905|1921|1898
+3|Vilket datum firas Sveriges nationaldag?|6 juni|6 maj|23 juni|1 juni
+3|Vilken färg får man av rött och blått?|Lila|Grön|Brun|Orange
+3|Hur många spelare finns på planen i ett basketlag?|5|6|7|4
+3|Vilket organ pumpar blod i kroppen?|Hjärtat|Levern|Lungorna|Njurarna
+3|Vad heter den största planeten i solsystemet?|Jupiter|Saturnus|Neptunus|Uranus
+3|Vad heter Sveriges största sjö?|Vänern|Vättern|Mälaren|Storsjön
+3|Vilket hav är störst?|Stilla havet|Atlanten|Indiska oceanen|Norra ishavet
+3|Vilken planet kallas den röda planeten?|Mars|Venus|Jupiter|Merkurius
+3|Hur många sidor har en oktagon?|8|6|10|12
+3|Vad heter Sveriges sydligaste landskap?|Skåne|Blekinge|Halland|Småland
+3|Hur många tänder har en vuxen människa vanligtvis?|32|28|30|36
+3|Hur många planeter finns i solsystemet?|8|9|7|10
+3|Vem var den första människan på månen?|Neil Armstrong|Buzz Aldrin|Jurij Gagarin|Michael Collins
+3|Vilken metall används ofta i läskburkar?|Aluminium|Koppar|Tenn|Zink
+3|Hur många färger har en regnbåge traditionellt?|7|6|5|8
+3|Hur många centimeter är en meter?|100|10|1000|50
+3|Vilket grundämne har symbolen Na?|Natrium|Kväve|Neon|Nickel
+3|Vilken stad kallas ofta för Kärlekens stad?|Paris|Rom|Venedig|Barcelona
+3|Vilken svensk stad har smeknamnet Peking?|Norrköping|Linköping|Västerås|Örebro
+3|Vilket landskap kallas Sveriges trädgård?|Blekinge|Skåne|Gotland|Halland
+3|Vilket land har flest öar i världen?|Sverige|Norge|Indonesien|Filippinerna
+3|Vilket land har flest tidszoner?|Frankrike|Ryssland|USA|Kina
+3|Vilket djur lägger ägg men är ett däggdjur?|Näbbdjur|Känguru|Fladdermus|Igelkott
+3|Vilken fågel är snabbast i dykning?|Pilgrimsfalk|Kungsörn|Havsörn|Tornseglare
+3|Vad mäter en hygrometer?|Luftfuktighet|Lufttryck|Temperatur|Vindhastighet
+3|Hur många kromosomer har människor normalt?|46|23|48|44
+3|Vilken planet är längst från solen?|Neptunus|Uranus|Pluto|Saturnus
+3|Vilken svensk kung dog vid Fredriksten 1718?|Karl XII|Gustav II Adolf|Karl XI|Gustav III
+3|Vilket år föll Berlinmuren?|1989|1991|1987|1990
+3|Vad kallas den svenska perioden 1611–1718 ofta?|Stormaktstiden|Frihetstiden|Vasatiden|Gustavianska tiden
+3|Om du har tre äpplen och tar två, hur många har du?|2|1|3|5
+3|Vad kallas ett ord som låter likadant baklänges?|Palindrom|Anagram|Synonym|Homonym
+3|Hur många vokaler finns i svenska alfabetet?|9|6|8|7
+3|Vilket datum är nyårsafton?|31 december|1 januari|30 december|24 december
+3|Vad kallas svensk rätt att vistas i naturen?|Allemansrätten|Strandskyddet|Naturrätten|Friluftslagen
+3|Vilket djur kan sova stående?|Häst|Gris|Hund|Katt
+3|Vilket djur har fingeravtryck som liknar människans?|Koala|Känguru|Panda|Tvättbjörn
+3|Vilket organ kan återbilda sig delvis efter skada?|Levern|Hjärtat|Hjärnan|Ögat
+1|Vilket landskap är Dalahästen mest förknippad med?|Dalarna|Värmland|Hälsingland|Jämtland
+1|Vad heter bron mellan Malmö och Köpenhamn?|Öresundsbron|Västerbron|Ölandsbron|Högakustenbron
+1|Vilken stad är känd för Turning Torso?|Malmö|Göteborg|Stockholm|Helsingborg
+1|Vilken stad är känd för Gävlebocken?|Gävle|Uppsala|Falun|Sundsvall
+1|Vad heter Sveriges längsta skidtävling?|Vasaloppet|Engelbrektsloppet|Tjejvasan|Vätternrundan
+1|Vilket djur kallas skogens konung?|Älg|Björn|Varg|Lodjur
+1|Vilken svensk författare skapade Pippi Långstrump?|Astrid Lindgren|Selma Lagerlöf|Elsa Beskow|Maria Gripe
+1|Vilken svensk artist vann Eurovision med Euphoria?|Loreen|Måns Zelmerlöw|Carola|Zara Larsson
+1|Vilket svenskt band sjöng Waterloo?|ABBA|Roxette|Ace of Base|Europe
+1|Vad heter Stockholms stora nöjespark?|Gröna Lund|Liseberg|Skara Sommarland|Furuvik
+1|Vad heter Göteborgs stora nöjespark?|Liseberg|Gröna Lund|Kolmården|Furuvik
+1|Vilken flod rinner genom Egypten?|Nilen|Amazonas|Donau|Tigris
+1|Vilket är världens största land till ytan?|Ryssland|Kanada|Kina|USA
+1|Vilket land har lönnlöv på flaggan?|Kanada|USA|Schweiz|Australien
+1|Vilket djur bygger dammar i vattendrag?|Bäver|Utter|Mink|Bisamråtta
+1|Vilket djur sover ofta upp och ner?|Fladdermus|Uggla|Papegoja|Ekorre
+1|Vilket djur har en pung för sina ungar?|Känguru|Elefant|Giraff|Zebra
+1|Vilket djur är känt för att vara långsamt?|Sengångare|Gepard|Hare|Ekorre
+1|Vilket djur kan spruta bläck?|Bläckfisk|Manet|Sjöstjärna|Krabba
+1|Vad kallas en hästunge?|Föl|Kalv|Lamm|Killing
+1|Vad kallas en ko-unge?|Kalv|Föl|Killing|Valp
+1|Vad kallas en fårunge?|Lamm|Kalv|Killing|Föl
+1|Vilket djur spinner när det trivs?|Katt|Hund|Kanin|Hamster
+1|Vilket djur är känt för svartvit päls och bambu?|Panda|Zebra|Grävling|Skunk
+1|Vilket träd har ekollon?|Ek|Björk|Lönn|Bok
+1|Vilken blomma förknippas ofta med kärlek och taggar?|Ros|Tulpan|Lilja|Solros
+1|Vad kallas vatten som faller från moln?|Regn|Dimma|Dagg|Frost
+1|Vad kallas H2O i vardagligt språk?|Vatten|Väte|Syre|Salt
+1|Vilken kroppsdel skyddar hjärnan?|Skallen|Revbenen|Ryggraden|Bäckenet
+1|Vid vilken temperatur fryser vatten normalt?|0 grader Celsius|-10 grader Celsius|4 grader Celsius|-4 grader Celsius
+1|Vid vilken temperatur kokar vatten vid havsnivå?|100 grader Celsius|90 grader Celsius|120 grader Celsius|80 grader Celsius
+1|Vilken planet har tydliga ringar?|Saturnus|Mars|Venus|Merkurius
+1|Vad kallades pestepidemin på medeltiden?|Digerdöden|Spanska sjukan|Svarta febern|Stora farsoten
+1|Vilket land hade samurajer?|Japan|Kina|Korea|Mongoliet
+1|Vad hette muren som delade Berlin?|Berlinmuren|Kinesiska muren|Järnridån|Hadrianus mur
+1|Vilken superhjälte är Peter Parker?|Spider-Man|Batman|Iron Man|Superman
+1|Vilken superhjälte är Clark Kent?|Superman|Batman|Spider-Man|The Flash
+1|Vilken Disneyfilm handlar om Simba?|Lejonkungen|Djungelboken|Bambi|Tarzan
+1|Vad heter prinsessan i Skönheten och odjuret?|Belle|Ariel|Jasmine|Aurora
+1|Vilken bokserie utspelar sig på Hogwarts?|Harry Potter|Narnia|Sagan om ringen|Percy Jackson
+1|Vilken artist kallas The King of Pop?|Michael Jackson|Elvis Presley|Prince|Justin Timberlake
+1|Vad heter Marios bror?|Luigi|Wario|Toad|Yoshi
+1|Vilket spel har figuren Pikachu?|Pokémon|Super Mario|Zelda|Minecraft
+1|Vilket brädspel går ut på att köpa gator och bygga hus?|Monopol|Fia med knuff|Trivial Pursuit|Alfapet
+1|Vad heter katten som älskar lasagne?|Gustaf|Findus|Tom|Pelle Svanslös
+1|Vad heter björnen som älskar honung i Sjumilaskogen?|Nalle Puh|Bamse|Baloo|Paddington
+1|Vilken figur bor i en ananas under havet?|SvampBob Fyrkant|Patrick Stjärna|Nemo|Ariel
+1|Vilken superhjälte har en sköld med en stjärna?|Captain America|Thor|Iron Man|Hulken
+1|Vad heter draken i Bolibompa?|Bolibompadraken|Fnurra|Ludde|Smaug
+1|Vilken färg har smurfarna?|Blå|Gröna|Röda|Gula
+1|Vad kallas tre mål av samma spelare i en match?|Hattrick|Trippel|Hole in one|Strike
+1|Vilken sport har sadel och hinder?|Ridning|Cykling|Häcklöpning|Gymnastik
+1|Vilken sport spelas i NBA?|Basket|Ishockey|Amerikansk fotboll|Baseboll
+1|Vilken sport spelas i NHL?|Ishockey|Basket|Baseboll|Fotboll
+1|Vilken sport åker man Vasaloppet i?|Längdskidor|Skridskor|Utförsåkning|Cykling
+1|Hur många perioder spelas normalt i ishockey?|3|2|4|5
+1|Vad kallas det när kungen hotas i schack?|Schack|Matt|Patt|Rockad
+1|Vilken frukt är huvudingrediens i guacamole?|Avokado|Lime|Tomat|Mango
+1|Vilket land förknippas med tacos?|Mexiko|Spanien|Brasilien|Argentina
+1|Vilket land förknippas med croissanter?|Frankrike|Italien|Belgien|Schweiz
+1|Vilken krydda gör saffransbullar gula?|Saffran|Gurkmeja|Kardemumma|Kanel
+1|Vad heter japansk rätt med ris och ofta rå fisk?|Sushi|Ramen|Tempura|Pad thai
+1|Vilken frukt torkas till russin?|Druva|Plommon|Aprikos|Fikon
+1|Vilket spannmål används till popcorn?|Majs|Ris|Vete|Havre
+1|Vilken grönsak är huvudingrediens i ketchup?|Tomat|Paprika|Morot|Rödbeta
+1|Vad heter redskapet man använder för att riva ost?|Rivjärn|Osthyvel|Durkslag|Visp
+1|Vad använder man för att öppna en konservburk?|Konservöppnare|Kapsylöppnare|Korkskruv|Vitlökspress
+1|Vad heter Apples mobiltelefon?|iPhone|Galaxy|Pixel|iPad
+1|Vilket företag gör operativsystemet Windows?|Microsoft|Apple|Google|IBM
+1|Vad heter Googles webbläsare?|Chrome|Safari|Firefox|Edge
+1|Vad heter symbolen @ på svenska?|Snabel-a|Kanelbulle-a|Krok-a|Snurr-a
+1|Vad används en powerbank till?|Att ladda batterier/enheter|Att spara pengar|Att lagra filer|Att förstärka wifi
+1|Vilken typ av fil slutar ofta med .jpg?|Bildfil|Ljudfil|Textfil|Videofil
+1|Vilken typ av fil slutar ofta med .mp3?|Ljudfil|Bildfil|Textfil|Videofil
+1|Vad är app en förkortning av?|Applikation|Apparat|Approach|Appendix
+1|Vad heter skärmen man trycker på med fingret?|Pekskärm|Plattskärm|Bildskärm|Storbildsskärm
+1|Vad används hörlurar till?|Att lyssna på ljud|Att ladda mobilen|Att mäta puls|Att ta bilder
+1|Vad gör en laddare?|Laddar batteri|Spelar musik|Kopplar upp wifi|Kyler mobilen
+1|Vad heter huvudstaden i Portugal?|Lissabon|Porto|Madrid|Sevilla
+1|Vad heter huvudstaden i Irland?|Dublin|Belfast|Cork|Edinburgh
+1|Vad heter huvudstaden i Grekland?|Aten|Thessaloniki|Sparta|Korfu
+1|Vad heter huvudstaden i Polen?|Warszawa|Kraków|Gdańsk|Prag
+1|Vilken form har tre hörn?|Triangel|Kvadrat|Cirkel|Rektangel
+1|Vilken form har fyra lika långa sidor?|Kvadrat|Rektangel|Triangel|Trapets
+1|Vad är hälften av 50?|25|20|30|15
+1|Vad heter hej på engelska?|Hello|Hola|Bonjour|Ciao
+1|Vilken är sista bokstaven i svenska alfabetet?|Ö|Ä|Å|Z
+1|Vilken dag kommer före tisdag?|Måndag|Onsdag|Söndag|Torsdag
+1|Vilken månad kommer efter april?|Maj|Mars|Juni|Juli
+1|Vad heter platsen där flygplan startar och landar?|Flygplats|Hamn|Station|Depå
+1|Vad kallas platsen där man lånar böcker?|Bibliotek|Bokhandel|Arkiv|Museum
+1|Vad är motsatsen till varm?|Kall|Het|Ljum|Blöt
+1|Vad är motsatsen till lång?|Kort|Smal|Hög|Bred
+1|Vilket djur är Bamse?|Björn|Hund|Lejon|Katt
+1|Vad äter Bamse för att bli stark?|Dunderhonung|Spenat|Magisk gröt|Trollsoppa
+1|Vilket djur är Kalle Anka?|Anka|Gås|Svan|Kyckling
+1|Vad kallas ett videosamtal med flera personer?|Videomöte|Podcast|Livestream|Gruppchatt
+2|Vilket land har flest invånare i världen?|Indien|Kina|USA|Indonesien
+2|Vad heter världens högsta berg?|Mount Everest|K2|Kilimanjaro|Mont Blanc
+2|Vilket grundämne har kemisk beteckning O?|Syre|Kol|Väte|Kväve
+2|Vilken planet är närmast solen?|Merkurius|Venus|Mars|Jorden
+2|Vilken stad kallas ofta för Den eviga staden?|Rom|Aten|Jerusalem|Paris
+2|Hur många hjärtan har en bläckfisk?|3|1|2|4
+2|Vilket hav ligger mellan Europa och Afrika?|Medelhavet|Röda havet|Svarta havet|Kaspiska havet
+2|Vilket land uppfann pizzan?|Italien|Grekland|USA|Frankrike
+2|Vilket språk talas i Brasilien?|Portugisiska|Spanska|Brasilianska|Franska
+2|Vad heter världens största ö?|Grönland|Madagaskar|Borneo|Island
+2|Vilket djur är snabbast på land?|Gepard|Lejon|Antilop|Struts
+2|Hur många ben har en insekt?|6|8|4|10
+2|Vad heter huvudstaden i Kanada?|Ottawa|Toronto|Vancouver|Montréal
+2|Vilket instrument har 88 tangenter?|Piano|Dragspel|Xylofon|Cembalo
+2|Vilken gas andas vi ut mer av än vi andas in?|Koldioxid|Syre|Kväve|Väte
+2|Vad heter Harry Potters uggla?|Hedwig|Errol|Hermes|Krumben
+2|Vilken är världens längsta flod?|Nilen|Amazonas|Mississippi|Yangtze
+2|Vilket land har formen av en stövel?|Italien|Chile|Norge|Portugal
+2|Vad heter valutan i Japan?|Yen|Yuan|Won|Baht
+2|Vem målade Mona Lisa?|Leonardo da Vinci|Michelangelo|Rafael|Vincent van Gogh
+2|Vilken metall är huvudingrediensen i stål?|Järn|Aluminium|Koppar|Nickel
+2|Vad heter huvudstaden i Australien?|Canberra|Sydney|Melbourne|Perth
+2|Hur många dagar har ett skottår?|366|365|364|367
+2|Vilket djur är känt för sitt goda minne?|Elefant|Guldfisk|Delfin|Papegoja
+2|Vilken stad ligger Eiffeltornet i?|Paris|Lyon|Bryssel|Marseille
+2|Vilket århundrade lever vi i nu?|2000-talet|1900-talet|2100-talet|2200-talet
+2|Hur många kontinenter finns det?|7|5|6|8
+2|Vilket land gav oss sushin?|Japan|Kina|Thailand|Korea
+2|Vilket grundämne har symbolen Au?|Guld|Silver|Aluminium|Argon
+2|Vem skrev Romeo och Julia?|William Shakespeare|Charles Dickens|Oscar Wilde|Jane Austen
+2|Vilken sport utövar man i Wimbledon?|Tennis|Golf|Cricket|Badminton
+2|Hur många strängar har en vanlig gitarr?|6|4|5|8
+2|Vad heter huvudstaden i Spanien?|Madrid|Barcelona|Sevilla|Valencia
+2|Vilken fågel kan inte flyga och lever på Antarktis?|Pingvin|Struts|Kiwi|Lunnefågel
+2|Vem uppfann telefonen?|Alexander Graham Bell|Thomas Edison|Nikola Tesla|Guglielmo Marconi
+2|Hur många minuter är två timmar?|120|100|90|200
+2|Vad heter världens största regnskog?|Amazonas|Kongo|Borneo|Daintree
+2|Vilken färg har smaragder oftast?|Grön|Röd|Blå|Lila
+2|Vilken stad är känd för Big Ben?|London|Edinburgh|Dublin|Manchester
+2|Vad heter huvudstaden i Norge?|Oslo|Bergen|Trondheim|Stavanger
+2|Vilket djur producerar honung?|Bi|Fjäril|Myra|Geting
+2|Vad heter valutan i USA?|Dollar|Pund|Euro|Peso
+2|Vilket är det största kattdjuret i världen?|Tiger|Lejon|Jaguar|Leopard
+2|Vilken ocean ligger mellan Amerika och Europa?|Atlanten|Stilla havet|Indiska oceanen|Norra ishavet
+2|Vad mäter man med en termometer?|Temperatur|Lufttryck|Luftfuktighet|Vindstyrka
+2|Vilken sport innehåller en touchdown?|Amerikansk fotboll|Baseboll|Basket|Ishockey
+2|Vad heter världens minsta land?|Vatikanstaten|Monaco|San Marino|Liechtenstein
+2|Vilken stad är Sveriges näst största?|Göteborg|Malmö|Uppsala|Västerås
+2|Vilken dryck görs av druvor?|Vin|Öl|Cider|Sake
+2|Vilket grundämne har symbolen Ag?|Silver|Guld|Argon|Aluminium
+2|Vem skrev Karlsson på taket?|Astrid Lindgren|Gunilla Bergström|Tove Jansson|Selma Lagerlöf
+2|Vad heter huvudstaden i Finland?|Helsingfors|Åbo|Tammerfors|Uleåborg
+2|Vilket djur är känt för sina svarta och vita ränder?|Zebra|Panda|Tiger|Dalmatiner
+2|Vilken är den längsta månaden?|Ingen, flera har 31 dagar|Januari|Juli|Augusti
+2|Vilken sport tävlar man i under Tour de France?|Cykling|Löpning|Motorsport|Segling
+2|Vad heter havet mellan Sverige och Baltikum?|Östersjön|Nordsjön|Skagerrak|Kattegatt
+2|Vilken färg har safirer oftast?|Blå|Röd|Grön|Gul
+2|Vilken är världens största öken?|Antarktis|Sahara|Gobi|Arabiska öknen
+2|Vad heter huvudstaden i Tyskland?|Berlin|München|Hamburg|Frankfurt
+2|Hur många kort finns i en vanlig kortlek?|52|56|50|48
+2|Vad heter världens största korallrev?|Stora barriärrevet|Röda havets rev|Belizerevet|Maldivernas rev
+2|Vilket land är känt för tulpaner?|Nederländerna|Belgien|Danmark|Tyskland
+2|Vad heter valutan i Storbritannien?|Pund|Euro|Dollar|Krona
+2|Vilket organ används för att andas?|Lungorna|Levern|Magen|Njurarna
+2|Vilken stad är känd för operahuset med segelliknande tak?|Sydney|Oslo|Wien|Milano
+2|Vad heter huvudstaden i Danmark?|Köpenhamn|Århus|Odense|Aalborg
+2|Vilken sport förknippas med Ryder Cup?|Golf|Tennis|Segling|Cricket
+2|Vilket land har pyramiderna i Giza?|Egypten|Mexiko|Sudan|Marocko
+2|Vilket är världens största landlevande däggdjur?|Afrikansk elefant|Noshörning|Flodhäst|Giraff
+2|Vad heter världens djupaste ocean?|Stilla havet|Atlanten|Indiska oceanen|Södra ishavet
+2|Vilken svensk möbelkedja grundades av Ingvar Kamprad?|IKEA|Mio|Jysk|Bauhaus
+2|Vad heter huvudstaden i Island?|Reykjavik|Akureyri|Tórshavn|Nuuk
+2|Vilken sport utövar man på en rink med puck?|Ishockey|Curling|Bandy|Konståkning
+2|Vad heter floden som rinner genom London?|Themsen|Seine|Donau|Rhen
+2|Vilken kontinent ligger Egypten främst i?|Afrika|Asien|Europa|Oceanien
+2|Hur många månader har 28 dagar?|Alla 12|1|2|6
+2|Vad heter världens största däggdjur?|Blåval|Afrikansk elefant|Kaskelot|Späckhuggare
+2|Vilket land kommer fetaost ursprungligen från?|Grekland|Turkiet|Italien|Cypern
+2|Vad heter huvudstaden i Schweiz?|Bern|Zürich|Genève|Basel
+2|Vad heter Sveriges högsta berg?|Kebnekaise|Sarektjåkkå|Åreskutan|Helags
+2|Vilken svensk ö är störst?|Gotland|Öland|Orust|Hisingen
+2|Vilket landskap är känt för raukar?|Gotland|Dalsland|Bohuslän|Blekinge
+2|Vilken stad är känd för Almedalsveckan?|Visby|Kalmar|Ystad|Båstad
+2|Mellan vilka orter går Vasaloppet?|Sälen och Mora|Mora och Falun|Sälen och Leksand|Idre och Mora
+2|Vilken sjö ligger intill Jönköping?|Vättern|Vänern|Mälaren|Siljan
+2|Vilken sjö ligger intill Karlstad?|Vänern|Vättern|Hjälmaren|Siljan
+2|Vilken kanal förbinder Medelhavet med Röda havet?|Suezkanalen|Panamakanalen|Kielkanalen|Göta kanal
+2|Vilken kanal förbinder Atlanten och Stilla havet?|Panamakanalen|Suezkanalen|Kielkanalen|Korinthkanalen
+2|Vilken bergskedja ligger mellan Frankrike och Spanien?|Pyrenéerna|Alperna|Apenninerna|Karpaterna
+2|Vilken bergskedja går genom Sydamerika?|Anderna|Klippiga bergen|Himalaya|Alperna
+2|Vilken flod rinner genom Paris?|Seine|Loire|Rhen|Rhône
+2|Vilken flod rinner genom Rom?|Tibern|Po|Arno|Donau
+2|Vilken är världens minsta ocean?|Norra ishavet|Indiska oceanen|Södra ishavet|Atlanten
+2|Vilket land kallas ofta soluppgångens land?|Japan|Kina|Thailand|Australien
+2|Vilken kontinent är minst?|Australien/Oceanien|Europa|Antarktis|Sydamerika
+2|Vilket land ligger både i Europa och Asien?|Turkiet|Grekland|Iran|Egypten
+2|Vilken fågel är störst i världen?|Struts|Kondor|Albatross|Emu
+2|Vilken insekt gör silke?|Silkesmask|Bi|Myra|Gräshoppa
+2|Vilken insekt lyser i mörkret?|Eldfluga|Nattfjäril|Trollslända|Mygga
+2|Vilket träd har kottar och barr?|Gran eller tall|Björk|Ek|Lönn
+2|Vad kallas ett stort snöras från ett berg?|Lavin|Jordskred|Glaciär|Snöstorm
+2|Vad heter kroppens största organ?|Huden|Levern|Lungorna|Hjärnan
+2|Vad kallas kraften som gör att saker faller mot marken?|Gravitation|Friktion|Magnetism|Tröghet
+2|Vad heter processen där växter gör energi av solljus?|Fotosyntes|Fermentering|Förbränning|Osmos
+2|Vad heter ämnet som gör växter gröna?|Klorofyll|Karoten|Kollagen|Keratin
+2|Vad mäter en barometer?|Lufttryck|Luftfuktighet|Temperatur|Vindhastighet
+2|Vilket organ renar blodet och producerar urin?|Njurarna|Levern|Mjälten|Gallblåsan
+2|Vilket vitamin hjälper solljus kroppen att bilda?|D-vitamin|C-vitamin|A-vitamin|B12-vitamin
+2|Vad kallas djur som äter både växter och kött?|Allätare|Rovdjur|Växtätare|Asätare
+2|Vad kallas ett djur som är aktivt på natten?|Nattdjur|Flyttdjur|Kallblodigt djur|Dagdjur
+2|Vad heter vår galax?|Vintergatan|Andromeda|Orion|Karlavagnen
+2|Vad kallas en sten från rymden som landar på jorden?|Meteorit|Komet|Asteroid|Satellit
+2|Vad kallas en stjärna som exploderar?|Supernova|Svart hål|Nebulosa|Pulsar
+2|Vilken stad begravdes av vulkanen Vesuvius år 79?|Pompeji|Neapel|Rom|Atlantis
+2|Vilket år började andra världskriget?|1939|1914|1941|1936
+2|Vilket år slutade andra världskriget?|1945|1944|1918|1949
+2|Vilken uppfinning förknippas ofta med Johannes Gutenberg?|Boktryckarkonsten|Ångmaskinen|Kompassen|Glödlampan
+2|Vilken svensk uppfinnare uppfann dynamiten?|Alfred Nobel|Anders Celsius|Carl von Linné|Baltzar von Platen
+2|Vad kallades vikingarnas skepp ofta?|Långskepp|Galeon|Kogg|Fregatt
+2|Vilket imperium förknippas med Julius Caesar?|Romarriket|Osmanska riket|Bysantinska riket|Perserriket
+2|Vilken historisk period kom efter stenåldern?|Bronsåldern|Järnåldern|Medeltiden|Vikingatiden
+2|Vilken typ av fartyg reste många emigranter till Amerika med i slutet av 1800-talet?|Ångfartyg|Ubåt|Hangarfartyg|Flygbåt
+2|Vad heter hobbitarnas hemtrakt i Sagan om ringen?|Fylke|Mordor|Gondor|Vattnadal
+2|Vem skrev böckerna om Mumintrollen?|Tove Jansson|Astrid Lindgren|Elsa Beskow|Sven Nordqvist
+2|Vilken musikgenre förknippas med Bob Marley?|Reggae|Jazz|Blues|Soul
+2|Vilken filmserie har en trollkarl som heter Gandalf?|Sagan om ringen|Harry Potter|Narnia|Star Wars
+2|Vem skapade Sherlock Holmes?|Arthur Conan Doyle|Agatha Christie|Edgar Allan Poe|Charles Dickens
+2|Vilken sport använder ordet love för noll?|Tennis|Golf|Bowling|Volleyboll
+2|Vilken sport använder en fjäderboll?|Badminton|Tennis|Squash|Pingis
+2|Hur många spelare har ett handbollslag på planen, inklusive målvakt?|7|6|11|5
+2|Vilken sport använder termen birdie?|Golf|Tennis|Bowling|Curling
+2|Hur många rutor finns på ett schackbräde?|64|81|100|49
+2|Vilken schackpjäs kan hoppa över andra pjäser?|Springaren|Löparen|Tornet|Damen
+2|Hur många färger har korten i UNO?|4|5|3|6
+2|Vad heter tärningsspelet där man vill få fem lika?|Yatzy|Fia|Poker|Mäxla
+2|Vilken grönsak används ofta till surkål?|Kål|Gurka|Morot|Lök
+2|Vad heter pastasorten formad som små rör?|Penne|Farfalle|Fusilli|Tagliatelle
+2|Vilken böna görs tofu oftast av?|Sojaböna|Kidneyböna|Kikärta|Bondböna
+2|Vad heter kikärtsröran från Mellanöstern?|Hummus|Tzatziki|Guacamole|Baba ganoush
+2|Vilken nöt används i marsipan?|Mandel|Hasselnöt|Valnöt|Cashew
+2|Vad används QR-koder oftast till?|Att öppna information eller en länk|Att ladda telefonen|Att betala skatt|Att mäta avstånd
+2|Vad används Bluetooth till?|Trådlös anslutning mellan enheter|Att ladda batterier|Att ringa nödsamtal|Att bleka tänder
+2|Vad kallas det att spara filer på internet?|Molnlagring|Streaming|Nedladdning|Brandvägg
+2|Vad används GPS till i vardagen?|Navigering och positionering|Att ringa samtal|Att betala|Att skicka sms
+2|Vad heter huvudstaden i Österrike?|Wien|Salzburg|Graz|Innsbruck
+2|Vad heter huvudstaden i Nederländerna?|Amsterdam|Rotterdam|Utrecht|Eindhoven
+2|Vad heter huvudstaden i Belgien?|Bryssel|Antwerpen|Brygge|Gent
+2|Vad heter huvudstaden i Tjeckien?|Prag|Brno|Ostrava|Pilsen
+2|Vad heter huvudstaden i Ungern?|Budapest|Debrecen|Bukarest|Wien
+2|Vad heter huvudstaden i Kroatien?|Zagreb|Split|Dubrovnik|Belgrad
+2|Vad heter huvudstaden i Turkiet?|Ankara|Istanbul|Izmir|Antalya
+2|Vad heter huvudstaden i Thailand?|Bangkok|Phuket|Hanoi|Chiang Mai
+2|Vad heter huvudstaden i Sydkorea?|Seoul|Busan|Pyongyang|Tokyo
+2|Vad heter huvudstaden i Kina?|Peking|Shanghai|Hongkong|Guangzhou
+2|Vad heter huvudstaden i Indien?|New Delhi|Mumbai|Kolkata|Bangalore
+2|Vad heter huvudstaden i Mexiko?|Mexico City|Cancún|Guadalajara|Monterrey
+2|Vad heter huvudstaden i Argentina?|Buenos Aires|Córdoba|Montevideo|Rosario
+2|Vad heter huvudstaden i Chile?|Santiago|Valparaíso|Lima|Concepción
+2|Vad heter huvudstaden i Sydafrika?|Pretoria|Johannesburg|Durban|Port Elizabeth
+2|Vad heter huvudstaden i Kenya?|Nairobi|Mombasa|Addis Abeba|Kampala
+2|Vad heter huvudstaden i Egypten?|Kairo|Alexandria|Luxor|Giza
+2|Vad heter huvudstaden i Marocko?|Rabat|Casablanca|Marrakech|Fès
+2|Vad heter huvudstaden i Nya Zeeland?|Wellington|Auckland|Christchurch|Queenstown
+2|Vad heter huvudstaden i Indonesien?|Jakarta|Surabaya|Bandung|Manila
+2|Vad heter huvudstaden i Vietnam?|Hanoi|Ho Chi Minh-staden|Da Nang|Bangkok
+2|Vad heter huvudstaden i Filippinerna?|Manila|Cebu|Davao|Jakarta
+2|Vad heter huvudstaden i Peru?|Lima|Cusco|Quito|La Paz
+2|Vad heter huvudstaden i Colombia?|Bogotá|Medellín|Cartagena|Caracas
+2|Vad heter huvudstaden i Saudiarabien?|Riyadh|Jeddah|Mecka|Dubai
+2|Vad heter huvudstaden i Ukraina?|Kyiv|Lviv|Odessa|Charkiv
+2|Vad heter huvudstaden i Estland?|Tallinn|Tartu|Riga|Pärnu
+2|Vad heter huvudstaden i Lettland?|Riga|Vilnius|Tallinn|Jūrmala
+2|Vad heter huvudstaden i Litauen?|Vilnius|Kaunas|Riga|Klaipėda
+2|Vad heter huvudstaden i Malta?|Valletta|Mdina|Nicosia|Sliema
+2|Vad heter huvudstaden i Slovakien?|Bratislava|Košice|Prag|Wien
+2|Var finns Colosseum?|Rom|Aten|Neapel|Milano
+2|Var finns Frihetsgudinnan?|New York|Washington D.C.|Boston|Chicago
+2|Var finns Taj Mahal?|Indien|Pakistan|Nepal|Bangladesh
+2|Var finns Machu Picchu?|Peru|Bolivia|Mexiko|Chile
+2|Var finns Akropolis?|Aten|Rom|Istanbul|Sparta
+2|Var finns Sagrada Família?|Barcelona|Madrid|Lissabon|Sevilla
+2|Var finns Burj Khalifa?|Dubai|Abu Dhabi|Doha|Riyadh
+2|Var finns Lutande tornet?|Pisa|Florens|Venedig|Rom
+2|Var finns Kristusstatyn Christ the Redeemer?|Rio de Janeiro|São Paulo|Buenos Aires|Lima
+2|Var finns Petra?|Jordanien|Egypten|Israel|Syrien
+2|Var finns Stonehenge?|England|Skottland|Irland|Wales
+2|Var finns Versailles?|Frankrike|Belgien|Österrike|Spanien
+2|Var finns Mount Rushmore?|USA|Kanada|Mexiko|Australien
+2|Var finns Den förbjudna staden?|Peking|Tokyo|Seoul|Shanghai
+2|Vad heter valutan i EU-länderna i euroområdet?|Euro|Krona|Pund|Franc
+2|Vad heter valutan i Norge?|Norsk krona|Euro|Dansk krona|Mark
+2|Vad heter valutan i Danmark?|Dansk krona|Euro|Norsk krona|Gulden
+2|Vad heter valutan i Schweiz?|Schweizerfranc|Euro|Schweizisk krona|Mark
+2|Vad heter valutan i Kina?|Yuan|Yen|Won|Rupie
+2|Vad heter valutan i Mexiko?|Peso|Real|Dollar|Escudo
+2|Vad heter valutan i Brasilien?|Real|Peso|Escudo|Dollar
+2|Vad heter valutan i Indien?|Rupie|Rand|Yuan|Dinar
+2|Vad heter valutan i Sydkorea?|Won|Yen|Yuan|Baht
+2|Vad heter valutan i Thailand?|Baht|Dong|Ringgit|Yen
+2|Vad heter valutan i Polen?|Złoty|Euro|Forint|Koruna
+2|Vad heter valutan i Tjeckien?|Tjeckisk koruna|Euro|Złoty|Forint
+2|Vad heter valutan i Turkiet?|Lira|Euro|Dinar|Rial
+2|Vad heter valutan i Australien?|Australisk dollar|Pund|Nyzeeländsk dollar|Euro
+2|Vad heter valutan i Kanada?|Kanadensisk dollar|Amerikansk dollar|Euro|Pund
+2|Vilket land har en flagga med en röd cirkel på vit bakgrund?|Japan|Kina|Sydkorea|Bangladesh
+2|Vilket land har en flagga med grönt, gult och blått?|Brasilien|Jamaica|Sverige|Ukraina
+2|Vilket land har en kvadratisk flagga med ett vitt kors på röd bakgrund?|Schweiz|Österrike|Polen|Kanada
+2|Vilket land har en flagga med blåa och vita ränder och ett vitt kors i hörnet?|Grekland|Finland|Israel|Argentina
+2|Vilket land har en flagga med ett rött, vitt och blått kors på röd bakgrund?|Norge|Danmark|Finland|Sverige
+2|Vilket land har en flagga med ett vitt kors på röd bakgrund, där korset är förskjutet åt vänster?|Danmark|Schweiz|England|Finland
+2|Vilket land har en flagga med ett blått kors på vit bakgrund?|Finland|Sverige|Grekland|Danmark
+2|Vilket land har en flagga med stjärnor och ränder?|USA|Australien|Kanada|Storbritannien
+2|Vilket land har Union Jack som flagga?|Storbritannien|Irland|Kanada|USA
+2|Hur många grader har en rät vinkel?|90 grader|180 grader|45 grader|360 grader
+2|Vad heter en form med fem sidor?|Pentagon|Hexagon|Oktagon|Trapets
+2|Hur många prickar finns totalt på en vanlig tärning?|21|18|24|36
+2|Vad är 7 gånger 8?|56|54|48|64
+2|Vilket svenskt ord blir samma baklänges: kajak eller stol?|Kajak|Stol|Båda|Inget av dem
+2|Vad heter plural av mus?|Möss|Musar|Muser|Mössor
+2|Vad heter ordklassen för något man gör?|Verb|Substantiv|Adjektiv|Adverb
+2|Hur många veckor är det ungefär på ett år?|52|48|56|60
+2|Hur många minuter är ett dygn?|1440|1200|1600|2400
+2|Vad heter dokumentet man ofta behöver för att resa utomlands?|Pass|Körkort|Personbevis|Betyg
+2|Vad kallas pengar man betalar till staten?|Skatt|Ränta|Lön|Hyra
+2|Vad kallas en bild på datorskärmen som visar ett program?|Ikon|Pixel|Fönster|Markör
+2|Vad heter en tunn fransk pannkaka?|Crêpe|Croissant|Baguette|Våffla
+2|Vilken ost är vanlig på pizza?|Mozzarella|Brie|Ädelost|Västerbottensost
+2|Vilken sport har en green?|Golf|Tennis|Fotboll|Bowling
+2|Vilken stad ligger vid Vättern och är känd för tändstickor?|Jönköping|Motala|Vadstena|Askersund
+2|Vad kallas de små byggstenar som allt levande består av?|Celler|Mineraler|Kristaller|Fibrer

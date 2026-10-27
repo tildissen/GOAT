@@ -1,0 +1,11 @@
+# Vems är bilden? – en hemlig spelare laddar upp en bild, alla andra gissar vems den är.
+# Fel gissning = dricka. Gissar alla rätt dricker den som laddade upp.
+# Format: kategori|uppmaning
+casual|Ladda upp den 10:e senaste bilden i din kamerarulle.
+casual|Ladda upp den senaste skärmdumpen du tog.
+casual|Ladda upp den senaste bilden du tog på mat.
+party|Ladda upp den senaste bilden från en fest.
+party|Ladda upp den senaste bilden i kamerarullen där du inte själv är med.
+cheeky|Ladda upp den 20:e bilden i dina favoriter.
+cheeky|Ladda upp den senaste selfien du skickade till någon.
+dirty|Ladda upp den mest pinsamma bilden du har på dig själv.

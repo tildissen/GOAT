@@ -1,0 +1,31 @@
+# Frågor till en person – bara den vars tur det är ser frågan.
+# Format: kategori|fråga
+casual|Vilket är det sämsta rådet du någonsin följt och faktiskt ångrat?
+casual|Berätta om en gång du ljög och det gick fullständigt åt skogen.
+casual|Vilket är det mest generande du har googlat?
+casual|Berätta om den värsta lögnen du berättat för dina föräldrar.
+party|Berätta om din värsta fyllehistoria som du inte har berättat för dina föräldrar.
+party|Vilket är det konstigaste stället du har somnat på efter en fest?
+party|Berätta om en gång du sa något på fyllan som du inte kan ta tillbaka.
+party|Vilket är det mest desperata du gjort för att ta dig in på en krog?
+party|Berätta om en person du hånglade med på en fest och sedan mötte igen på det mest obekväma stället.
+cheeky|Berätta om den mest genomtänkta stalkingen du gjort på sociala medier.
+cheeky|Vilket är det mest genomskinliga flörtförsöket du gjort som inte funkade alls?
+cheeky|Berätta om en gång du var intresserad av någon i den här gruppen.
+cheeky|Vilket är det fegaste sättet du någonsin har avvisat någon på?
+cheeky|Vem är snyggast i stan enligt dig?
+cheeky|Vilket par tror du kommer att göra slut?
+cheeky|Berätta om en gång du låtsades vara intresserad av en person bara för att du var uttråkad.
+dirty|Berätta om ditt första ligg – hur katastrofalt var det egentligen?
+dirty|Vilket är det konstigaste stället du haft sex på?
+dirty|Berätta om den mest pinsamma sexuella missförståelsen du råkat ut för.
+dirty|Vilket är det vildaste du gjort som du aldrig skulle berätta för din familj?
+dirty|Berätta om en gång du försökte vara sexig men det gick helt åt fel håll.
+dirty|Vilket är det konstigaste någon sagt till dig i en intim situation?
+dirty|Vilket är ditt bästa ligg?
+dirty|Vilket par tror du har snuskigast sex?
+dirty|Vem i stan vill du gå hem med ikväll?
+framtid|Vilket livsval tror du att du kommer ångra mest om tio år?
+framtid|Berätta om din hemliga plan B – det du skulle göra om allt annat fallerade.
+framtid|Om du visste att ingen dömde dig, vad hade du gjort annorlunda i livet redan nu?
+framtid|Vilket är det mest orealistiska drömscenario du faktiskt fortfarande hoppas på?
