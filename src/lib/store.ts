@@ -123,7 +123,12 @@ class SupabaseStore implements Store {
     try {
       await fetch(`${this.url}/realtime/v1/api/broadcast`, {
         method: 'POST',
-        headers: { apikey: this.key, Authorization: `Bearer ${this.key}`, 'Content-Type': 'application/json' },
+        headers: {
+          apikey: this.key,
+          // De nya nycklarna (sb_secret_…) är inga JWT och ska inte skickas som Bearer.
+          ...(this.key.startsWith('eyJ') ? { Authorization: `Bearer ${this.key}` } : {}),
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ messages: [{ topic: `game-${code}`, event: 'update', payload: { version } }] }),
       });
     } catch (err) {
