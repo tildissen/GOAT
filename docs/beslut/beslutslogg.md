@@ -179,3 +179,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B35. Alla beslut registreras i GitHub
 - **Beslut:** Alla beslut Tilda tar skrivs in i den här mappen (`docs/beslut/`) i repot.
 - **Var:** [`CLAUDE.md`](../../CLAUDE.md) säger åt framtida Claude-sessioner att fortsätta föra loggen.
+
+### B36. Smileyn finns som SVG-fil
+- **Beslut:** Smileyn från `smile.png` ritades om som vektorfil, `smile.svg`, med transparent bakgrund.
+- **Tillägg (av Claude):** Filen ligger bredvid `smile.png` i repots rot och används inte av spelet. Ansiktet i spelet ritas redan som SVG i [`src/components/Face.tsx`](../../src/components/Face.tsx).
+- **Var i koden:** [`smile.svg`](../../smile.svg).
