@@ -607,3 +607,6 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 
 /* Rubrik ovanför dricka/spara/utmaningskort på utmaningar och minigames */
 .choice-prompt { margin: 6px 0 0; font-size: 17px; font-weight: 700; text-align: center; }
+
+/* Spelarnamn som står stort (vem som röstades fram, vems tur det är) skrivs i Knewave. */
+.name-font { font-family: var(--font-knewave), var(--font-glacial), system-ui, sans-serif; font-weight: 400; letter-spacing: 0.01em; }

@@ -271,3 +271,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** All stor text (rubriker, spelarnamn på resultatkorten och liknande) byter från Playfair Display i kursiv till Glacial Indifference i fet stil. Knewave finns kvar på G.O.A.T och "Låt oss spela".
 - **Ersätter:** den del av B39 som lät Playfair vara kvar på skärmrubriker.
 - **Var i koden:** `.display` i [`src/app/globals.css`](../../src/app/globals.css), [`src/app/layout.tsx`](../../src/app/layout.tsx).
+
+### B44. Knewave på stora spelarnamn
+- **Beslut:** Spelarnamn som står stort skrivs i Knewave: den som röstas fram på resultatkortet, "Elsas tur" när någon annan spelar, namnet på ditt utmaningskort och namnet över din egen fråga eller utmaning.
+- **Tillägg (av Claude):** Övriga namn (topplistor, knappar, rösta-knapparna) är kvar i Glacial Indifference.
+- **Var i koden:** `.name-font` i [`src/app/globals.css`](../../src/app/globals.css), [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
