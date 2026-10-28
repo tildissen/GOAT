@@ -425,6 +425,13 @@ export function toPublic(s: GameState, viewerId: string | null): PublicState {
     if (cur.phase === 'voting') {
       cur.votes = Object.fromEntries(Object.entries(cur.votes).map(([voter, target]) => [voter, voter === viewerId ? target : '']));
     }
+    if (cur.phase === 'result') {
+      // Efter röstningen syns bara hur många röster var och en fick – inte vem som röstade på vem.
+      const tally: Record<string, number> = {};
+      for (const target of Object.values(cur.votes)) tally[target] = (tally[target] ?? 0) + 1;
+      cur.tally = tally;
+      cur.votes = viewerId && cur.votes[viewerId] ? { [viewerId]: cur.votes[viewerId] } : {};
+    }
     const secret = cur.card.kind === 'bild' && (cur.phase === 'upload' || cur.phase === 'voting');
     if (secret && viewerId !== cur.turnId) cur.turnId = '';
   }

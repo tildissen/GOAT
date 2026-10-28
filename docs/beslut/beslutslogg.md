@@ -62,6 +62,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Den som får flest röster väljer dricka/spara/utmaningskort. Vid **lika** dricker alla som delar förstaplatsen. Efteråt **visas vem som röstade på vem**.
 - **Alternativ:** klunkar per röst.
 - **Var i koden:** `resolveVotes()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
+- **Delvis ersatt av B48:** att visa vem som röstade på vem.
 
 ### B12. Trivia: flerval, bara en svarar
 - **Beslut:** Fyra svarsalternativ. Bara den vars tur det är svarar. Fel svar = dricka/spara/utmaningskort.
@@ -243,3 +244,12 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Tuva är Tildas kompanjon. Villkoren säger nu att spelet drivs av **Tilda och Tuva** som privatpersoner.
 - **Tillägg (av Claude):** Namnet byttes på alla tre ställen där Tilda nämndes i villkoren (avsnitt 1, 7 och 10), så att texten är konsekvent.
 - **Var i koden:** [`src/app/villkor/page.tsx`](../../src/app/villkor/page.tsx).
+
+---
+
+## 2026-10-28 – Justeringar i spelet
+
+### B48. Resultatet visar antal röster, inte vem som röstade på vem
+- **Beslut:** På resultatkortet efter en röstning visas hur många röster varje person fick (t.ex. "Elsa – 2 röster"), i stället för vem som röstade på vem. Ersätter den delen av B11.
+- **Tillägg (av Claude):** Gäller även "Vems är bilden?" (där står det "gissningar"). Listan sorteras med flest röster överst. Servern skickar inte längre ut vem som röstade på vem till mobilerna, bara antalet. Man ser fortfarande sin egen röst.
+- **Var i koden:** `toPublic()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `ResultCard` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).

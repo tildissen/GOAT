@@ -124,6 +124,13 @@ function play(seed: number, playerCount: number) {
       }
       assert.equal(s.current?.phase, 'result');
       assert.ok(s.current!.losers.length > 0);
+      // Resultatet visar bara antal röster, aldrig vem som röstade på vem.
+      const pubResult = toPublic(s, ids[0]).current!;
+      assert.ok(Object.keys(pubResult.votes).every((voter) => voter === ids[0]), 'röster läcker ut');
+      assert.equal(
+        Object.values(pubResult.tally ?? {}).reduce((a, b) => a + b, 0),
+        Object.keys(s.current!.votes).length,
+      );
     } else if (c.phase === 'result') {
       for (const id of c.losers) {
         if (!s.current?.choices[id] && pausedPlayers(s).length === 0 && rng() < 0.8) act(id, { type: 'choose', choice: chooseAny() });

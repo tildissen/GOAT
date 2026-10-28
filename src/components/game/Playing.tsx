@@ -314,13 +314,15 @@ function ResultCard(p: CardProps) {
         <img className="photo" style={{ maxHeight: '24dvh' }} src={cur.photoUrl} alt="" />
       )}
       <div className="card-body">{headline}</div>
-      {Object.keys(cur.votes).length > 0 && (
+      {cur.tally && Object.keys(cur.tally).length > 0 && (
         <div className="votes-list">
-          {Object.entries(cur.votes).map(([voter, target]) => (
-            <div key={voter}>
-              {nameOf(state, voter)} → <strong>{nameOf(state, target)}</strong>
-            </div>
-          ))}
+          {Object.entries(cur.tally)
+            .sort(([, a], [, b]) => b - a)
+            .map(([id, n]) => (
+              <div key={id}>
+                <strong>{nameOf(state, id)}</strong> – {n} {photo ? (n === 1 ? 'gissning' : 'gissningar') : n === 1 ? 'röst' : 'röster'}
+              </div>
+            ))}
         </div>
       )}
       {iLost && !cur.choices[me.id] ? (

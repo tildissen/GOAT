@@ -59,6 +59,8 @@ export interface Current {
   sips: number;
   phase: Phase;
   votes: Record<string, string>;
+  /** Bara i det publika läget efter röstningen: antal röster per spelare. Vem som röstade på vem skickas inte ut. */
+  tally?: Record<string, number>;
   losers: string[];
   choices: Record<string, Choice>;
   photoUrl?: string | null;
