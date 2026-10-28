@@ -213,3 +213,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Tillägg (av Claude):** Del 1 grön/cyan, del 2 cyan/gul, del 3 korall/grön, del 4 gul/korall (bakgrund/kort). Utmaningar och minigames behåller sina egna skärmar. Toppyta med fem prickar för sparade klunkar och femton streck för framsteg. Svart korttagg med ikon överst på varje kort. Svarta primärknappar, avstängda knappar som mörk genomskinlig fyllning, svarta rubriker med färgad skugga (korall och cyan på bakgrunden hade kontrast runt 2:1). Ny startsida med tagline, lobby med kod och QR i samma kort och värden märkt, knappen direkt under fältet på formulären.
 - **Öppen fråga:** Ska G.O.A.T. ha sista punkten i logotypen? Texten skrivs nu med punkt, logotypen utan.
 - **Var i koden:** `partTheme` och `KindTag` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `Hud` och `CardScreen` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Lobby.tsx`](../../src/components/game/Lobby.tsx).
+
+### B42. Svarta knappar har vit text
+- **Beslut:** Tilda påpekade att texten på den svarta knappen "Skapa ett spel" på startsidan inte var vit. Länkknappar (`a.btn`) har nu svart text som standard och `a.btn.ink` vit text.
+- **Var i koden:** `a.btn` i [`src/app/globals.css`](../../src/app/globals.css), [`src/app/page.tsx`](../../src/app/page.tsx).

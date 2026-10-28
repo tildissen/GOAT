@@ -59,6 +59,5 @@ const linkBtn = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: 'inherit',
   textDecoration: 'none',
 } as const;
