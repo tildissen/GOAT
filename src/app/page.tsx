@@ -50,6 +50,9 @@ export default function Home() {
           <span>4 delar</span>
           <span>{MIN_PLAYERS}+ spelare</span>
         </div>
+        <Link href="/villkor" className="footer-link">
+          Användarvillkor
+        </Link>
       </div>
     </Screen>
   );

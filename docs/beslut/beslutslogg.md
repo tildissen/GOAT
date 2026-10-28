@@ -217,3 +217,24 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B42. Svarta knappar har vit text
 - **Beslut:** Tilda påpekade att texten på den svarta knappen "Skapa ett spel" på startsidan inte var vit. Länkknappar (`a.btn`) har nu svart text som standard och `a.btn.ink` vit text.
 - **Var i koden:** `a.btn` i [`src/app/globals.css`](../../src/app/globals.css), [`src/app/page.tsx`](../../src/app/page.tsx).
+
+---
+
+## 2026-10-28 – Användarvillkor
+
+### B43. Användarvillkor som länk på startsidan
+- **Beslut:** Startsidan får en länk **”Användarvillkor”** under knapparna. Villkoren ska bygga på hur spelet fungerar och var bilder, frågor och annat sparas.
+- **Var i koden:** [`src/app/villkor/page.tsx`](../../src/app/villkor/page.tsx) (sidan `/villkor`), länken i [`src/app/page.tsx`](../../src/app/page.tsx), `.legal` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B44. Kontakt sker via GitHub-ärenden
+- **Beslut:** Frågor och begäran om radering görs genom att skapa ett ärende på github.com/tildissen/GOAT/issues.
+- **Alternativ:** Tildas e-post · en ny e-postadress · ingen kontakt.
+- **Tillägg (av Claude):** Villkoren säger att ärenden är offentliga och att man inte ska skriva personuppgifter i dem. Det fungerar bara så länge repot är publikt.
+
+### B45. Åldersgräns 18 år
+- **Beslut:** Villkoren säger att man måste vara minst 18 år. Ingen kontroll i appen (se B19).
+- **Alternativ:** 20 år · ingen åldersgräns.
+
+### B46. Innehållet i villkoren
+- **Tillägg (av Claude):** Villkoren beskriver bara det koden faktiskt gör: namn, bilder, röster, klunkar och egna kort sparas i Supabase (Irland) och passerar Vercel (USA). Bilderna raderas när någon trycker Avsluta. Resten raderas när spelet är äldre än 12 timmar, vid nästa städning. Inga kakor för spårning, ingen statistik och ingen reklam. Villkoren innehåller också avsnitt om att dricka ansvarsfullt (112, Alkohollinjen 020-84 44 48), samtycke för bilder, förbjudet innehåll, rättigheter (IMY) och ansvarsfrihet.
+- **Obs:** Villkoren är inte granskade av en jurist.
