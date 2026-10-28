@@ -28,7 +28,7 @@ export default function TermsPage() {
           <h2>1. Om G.O.A.T.</h2>
           <p>
             G.O.A.T. är ett gratis sällskaps- och dryckesspel som ni spelar tillsammans, var och en på sin egen mobil.
-            Spelet drivs av Tilda som privatperson och är ett hobbyprojekt. Det finns inga konton, ingen reklam och
+            Spelet drivs av Tilda och Tuva som privatpersoner och är ett hobbyprojekt. Det finns inga konton, ingen reklam och
             ingenting kostar pengar.
           </p>
           <p>Genom att skapa eller joina ett spel godkänner du de här villkoren.</p>
@@ -134,7 +134,7 @@ export default function TermsPage() {
               Bilderna sparas med en lång, svårgissad länk. Den som får tag på länken kan se bilden tills den har
               raderats.
             </li>
-            <li>Tilda kan som ägare av databasen tekniskt sett se det som sparas, men tittar inte på pågående spel.</li>
+            <li>Tilda och Tuva kan som de som driver spelet tekniskt sett se det som sparas, men tittar inte på pågående spel.</li>
           </ul>
         </section>
 
@@ -174,7 +174,7 @@ export default function TermsPage() {
           <h2>10. Ansvar</h2>
           <p>
             Spelet är gratis och finns i befintligt skick. Det kan innehålla fel eller sluta fungera ibland. Ni som spelar
-            ansvarar själva för hur ni spelar, vad ni dricker och vad som händer under kvällen. Tilda ansvarar inte för
+            ansvarar själva för hur ni spelar, vad ni dricker och vad som händer under kvällen. Tilda och Tuva ansvarar inte för
             skador eller förluster som uppstår när spelet används, eller för bilder och texter som spelarna laddar upp.
           </p>
         </section>

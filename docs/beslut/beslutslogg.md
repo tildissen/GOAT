@@ -238,3 +238,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B46. Innehållet i villkoren
 - **Tillägg (av Claude):** Villkoren beskriver bara det koden faktiskt gör: namn, bilder, röster, klunkar och egna kort sparas i Supabase (Irland) och passerar Vercel (USA). Bilderna raderas när någon trycker Avsluta. Resten raderas när spelet är äldre än 12 timmar, vid nästa städning. Inga kakor för spårning, ingen statistik och ingen reklam. Villkoren innehåller också avsnitt om att dricka ansvarsfullt (112, Alkohollinjen 020-84 44 48), samtycke för bilder, förbjudet innehåll, rättigheter (IMY) och ansvarsfrihet.
 - **Obs:** Villkoren är inte granskade av en jurist.
+
+### B47. Spelet drivs av Tilda och Tuva
+- **Beslut:** Tuva är Tildas kompanjon. Villkoren säger nu att spelet drivs av **Tilda och Tuva** som privatpersoner.
+- **Tillägg (av Claude):** Namnet byttes på alla tre ställen där Tilda nämndes i villkoren (avsnitt 1, 7 och 10), så att texten är konsekvent.
+- **Var i koden:** [`src/app/villkor/page.tsx`](../../src/app/villkor/page.tsx).
