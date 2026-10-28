@@ -253,3 +253,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** På resultatkortet efter en röstning visas hur många röster varje person fick (t.ex. "Elsa – 2 röster"), i stället för vem som röstade på vem. Ersätter den delen av B11.
 - **Tillägg (av Claude):** Gäller även "Vems är bilden?" (där står det "gissningar"). Listan sorteras med flest röster överst. Servern skickar inte längre ut vem som röstade på vem till mobilerna, bara antalet. Man ser fortfarande sin egen röst.
 - **Var i koden:** `toPublic()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `ResultCard` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B49. "Vill du hoppa över?" ovanför knapparna på utmaningar och minigames
+- **Beslut:** På utmanings- och minigamekort står "Vill du hoppa över?" ovanför knapparna "Jag dricker …", "Jag vill spara …" och "Dra ett utmaningskort", eftersom knapparna där är ett sätt att slippa uppgiften.
+- **Tillägg (av Claude):** Rubriken står inte på direkta frågor, trivia eller röstningsresultat, där knapparna är själva konsekvensen och inte ett sätt att hoppa över.
+- **Var i koden:** `prompt` i `ChoiceButtons` ([`src/components/game/shared.tsx`](../../src/components/game/shared.tsx)), `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `.choice-prompt` i [`src/app/globals.css`](../../src/app/globals.css).

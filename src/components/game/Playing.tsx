@@ -195,7 +195,7 @@ function Challenge(p: CardProps) {
         )}
         {!solo && involved && cur.targetIds.length <= 2 && <p className="body-text">Det gäller dig!</p>}
       </div>
-      {mine ? <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} /> : <Chosen cur={cur} meId={me.id} />}
+      {mine ? <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" /> : <Chosen cur={cur} meId={me.id} />}
     </CardScreen>
   );
 }

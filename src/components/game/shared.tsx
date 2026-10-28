@@ -39,15 +39,19 @@ export function ChoiceButtons({
   act,
   busy,
   extra,
+  prompt,
 }: {
   sips: number;
   act: GameProps['act'];
   busy: boolean;
   extra?: React.ReactNode;
+  /** Rubrik ovanför knapparna, t.ex. "Vill du hoppa över?" */
+  prompt?: string;
 }) {
   return (
     <div className="actions">
       {extra}
+      {prompt && <p className="choice-prompt">{prompt}</p>}
       <button className="btn yellow" disabled={busy} onClick={() => act({ type: 'choose', choice: 'drink' })}>
         Jag dricker {sipsText(sips)}
       </button>

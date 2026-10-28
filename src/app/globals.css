@@ -605,3 +605,6 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .legal li { margin-bottom: 6px; }
 .legal a { color: inherit; font-weight: 700; overflow-wrap: anywhere; }
 .footer-link { font-size: 14px; color: inherit; text-decoration: underline; opacity: 0.75; padding: 8px; }
+
+/* Rubrik ovanför dricka/spara/utmaningskort på utmaningar och minigames */
+.choice-prompt { margin: 6px 0 0; font-size: 17px; font-weight: 700; text-align: center; }
