@@ -266,3 +266,13 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Alternativ:** behåll lottningen men visa vems tur det är · vem som helst får trycka.
 - **Tillägg (av Claude):** Även "Visa resultatet nu" vid röstningar är bara för värden. De andra ser "Väntar på att Tilda (värd) trycker nästa…". Är värden borta kan vem som helst trycka, så att spelet inte fastnar. Rättade samtidigt en bugg där "Det gäller dig!" visades på minigames och gruppkort – nu bara på X och Y-kort.
 - **Var i koden:** `canPressNext()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `canAdvance`/`NextButton` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B43. Stor text i Glacial Indifference, Playfair tas bort
+- **Beslut:** All stor text (rubriker, spelarnamn på resultatkorten och liknande) byter från Playfair Display i kursiv till Glacial Indifference i fet stil. Knewave finns kvar på G.O.A.T och "Låt oss spela".
+- **Ersätter:** den del av B39 som lät Playfair vara kvar på skärmrubriker.
+- **Var i koden:** `.display` i [`src/app/globals.css`](../../src/app/globals.css), [`src/app/layout.tsx`](../../src/app/layout.tsx).
+
+### B44. Knewave på stora spelarnamn
+- **Beslut:** Spelarnamn som står stort skrivs i Knewave: den som röstas fram på resultatkortet, "Elsas tur" när någon annan spelar, namnet på ditt utmaningskort och namnet över din egen fråga eller utmaning.
+- **Tillägg (av Claude):** Övriga namn (topplistor, knappar, rösta-knapparna) är kvar i Glacial Indifference.
+- **Var i koden:** `.name-font` i [`src/app/globals.css`](../../src/app/globals.css), [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).

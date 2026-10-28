@@ -1,14 +1,8 @@
 import type { Metadata, Viewport } from 'next';
-import { Knewave, Playfair_Display } from 'next/font/google';
+import { Knewave } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
 
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '900'],
-  style: ['normal', 'italic'],
-  variable: '--font-playfair',
-});
 /** Bara logotypen och öppningsbilden ("Låt oss spela"). */
 const knewave = Knewave({ subsets: ['latin'], weight: '400', variable: '--font-knewave' });
 /** Allt annat: knappar, namn, frågor (fet) och förklaringar (vanlig). */
@@ -34,7 +28,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="sv" className={`${playfair.variable} ${knewave.variable} ${glacial.variable}`}>
+    <html lang="sv" className={`${knewave.variable} ${glacial.variable}`}>
       <body>{children}</body>
     </html>
   );

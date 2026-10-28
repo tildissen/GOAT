@@ -126,7 +126,7 @@ export function ChallengeOverlay({ state, me, busy, act }: GameProps) {
     <div className="overlay solid-cyan" role="dialog" aria-label="Utmaningskort">
       <div className="panel green" style={{ minHeight: '70dvh' }}>
         <h2 className="display mid">
-          {possessive(me.name)}
+          <span className="name-font">{possessive(me.name)}</span>
           <br />
           UTMANINGSKORT
         </h2>
