@@ -33,6 +33,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Alternativ:** bara värden · vem som helst.
 - **Tillägg (av Claude):** Om personen har tappat uppkopplingen kan värden, eller någon annan om värden också är borta, trycka vidare så att spelet inte fastnar.
 - **Var i koden:** `next` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
+- **Delvis ersatt av B50:** på gruppkort trycker värden NÄSTA.
 
 ### B6. Antal klunkar ökar per del
 - **Beslut:** ”Jag dricker X klunkar” där X = delens nummer: 1 i del 1, 2 i del 2, 3 i del 3, 4 i del 4.
@@ -258,3 +259,10 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** På utmanings- och minigamekort står "Vill du hoppa över?" ovanför knapparna "Jag dricker …", "Jag vill spara …" och "Dra ett utmaningskort", eftersom knapparna där är ett sätt att slippa uppgiften.
 - **Tillägg (av Claude):** Rubriken står inte på direkta frågor, trivia eller röstningsresultat, där knapparna är själva konsekvensen och inte ett sätt att hoppa över.
 - **Var i koden:** `prompt` i `ChoiceButtons` ([`src/components/game/shared.tsx`](../../src/components/game/shared.tsx)), `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `.choice-prompt` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B50. Värden trycker NÄSTA på gruppkort
+- **Beslut:** På kort som gäller hela gruppen trycker **värden** NÄSTA: röstningar, "Vems är bilden?", gruppkort, X och Y, lag och minigames. På kort till en person (direkt fråga, trivia, solo-utmaning) trycker personen själv, som tidigare. Ersätter B5 för gruppkort.
+- **Varför:** Det var förvirrande att en osynlig, slumpad spelare fick NÄSTA-knappen på gruppkort.
+- **Alternativ:** behåll lottningen men visa vems tur det är · vem som helst får trycka.
+- **Tillägg (av Claude):** Även "Visa resultatet nu" vid röstningar är bara för värden. De andra ser "Väntar på att Tilda (värd) trycker nästa…". Är värden borta kan vem som helst trycka, så att spelet inte fastnar. Rättade samtidigt en bugg där "Det gäller dig!" visades på minigames och gruppkort – nu bara på X och Y-kort.
+- **Var i koden:** `canPressNext()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `canAdvance`/`NextButton` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).

@@ -106,6 +106,16 @@ function isLeader(s: GameState, playerId: string, ctx: Ctx): boolean {
   return playerId === s.hostId || !ctx.active.has(s.hostId);
 }
 
+/**
+ * Kort till en person: personen själv (eller värden, eller vem som helst om personen är borta).
+ * Gruppkort – röstningar, gruppen, X och Y, lag och minigames: bara värden (vem som helst om värden är borta).
+ */
+export function canPressNext(s: GameState | PublicState, cur: Current, playerId: string, ctx: Pick<Ctx, 'active'>): boolean {
+  const leader = playerId === s.hostId || !ctx.active.has(s.hostId);
+  if (!isSoloCard(cur.card)) return leader;
+  return leader || playerId === cur.turnId || !ctx.active.has(cur.turnId);
+}
+
 function assertNotPaused(s: GameState, ctx: Ctx) {
   const blocking = pausedPlayers(s).filter((p) => ctx.active.has(p.id));
   if (blocking.length > 0) {
@@ -305,7 +315,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
     case 'close_vote': {
       const c = requireCurrent();
       if (c.phase !== 'voting') throw new GameError('Röstningen är redan stängd', 409);
-      if (playerId !== c.turnId && !isLeader(s, playerId, ctx)) throw new GameError('Du kan inte stänga röstningen', 403);
+      if (!isLeader(s, playerId, ctx)) throw new GameError('Bara värden kan visa resultatet', 403);
       if (Object.keys(c.votes).length === 0) throw new GameError('Ingen har röstat än');
       resolveVotes(s, c);
       break;
@@ -374,8 +384,8 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
     }
     case 'next': {
       const c = requireCurrent();
-      if (playerId !== c.turnId && !isLeader(s, playerId, ctx) && ctx.active.has(c.turnId)) {
-        throw new GameError('Det är inte din tur', 403);
+      if (!canPressNext(s, c, playerId, ctx)) {
+        throw new GameError(isSoloCard(c.card) ? 'Det är inte din tur' : 'Bara värden kan gå vidare på gruppkort', 403);
       }
       assertNotPaused(s, ctx);
       advance(s, ctx);

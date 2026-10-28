@@ -135,7 +135,11 @@ function play(seed: number, playerCount: number) {
       for (const id of c.losers) {
         if (!s.current?.choices[id] && pausedPlayers(s).length === 0 && rng() < 0.8) act(id, { type: 'choose', choice: chooseAny() });
       }
-      if (s.current?.seq === c.seq && pausedPlayers(s).length === 0) act(c.turnId, { type: 'next' });
+      if (s.current?.seq === c.seq && pausedPlayers(s).length === 0) {
+        // Gruppkort: bara värden går vidare.
+        assert.throws(() => act(ids[1], { type: 'next' }), GameError, 'icke-värd fick trycka nästa på gruppkort');
+        act(ids[0], { type: 'next' });
+      }
     } else if (c.card.kind === 'trivia') {
       act(c.turnId, { type: 'trivia_answer', index: Math.floor(rng() * 4) });
       if (s.current!.triviaPick === c.card.answerIndex) act(c.turnId, { type: 'next' });
@@ -150,7 +154,11 @@ function play(seed: number, playerCount: number) {
       for (const id of ids) {
         if (!s.current?.choices[id] && pausedPlayers(s).length === 0 && rng() < 0.3) act(id, { type: 'choose', choice: chooseAny() });
       }
-      if (s.current?.seq === c.seq && pausedPlayers(s).length === 0) act(c.turnId, { type: 'next' });
+      if (s.current?.seq === c.seq && pausedPlayers(s).length === 0) {
+        // Gruppkort: bara värden går vidare.
+        assert.throws(() => act(ids[1], { type: 'next' }), GameError, 'icke-värd fick trycka nästa på gruppkort');
+        act(ids[0], { type: 'next' });
+      }
     }
     for (const p of s.players) assert.ok(p.saved <= MAX_SAVED + 6, 'för många sparade klunkar');
   }

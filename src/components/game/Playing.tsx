@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
-import { isSoloCard, MAX_SAVED } from '@/lib/engine';
+import { canPressNext, isSoloCard, MAX_SAVED } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import { Avatar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
 import { Board, CHOICE_TEXT, ChoiceButtons, nameOf, possessive, sipsText, type GameProps } from './shared';
@@ -83,12 +83,13 @@ export function Hud({ me, part, index, total }: { me: GameProps['me']; part: num
 }
 
 function canAdvance(p: CardProps) {
-  return p.cur.turnId === p.me.id || p.isLeader || (p.cur.turnId !== '' && !p.view.active.includes(p.cur.turnId));
+  return canPressNext(p.state, p.cur, p.me.id, { active: new Set(p.view.active) });
 }
 
 function NextButton(p: CardProps & { label?: string; color?: 'white' | 'cyan' | 'ink' }) {
   if (!canAdvance(p)) {
-    return <p className="body-text">Väntar på att {nameOf(p.state, p.cur.turnId)} trycker nästa…</p>;
+    const who = isSoloCard(p.cur.card) ? nameOf(p.state, p.cur.turnId) : `${nameOf(p.state, p.state.hostId)} (värd)`;
+    return <p className="body-text">Väntar på att {who} trycker nästa…</p>;
   }
   return (
     <button className={`btn ${p.color ?? 'ink'}`} disabled={p.busy} onClick={() => p.act({ type: 'next' })}>
@@ -193,7 +194,7 @@ function Challenge(p: CardProps) {
             ))}
           </div>
         )}
-        {!solo && involved && cur.targetIds.length <= 2 && <p className="body-text">Det gäller dig!</p>}
+        {cur.card.players === 2 && involved && <p className="body-text">Det gäller dig!</p>}
       </div>
       {mine ? <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" /> : <Chosen cur={cur} meId={me.id} />}
     </CardScreen>
@@ -263,7 +264,7 @@ function VoteCard(p: CardProps) {
           {voted} av {voters.length} har röstat
         </span>
       </div>
-      {voted > 0 && (cur.turnId === me.id || p.isLeader) && (
+      {voted > 0 && p.isLeader && (
         <button className="link-btn" disabled={p.busy} onClick={() => p.act({ type: 'close_vote' })}>
           Visa resultatet nu
         </button>
