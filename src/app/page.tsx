@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Face from '@/components/Face';
 import { Screen } from '@/components/ui';
+import { MIN_PLAYERS } from '@/lib/engine';
 
 export default function Home() {
   const [splash, setSplash] = useState(true);
@@ -19,8 +20,8 @@ export default function Home() {
         <Screen bg="green" center>
           <div className="stack" style={{ gap: 64 }}>
             <p className="serif">LÅT OSS SPELA</p>
-            <Face size={200} />
-            <h1 className="display huge">G.O.A.T</h1>
+            <Face size={220} />
+            <h1 className="logo huge">G.O.A.T</h1>
           </div>
         </Screen>
       </div>
@@ -29,16 +30,25 @@ export default function Home() {
 
   return (
     <Screen bg="cyan" center>
-      <div className="stack" style={{ gap: 48 }}>
-        <Face size={200} />
-        <h1 className="display huge">G.O.A.T</h1>
-        <div className="stack" style={{ marginTop: 40, gap: 28 }}>
-          <Link href="/skapa" className="btn yellow bold" style={linkBtn}>
+      <div className="stack" style={{ gap: 28 }}>
+        <Face size={240} />
+        <h1 className="logo huge">G.O.A.T</h1>
+        <p className="tagline">
+          Börjar oskyldigt…
+          <br />
+          slutar i fullständigt kaos.
+        </p>
+        <div className="stack" style={{ marginTop: 28, gap: 14 }}>
+          <Link href="/skapa" className="btn ink" style={linkBtn}>
             Skapa ett spel
           </Link>
-          <Link href="/join" className="btn yellow bold" style={linkBtn}>
+          <Link href="/join" className="btn yellow" style={linkBtn}>
             Joina ett spel
           </Link>
+        </div>
+        <div className="chips" style={{ marginTop: 16 }}>
+          <span>4 delar</span>
+          <span>{MIN_PLAYERS}+ spelare</span>
         </div>
       </div>
     </Screen>
@@ -49,6 +59,6 @@ const linkBtn = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  textDecoration: 'none',
   color: 'inherit',
+  textDecoration: 'none',
 } as const;

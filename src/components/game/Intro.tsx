@@ -49,7 +49,7 @@ function StorEj({ onDone }: { onDone: () => void }) {
           <p className="light">
             Sätt din telefon på <strong>stör ej</strong> för att fortsätta
           </p>
-          <button className="btn white" onClick={onDone} style={{ boxShadow: 'none' }}>
+          <button className="btn ink" onClick={onDone} style={{ boxShadow: 'none' }}>
             Klar
           </button>
         </div>
@@ -84,7 +84,7 @@ function Regler({ onDone }: { onDone: () => void }) {
           Du får <strong>spara</strong> klunkar – men bara upp till 5 stycken. Får du fler än så pausas spelet tills du
           druckit ikapp. Det här är ett dryckesspel, inte en sparbank.
         </p>
-        <button className="btn white" onClick={onDone} style={{ marginTop: 8 }}>
+        <button className="btn ink" onClick={onDone} style={{ marginTop: 8 }}>
           Nästa
         </button>
       </div>
@@ -135,7 +135,7 @@ function Selfie({ me, busy, upload, onDone }: GameProps & { onDone: () => void }
             Hoppa över
           </button>
         )}
-        <button className="btn white" disabled={!me.selfie || working} onClick={onDone}>
+        <button className="btn ink" disabled={!me.selfie || working} onClick={onDone}>
           Nästa
         </button>
       </div>
@@ -199,7 +199,7 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
         {state.customCards.length} egna kort i spelet
       </p>
       <div className="grow" style={{ minHeight: 24 }} />
-      <button className="btn white" disabled={busy} onClick={onDone}>
+      <button className="btn ink" disabled={busy} onClick={onDone}>
         {mine.length > 0 ? 'Nästa' : 'Hoppa över'}
       </button>
     </Screen>
@@ -228,7 +228,7 @@ export function ReadyWait({ state, view, isLeader, busy, act }: GameProps) {
       {isLeader ? (
         <div className="stack">
           {ready.length < MIN_PLAYERS && <p className="body-text">Minst {MIN_PLAYERS} måste vara redo.</p>}
-          <button className="btn white" disabled={busy || ready.length < MIN_PLAYERS} onClick={() => act({ type: 'start_game' })}>
+          <button className="btn ink" disabled={busy || ready.length < MIN_PLAYERS} onClick={() => act({ type: 'start_game' })}>
             Starta spelet
           </button>
         </div>
