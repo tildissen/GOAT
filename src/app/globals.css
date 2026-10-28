@@ -139,6 +139,8 @@ textarea {
 /* Avstängd: mörk, genomskinlig fyllning. En dämpad vit knapp på cyan syntes knappt (1,2:1). */
 .btn:disabled { background: rgba(0, 0, 0, 0.14); color: rgba(0, 0, 0, 0.62); box-shadow: none; cursor: default; transform: none; }
 .btn.ink { background: var(--black); color: var(--white); }
+a.btn { color: var(--black); text-decoration: none; }
+a.btn.ink { color: var(--white); }
 .btn.ink:disabled { background: rgba(0, 0, 0, 0.14); color: rgba(0, 0, 0, 0.62); }
 .btn.white { background: var(--white); }
 .btn.yellow { background: var(--yellow); }
