@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Jost, League_Spartan, Playfair_Display } from 'next/font/google';
+import { Knewave, Playfair_Display } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 
 const playfair = Playfair_Display({
@@ -8,8 +9,17 @@ const playfair = Playfair_Display({
   style: ['normal', 'italic'],
   variable: '--font-playfair',
 });
-const spartan = League_Spartan({ subsets: ['latin'], weight: ['600', '700'], variable: '--font-spartan' });
-const jost = Jost({ subsets: ['latin'], weight: ['300', '400', '600'], style: ['normal', 'italic'], variable: '--font-jost' });
+/** Bara logotypen och öppningsbilden ("Låt oss spela"). */
+const knewave = Knewave({ subsets: ['latin'], weight: '400', variable: '--font-knewave' });
+/** Allt annat: knappar, namn, frågor (fet) och förklaringar (vanlig). */
+const glacial = localFont({
+  src: [
+    { path: '../fonts/glacial-indifference-400.woff2', weight: '400', style: 'normal' },
+    { path: '../fonts/glacial-indifference-400italic.woff2', weight: '400', style: 'italic' },
+    { path: '../fonts/glacial-indifference-700.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-glacial',
+});
 
 export const metadata: Metadata = {
   title: 'G.O.A.T.',
@@ -24,7 +34,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="sv" className={`${playfair.variable} ${spartan.variable} ${jost.variable}`}>
+    <html lang="sv" className={`${playfair.variable} ${knewave.variable} ${glacial.variable}`}>
       <body>{children}</body>
     </html>
   );

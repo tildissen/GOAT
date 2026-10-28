@@ -22,7 +22,7 @@ export function PartEnd({ state, isLeader, busy, act }: GameProps) {
         <p className="tagline">{look.tagline}</p>
         {isLeader ? (
           <div className="stack" style={{ marginTop: 60, gap: 28 }}>
-            <button className="btn white" disabled={busy} onClick={() => act({ type: 'continue' })}>
+            <button className="btn ink" disabled={busy} onClick={() => act({ type: 'continue' })}>
               Fortsätt spela
             </button>
             <button className={`btn ${look.end}`} disabled={busy} onClick={() => confirmEnd() && act({ type: 'end' })}>
@@ -54,7 +54,7 @@ export function Finished({ state, isLeader, busy, act }: GameProps) {
       <div className="grow" />
       {isLeader ? (
         <div className="stack" style={{ gap: 24 }}>
-          <button className="btn white" disabled={busy} onClick={() => act({ type: 'restart' })}>
+          <button className="btn ink" disabled={busy} onClick={() => act({ type: 'restart' })}>
             Börja om!
           </button>
           <button className="btn coral" disabled={busy} onClick={() => confirmEnd() && act({ type: 'end' })}>
@@ -73,7 +73,7 @@ export function Ended({ state }: GameProps) {
     <Screen bg="coral">
       <div className="stack" style={{ marginTop: 56, gap: 40 }}>
         <Face size={220} />
-        <h1 className="display huge">G.O.A.T</h1>
+        <h1 className="logo huge">G.O.A.T</h1>
       </div>
       <div style={{ width: '100%', margin: '36px 0 20px' }}>
         <Stats state={state} />
@@ -131,7 +131,7 @@ export function ChallengeOverlay({ state, me, busy, act }: GameProps) {
           UTMANINGSKORT
         </h2>
         <div className="grow" style={{ display: 'flex', alignItems: 'center' }}>
-          <p className="card-text" style={{ fontFamily: 'var(--font-spartan)', fontWeight: 700, fontSize: 26, textAlign: 'center' }}>
+          <p className="card-text" style={{ fontFamily: 'var(--font-glacial)', fontWeight: 700, fontSize: 26, textAlign: 'center' }}>
             {overlay.text}
           </p>
         </div>

@@ -2,9 +2,9 @@
 
 import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
-import { isSoloCard } from '@/lib/engine';
+import { isSoloCard, MAX_SAVED } from '@/lib/engine';
 import type { Current } from '@/lib/types';
-import { Avatar, Screen, Spinner, type Color } from '../ui';
+import { Avatar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
 import { Board, CHOICE_TEXT, ChoiceButtons, nameOf, possessive, sipsText, type GameProps } from './shared';
 
 /** Visar kortet som spelas just nu – olika beroende på korttyp och vems tur det är. */
@@ -27,56 +27,71 @@ export default function Playing(props: GameProps) {
 type CardProps = GameProps & { cur: Current };
 
 function CardScreen({
+  game,
   bg,
   card,
-  me,
-  progress,
   children,
   below,
 }: {
-  bg: Color;
-  card: Color;
-  me: GameProps['me'];
-  progress: string;
+  game: GameProps;
+  /** Utan bg/card används delens egna färger. Utmaningar och minigames anger sina egna. */
+  bg?: Color;
+  card?: Color;
   children: React.ReactNode;
   below?: React.ReactNode;
 }) {
+  const theme = partTheme(game.state.part);
   return (
-    <Screen bg={bg}>
-      <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-        <SavedLabel saved={me.saved} />
-        <span className="progress">{progress}</span>
-      </div>
-      <div className={`card ${card}`}>{children}</div>
+    <Screen bg={bg ?? theme.bg}>
+      <Hud me={game.me} part={game.state.part} index={game.state.cardIndex} total={game.state.cardsInPart} />
+      <div className={`card ${card ?? theme.card}`}>{children}</div>
       {below && <div className="stack" style={{ marginTop: 18 }}>{below}</div>}
     </Screen>
   );
 }
 
-export function SavedLabel({ saved }: { saved: number }) {
+/** Toppytan: sparade klunkar (max 5, sedan ERROR) och hur långt det är kvar i delen. */
+export function Hud({ me, part, index, total }: { me: GameProps['me']; part: number; index: number; total: number }) {
+  const filled = Math.min(me.saved, MAX_SAVED);
   return (
-    <button
-      className="saved-label"
-      onClick={() => window.dispatchEvent(new Event('goat:saved'))}
-      aria-label={`Sparade klunkar: ${saved}. Tryck för att dricka dem.`}
-    >
-      Sparade klunkar: <strong>{saved}</strong>
-    </button>
+    <div className="hud">
+      <button
+        className="hud-block"
+        onClick={() => window.dispatchEvent(new Event('goat:saved'))}
+        aria-label={`Sparade klunkar: ${me.saved} av ${MAX_SAVED}. Tryck för att dricka dem.`}
+      >
+        <span className="hud-label">
+          Sparade {me.saved}/{MAX_SAVED}
+        </span>
+        <span className="pips" aria-hidden="true">
+          {Array.from({ length: MAX_SAVED }, (_, i) => (
+            <i key={i} className={i < filled ? 'on' : ''} />
+          ))}
+          {me.saved > MAX_SAVED && <span className="more">+{me.saved - MAX_SAVED}</span>}
+        </span>
+      </button>
+      <div className="hud-block right" role="img" aria-label={`Del ${part}, kort ${index + 1} av ${total}`}>
+        <span className="hud-label">Del {part}</span>
+        <span className="segs" aria-hidden="true">
+          {Array.from({ length: total }, (_, i) => (
+            <i key={i} className={i <= index ? 'on' : ''} />
+          ))}
+        </span>
+      </div>
+    </div>
   );
 }
-
-const progressOf = (p: GameProps) => `Del ${p.state.part} · ${p.state.cardIndex + 1}/${p.state.cardsInPart}`;
 
 function canAdvance(p: CardProps) {
   return p.cur.turnId === p.me.id || p.isLeader || (p.cur.turnId !== '' && !p.view.active.includes(p.cur.turnId));
 }
 
-function NextButton(p: CardProps & { label?: string; color?: 'white' | 'cyan' }) {
+function NextButton(p: CardProps & { label?: string; color?: 'white' | 'cyan' | 'ink' }) {
   if (!canAdvance(p)) {
     return <p className="body-text">Väntar på att {nameOf(p.state, p.cur.turnId)} trycker nästa…</p>;
   }
   return (
-    <button className={`btn ${p.color ?? 'white'}`} disabled={p.busy} onClick={() => p.act({ type: 'next' })}>
+    <button className={`btn ${p.color ?? 'ink'}`} disabled={p.busy} onClick={() => p.act({ type: 'next' })}>
       {p.label ?? 'Nästa'}
     </button>
   );
@@ -90,17 +105,18 @@ function Chosen({ cur, meId }: { cur: Current; meId: string }) {
 /* ---------- Direkt fråga ---------- */
 function Direct(p: CardProps) {
   return (
-    <CardScreen bg="green" card="cyan" me={p.me} progress={progressOf(p)}>
-      <h2 className="display mid">{p.me.name}</h2>
-      <div className="card-body">
-        <p className="card-text">{p.cur.text}</p>
+    <CardScreen game={p}>
+      <KindTag kind="direkt" />
+      <div className="card-q">
+        <p className="heading">{p.me.name}</p>
+        <p className="card-text big">{p.cur.text}</p>
       </div>
       <ChoiceButtons
         sips={p.cur.sips}
         act={p.act}
         busy={p.busy}
         extra={
-          <button className="btn white" disabled={p.busy} onClick={() => p.act({ type: 'choose', choice: 'answered' })}>
+          <button className="btn yellow" disabled={p.busy} onClick={() => p.act({ type: 'choose', choice: 'answered' })}>
             Jag svarar!
           </button>
         }
@@ -118,27 +134,32 @@ function Trivia(p: CardProps) {
   const right = answered && picked === cur.card.answerIndex;
 
   return (
-    <CardScreen bg="green" card="cyan" me={p.me} progress={progressOf(p)} below={right ? <NextButton {...p} /> : undefined}>
-      <h2 className="display mid">Trivia ?</h2>
-      <div className="card-body">
-        <p className="card-text">{cur.text}</p>
-        <div className="options">
-          {options.map((opt, i) => {
-            const cls = answered ? (i === cur.card.answerIndex ? ' right' : i === picked ? ' wrong' : '') : '';
-            return (
-              <button
-                key={i}
-                className={`option${cls}`}
-                disabled={answered || p.busy}
-                onClick={() => p.act({ type: 'trivia_answer', index: i })}
-              >
-                {opt}
-              </button>
-            );
-          })}
-        </div>
+    <CardScreen game={p} below={right ? <NextButton {...p} /> : undefined}>
+      <div className="card-top">
+        <KindTag kind="trivia" />
+        <span className="chip">Din tur</span>
+      </div>
+      <div className="card-q">
+        <p className="card-text big">{cur.text}</p>
         {answered && <p className="heading">{right ? 'RÄTT! 🐐' : 'FEL!'}</p>}
       </div>
+      <div className="options">
+        {options.map((opt, i) => {
+          const cls = answered ? (i === cur.card.answerIndex ? ' right' : i === picked ? ' wrong' : '') : '';
+          return (
+            <button
+              key={i}
+              className={`option${cls}`}
+              disabled={answered || p.busy}
+              onClick={() => p.act({ type: 'trivia_answer', index: i })}
+            >
+              <span className="letter">{'ABCD'[i]}</span>
+              <span>{opt}</span>
+            </button>
+          );
+        })}
+      </div>
+      {!answered && <p className="hint">Fel svar: drick, spara eller dra en utmaning</p>}
       {answered && !right && <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} />}
     </CardScreen>
   );
@@ -153,13 +174,12 @@ function Challenge(p: CardProps) {
   const involved = cur.targetIds.includes(me.id);
   return (
     <CardScreen
+      game={p}
       bg={minigame ? 'cyan' : 'coral'}
       card={minigame ? 'coral' : 'green'}
-      me={me}
-      progress={progressOf(p)}
       below={<NextButton {...p} label={solo ? 'Klar!' : 'Nästa'} />}
     >
-      <h2 className="display mid">{minigame ? 'MINIGAME:' : 'UTMANING:'}</h2>
+      <KindTag kind={minigame ? 'minigame' : 'utmaning'} />
       {minigame && cur.card.title && <p className="heading">{cur.card.title}</p>}
       {solo && <p className="heading">{me.name}</p>}
       <div className="card-body">
@@ -191,13 +211,15 @@ function VoteCard(p: CardProps) {
   const voted = Object.keys(cur.votes).length;
 
   return (
-    <CardScreen bg="green" card="cyan" me={me} progress={progressOf(p)}>
-      <h2 className="display mid">{photo ? 'VEMS ÄR BILDEN?' : 'ALLA RÖSTAR!'}</h2>
+    <CardScreen game={p}>
+      <KindTag kind={photo ? 'bild' : 'vem'} />
       {photo ? (
         // eslint-disable-next-line @next/next/no-img-element
         cur.photoUrl && <img className="photo" src={cur.photoUrl} alt="Den hemliga bilden" />
       ) : (
-        <p className="card-text">{cur.text}</p>
+        <div className="card-q">
+          <p className="card-text big">{cur.text}</p>
+        </div>
       )}
       {isOwner ? (
         <p className="body-text">Alla gissar på din bild 🤫 Håll pokerfejset!</p>
@@ -209,24 +231,22 @@ function VoteCard(p: CardProps) {
         </div>
       ) : (
         <>
-          <div className="names" style={{ gap: 14 }}>
+          <div className="name-grid">
             {state.players
               .filter((pl) => pl.ready)
               .map((pl) => (
                 <button
                   key={pl.id}
                   className={`name-pill yellow${selected === pl.id ? ' selected' : ''}`}
-                  style={{ minHeight: 54, fontSize: 19 }}
                   onClick={() => setSelected(pl.id)}
                 >
                   <span>{pl.name}</span>
                 </button>
               ))}
           </div>
-          <div className="grow" />
           <div className="actions">
             <button
-              className="btn yellow"
+              className="btn ink"
               disabled={!selected || p.busy}
               onClick={() => selected && p.act({ type: 'vote', targetId: selected })}
             >
@@ -235,9 +255,14 @@ function VoteCard(p: CardProps) {
           </div>
         </>
       )}
-      <p className="progress">
-        {voted} av {voters.length} har röstat
-      </p>
+      <div className="dots" aria-label={`${voted} av ${voters.length} har röstat`}>
+        {voters.map((v, i) => (
+          <i key={v.id} className={i < voted ? 'on' : ''} />
+        ))}
+        <span>
+          {voted} av {voters.length} har röstat
+        </span>
+      </div>
       {voted > 0 && (cur.turnId === me.id || p.isLeader) && (
         <button className="link-btn" disabled={p.busy} onClick={() => p.act({ type: 'close_vote' })}>
           Visa resultatet nu
@@ -281,10 +306,7 @@ function ResultCard(p: CardProps) {
 
   return (
     <CardScreen
-      bg="green"
-      card="cyan"
-      me={me}
-      progress={progressOf(p)}
+      game={p}
       below={pending.length === 0 || p.isLeader ? <NextButton {...p} /> : <p className="body-text">Väntar på {pending.map((id) => nameOf(state, id)).join(', ')}…</p>}
     >
       {photo && cur.photoUrl && (
@@ -326,8 +348,8 @@ function PhotoUpload(p: CardProps) {
 
   if (cur.turnId !== me.id) {
     return (
-      <CardScreen bg="green" card="cyan" me={me} progress={progressOf(p)}>
-        <h2 className="display mid">VEMS ÄR BILDEN?</h2>
+      <CardScreen game={p}>
+        <KindTag kind="bild" />
         <div className="card-body">
           <p className="card-text">Någon laddar upp en hemlig bild…</p>
           <Spinner />
@@ -348,8 +370,8 @@ function PhotoUpload(p: CardProps) {
   }
 
   return (
-    <CardScreen bg="green" card="cyan" me={me} progress={progressOf(p)}>
-      <h2 className="display mid">VEMS ÄR BILDEN?</h2>
+    <CardScreen game={p}>
+      <KindTag kind="bild" />
       <div className="card-body">
         <p className="body-text">
           <strong>Psst, {me.name}!</strong> Du är vald i hemlighet. Ingen annan vet att det är du.
@@ -389,7 +411,7 @@ function Waiting(p: CardProps) {
   const { cur, state } = p;
   const player = state.players.find((pl) => pl.id === cur.turnId);
   return (
-    <CardScreen bg="green" card="cyan" me={p.me} progress={progressOf(p)}>
+    <CardScreen game={p}>
       {player && <Avatar player={player} big />}
       <h2 className="display mid">{possessive(nameOf(state, cur.turnId))} tur</h2>
       <p className="body-text">{nameOf(state, cur.turnId)} {DOING[cur.card.kind] ?? 'spelar'}…</p>

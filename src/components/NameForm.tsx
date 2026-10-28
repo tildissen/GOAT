@@ -32,7 +32,7 @@ export default function NameForm({ mode, initialCode = '' }: { mode: 'create' | 
   return (
     <Screen bg="cyan">
       <form onSubmit={submit} className="stack grow" style={{ gap: 0 }}>
-        <h1 className="display mid coral" style={{ marginTop: 48, marginBottom: 72 }}>
+        <h1 className="display mid coral" style={{ marginTop: 48, marginBottom: 48 }}>
           {mode === 'create' ? 'SKAPA G.O.A.T.' : 'JOINA G.O.A.T.'}
         </h1>
         {mode === 'join' && (
@@ -48,7 +48,7 @@ export default function NameForm({ mode, initialCode = '' }: { mode: 'create' | 
               autoComplete="off"
               autoCapitalize="characters"
               inputMode="text"
-              style={{ marginBottom: 56 }}
+              style={{ marginBottom: 28 }}
             />
           </>
         )}
@@ -64,13 +64,12 @@ export default function NameForm({ mode, initialCode = '' }: { mode: 'create' | 
           autoFocus={mode === 'create' || Boolean(initialCode)}
           enterKeyHint="go"
         />
-        <div className="grow" />
         {error && (
-          <p className="error-text" style={{ marginBottom: 16 }}>
+          <p className="error-text" style={{ marginTop: 20 }}>
             {error}
           </p>
         )}
-        <button className="btn white" disabled={busy}>
+        <button className="btn ink" style={{ marginTop: 28 }} disabled={busy}>
           {busy ? '…' : mode === 'create' ? 'Skapa' : 'Joina'}
         </button>
       </form>
