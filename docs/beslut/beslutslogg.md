@@ -15,6 +15,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** All kod sparas i repot `tildissen/GOAT` på grenen `main`, som Vercel publicerar från.
 
 ### B3. Designen följer PDF:en
+- **Delvis ersatt av B37–B41** (typsnitt, ikon och delteman ändrades i designuppdateringen 2026-10-28). Färgerna och formerna gäller fortfarande.
 - **Beslut:** Färger, knappar och skärmar ska se ut som i PDF:en: limegrönt, turkos, korall och gult, det snurriga ansiktet och G.O.A.T.-loggan.
 - **Var i koden:** [`src/app/globals.css`](../../src/app/globals.css), [`src/components/Face.tsx`](../../src/components/Face.tsx).
 
@@ -184,3 +185,31 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Smileyn från `smile.png` ritades om som vektorfil, `smile.svg`, med transparent bakgrund.
 - **Tillägg (av Claude):** Filen ligger bredvid `smile.png` i repots rot och används inte av spelet. Ansiktet i spelet ritas redan som SVG i [`src/components/Face.tsx`](../../src/components/Face.tsx).
 - **Var i koden:** [`smile.svg`](../../smile.svg).
+
+---
+
+## 2026-10-28 – Designuppdatering (grenen `design-refresh`)
+
+### B37. Ikonen är Tildas `smile.svg`, ingen get med horn och skägg
+- **Beslut:** Spelets ikon är exakt den smiley Tilda ritat (två spiralögon och en vågig mun). Ingen variant med horn eller skägg.
+- **Alternativ:** ansiktet med horn och skägg (föreslogs av Claude, avvisades).
+- **Tillägg (av Claude):** Ikonen beskärs till själva ansiktet och används även som app- och flikikon.
+- **Var i koden:** [`src/components/Face.tsx`](../../src/components/Face.tsx), [`src/app/icon.svg`](../../src/app/icon.svg).
+
+### B38. Knewave på G.O.A.T och "Låt oss spela"
+- **Beslut:** Typsnittet **Knewave** används på stället där det står G.O.A.T och på texten "LÅT OSS SPELA".
+- **Var i koden:** `.logo` och `.serif` i [`src/app/globals.css`](../../src/app/globals.css), [`src/app/layout.tsx`](../../src/app/layout.tsx), [`src/app/page.tsx`](../../src/app/page.tsx).
+
+### B39. Glacial Indifference på knappar, namn och övrig text
+- **Beslut:** **Glacial Indifference** används på knappar, namn och liknande. Det ersätter Jost och League Spartan.
+- **Tillägg (av Claude):** Fonten finns inte på Google Fonts. Filerna (SIL Open Font License) ligger i [`src/fonts/`](../../src/fonts/). Playfair Display i kursiv behålls på skärmrubriker. Tilda har inte sagt något om den.
+
+### B40. Fet text används sparsamt och betyder något
+- **Beslut:** Tilda frågade om det är snyggt med fet text på vissa ställen. Claude rekommenderade och byggde: fet = sådant man trycker på eller någons namn (knappar, spelarnamn, korttaggar, frågan). Förklaringar är vanliga. Versaler bara på knappar och taggar. Namn skrivs som de heter.
+- **Var i koden:** `.btn`, `.name-pill`, `.kind` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B41. Ett färgtema per del, ny toppyta och korttaggar
+- **Beslut:** Tilda godkände förslagen i designgenomgången och bad Claude bygga allt.
+- **Tillägg (av Claude):** Del 1 grön/cyan, del 2 cyan/gul, del 3 korall/grön, del 4 gul/korall (bakgrund/kort). Utmaningar och minigames behåller sina egna skärmar. Toppyta med fem prickar för sparade klunkar och femton streck för framsteg. Svart korttagg med ikon överst på varje kort. Svarta primärknappar, avstängda knappar som mörk genomskinlig fyllning, svarta rubriker med färgad skugga (korall och cyan på bakgrunden hade kontrast runt 2:1). Ny startsida med tagline, lobby med kod och QR i samma kort och värden märkt, knappen direkt under fältet på formulären.
+- **Öppen fråga:** Ska G.O.A.T. ha sista punkten i logotypen? Texten skrivs nu med punkt, logotypen utan.
+- **Var i koden:** `partTheme` och `KindTag` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `Hud` och `CardScreen` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Lobby.tsx`](../../src/components/game/Lobby.tsx).
