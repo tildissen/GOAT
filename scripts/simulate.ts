@@ -86,6 +86,11 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
         ownCards++;
       }
     }
+    // Riktade kort: till en viss spelare, aldrig till sig själv.
+    assert.throws(() => act(ids[1], { type: 'add_custom', kind: 'direkt', text: 'Till mig själv?', targetId: ids[1] }), GameError);
+    act(ids[1], { type: 'add_custom', kind: 'direkt', text: 'Vad tycker du om sälj?', targetId: ids[2] });
+    act(ids[2], { type: 'add_custom', kind: 'utmaning', players: 1, text: 'Härma mig!', targetId: ids[0] });
+    ownCards += 2;
   } else {
     act(ids[1], { type: 'add_custom', kind: 'vem', text: 'Vem är egentligen värst på det här spelet?' });
     act(ids[2], { type: 'add_custom', kind: 'utmaning', text: 'Alla som har på sig något rött tar 2 klunkar.' });
@@ -139,6 +144,7 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
     }
     const c = s.current!;
     seen.add(c.card.kind);
+    if (c.card.targetId) assert.equal(c.turnId, c.card.targetId, `riktat kort hamnade fel: ${c.text}`);
     if (family) {
       // Familjespel: aldrig något om att dricka, och man kan inte spara.
       // Spelarnas egna kort kan handla om vad som helst, men klunkar och drickande skrivs om.

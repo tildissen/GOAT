@@ -345,3 +345,9 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Texten "3 av 3 kort skrivna" tas bort, eftersom man kan skriva fler än 3 kort och räknaren då blev missvisande.
 - **Tillägg (av Claude):** Knappen längst ner visar fortfarande hur många kort som saknas ("Skriv 2 kort till") tills man har skrivit 3. I vanliga spel står "N egna kort i spelet" kvar under "Egna kort".
 - **Var i koden:** `EgnaKort` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B66. Välj mottagare för egna direkta frågor
+- **Beslut:** När man skriver en direkt fråga kan man välja vem den ska gå till. Bakgrund: ett kort som "Lucas, vem gillar du minst på sälj?" kunde hamna hos någon annan än Lucas, eftersom kortet gick till den vars tur det var.
+- **Alternativ:** den som skrev frågan får den aldrig själv · visa frågan för alla.
+- **Tillägg (av Claude):** Samma val finns för "Utmaning till en person". Man väljer "Vem som helst" (som tidigare) eller en av de andra spelarna – inte sig själv. Kortet går till den valda personen när det dyker upp. Är personen inte uppkopplad då går det till den vars tur det är, så att spelet inte fastnar. Listan över ens kort visar mottagaren ("Direkt fråga → Lucas"). Fungerar både i "Bygg eget spel" och under "Egna kort" i vanliga spel.
+- **Var i koden:** `targetId` i [`src/lib/types.ts`](../../src/lib/types.ts), `add_custom` och `deal()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), "Till vem?" i `EgnaKort` ([`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx)).

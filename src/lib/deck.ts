@@ -49,6 +49,7 @@ function customToDeckCard(custom: CustomCard): DeckCard {
     custom: true,
   };
   if (custom.title) card.title = custom.title;
+  if (custom.targetId) card.targetId = custom.targetId;
   return card;
 }
 

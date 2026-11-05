@@ -32,6 +32,8 @@ export interface DeckCard {
   /** Tidigaste del kortet får dyka upp i. */
   level: number;
   custom?: boolean;
+  /** Eget kort till en viss spelare (direkt fråga eller utmaning till en person). */
+  targetId?: string;
 }
 
 export type Choice = 'drink' | 'save' | 'challenge' | 'answered';
@@ -89,6 +91,8 @@ export interface CustomCard {
   title?: string;
   /** Utmaningar: 1 = till den vars tur det är, 0 = för alla. */
   players?: number;
+  /** Direkt fråga eller utmaning till en person: vem kortet ska gå till. Saknas = vem som helst. */
+  targetId?: string;
   by: string;
 }
 
@@ -134,7 +138,7 @@ export type Action =
   | { type: 'start_intro' }
   | { type: 'ready' }
   | { type: 'set_selfie'; url: string }
-  | { type: 'add_custom'; kind: CustomKind; text: string; title?: string; players?: number }
+  | { type: 'add_custom'; kind: CustomKind; text: string; title?: string; players?: number; targetId?: string }
   | { type: 'remove_custom'; id: string }
   | { type: 'start_game' }
   | { type: 'vote'; targetId: string }

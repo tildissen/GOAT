@@ -161,7 +161,9 @@ function pickTurn(s: GameState, ctx: Ctx): Player {
 
 function deal(s: GameState, ctx: Ctx) {
   const card = s.deck[s.part - 1][s.cardIndex];
-  const turn = pickTurn(s, ctx);
+  // Eget kort till en viss spelare går till den personen, om hen är med och uppkopplad.
+  const target = card.targetId ? s.players.find((p) => p.id === card.targetId && p.ready && ctx.active.has(p.id)) : undefined;
+  const turn = target ?? pickTurn(s, ctx);
   const others = shuffle(
     readyPlayers(s, ctx).filter((p) => p.id !== turn.id),
     ctx.rng,
@@ -318,6 +320,12 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       const kind: CustomKind = (['vem', 'direkt', 'utmaning', 'minigame'] as const).includes(action.kind) ? action.kind : 'vem';
       const card: CustomCard = { id: `custom-${ctx.now}-${Math.floor(ctx.rng() * 1e6)}`, kind, text, by: playerId };
       if (kind === 'utmaning') card.players = action.players === 1 ? 1 : 0;
+      const personal = kind === 'direkt' || (kind === 'utmaning' && card.players === 1);
+      if (personal && action.targetId) {
+        if (action.targetId === playerId) throw new GameError('Välj någon annan än dig själv');
+        if (!s.players.some((p) => p.id === action.targetId)) throw new GameError('Spelaren finns inte i spelet');
+        card.targetId = action.targetId;
+      }
       if (kind === 'minigame') {
         const title = (action.title ?? '').replace(/\s+/g, ' ').trim();
         if (title.length < 2) throw new GameError('Ge minigamet ett namn');
