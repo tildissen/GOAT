@@ -339,9 +339,49 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ---
 
+## 2026-11-05 – Fler justeringar
+
+### B65. Ingen räknare på "Skriv dina kort"
+- **Beslut:** Texten "3 av 3 kort skrivna" tas bort, eftersom man kan skriva fler än 3 kort och räknaren då blev missvisande.
+- **Tillägg (av Claude):** Knappen längst ner visar fortfarande hur många kort som saknas ("Skriv 2 kort till") tills man har skrivit 3. I vanliga spel står "N egna kort i spelet" kvar under "Egna kort".
+- **Var i koden:** `EgnaKort` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B66. Välj mottagare för egna direkta frågor
+- **Beslut:** När man skriver en direkt fråga kan man välja vem den ska gå till. Bakgrund: ett kort som "Lucas, vem gillar du minst på sälj?" kunde hamna hos någon annan än Lucas, eftersom kortet gick till den vars tur det var.
+- **Alternativ:** den som skrev frågan får den aldrig själv · visa frågan för alla.
+- **Tillägg (av Claude):** Samma val finns för "Utmaning till en person". Man väljer "Vem som helst" (som tidigare) eller en av de andra spelarna – inte sig själv. Kortet går till den valda personen när det dyker upp. Är personen inte uppkopplad då går det till den vars tur det är, så att spelet inte fastnar. Listan över ens kort visar mottagaren ("Direkt fråga → Lucas"). Fungerar både i "Bygg eget spel" och under "Egna kort" i vanliga spel.
+- **Var i koden:** `targetId` i [`src/lib/types.ts`](../../src/lib/types.ts), `add_custom` och `deal()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), "Till vem?" i `EgnaKort` ([`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx)).
+
+### B67. 10 kort per del
+- **Beslut:** Varje del har 10 kort i stället för 15, eftersom spelet blev för långt och tråkigt. Ersätter B10.
+- **Tillägg (av Claude):** Vanliga spel: 3 "Vem i rummet?" (varav 1 Framtid), 1 "Vems är bilden?", 2 direkta frågor (varav 1 Framtid), 1 trivia, 2 utmaningar och 1 minigame per del. "Bygg eget spel": 7 frågor och utmaningar (egna, fyllda med förvalda om det behövs) plus minigame, trivia och bildkort. Har spelarna skrivit fler än 28 kort blir delarna längre, eftersom alla egna kort alltid kommer med. Ersätter delvis B29, B57 och B62.
+- **Var i koden:** `CARDS_PER_PART`, `OWN_CARDS_PER_PART`, `buildDeck()` och `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts).
+
+### B68. Minigames har bara "Nästa" och "Hoppa över"
+- **Beslut:** Knapparna "Jag dricker", "Jag vill spara" och "Dra ett utmaningskort" tas bort från minigames. Där finns bara "Nästa" och "Hoppa över". Ersätter B49 och B16 för minigames.
+- **Tillägg (av Claude):** Båda knapparna är värdens (se B50) och går vidare till nästa kort. De andra ser "Väntar på att … (värd) trycker nästa…". Servern godkänner inte heller val på minigames.
+- **Var i koden:** `canChoose()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B69. Vem som får välja dricka/spara/utmaningskort (genomgång)
+- **Beslut:** Tilda bad Claude dubbelkolla vem som får knapparna "Jag svarar", "Jag dricker", "Jag vill spara" och "Dra ett utmaningskort".
+- **Tillägg (av Claude):** Genomgången visade att alla spelare fick knapparna på X och Y-kort, fast utmaningen bara gäller två personer. Nu får bara X och Y dem. Reglerna är:
+  - **Direkt fråga:** bara den som frågan är till – "Jag svarar!" plus dricka/spara/utmaningskort.
+  - **Trivia:** bara den som svarar, och bara efter fel svar (inte "Jag svarar").
+  - **Utmaning till en person:** bara den personen, plus "Klar!".
+  - **X och Y:** bara de två.
+  - **Utmaning för alla och lag:** alla.
+  - **Alla röstar / Vems är bilden?:** bara de som förlorade röstningen (flest röster, eller gissade fel).
+  - **Vems är bilden? (uppladdning):** den hemliga uppladdaren kan välja "Jag vägrar (och dricker)".
+  - **Minigames:** ingen (B68).
+- **Var i koden:** `canChoose()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
+
+### B70. Minigames har bara "Nästa"
+- **Beslut:** Länken "Hoppa över" tas bort från minigames – det räcker med "Nästa". Ersätter den delen av B68.
+- **Var i koden:** `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
 ## 2026-11-05 – Rubriker och fält
 
-### B65. Ingen svart kant på fälten, rubrikerna behåller sitt typsnitt
+### B71. Ingen svart kant på fälten, rubrikerna behåller sitt typsnitt
 - **Beslut:** Fälten får inte längre en svart kant runt sig när man skriver. Tilda valde att ta bort den.
 - **Alternativ:** Tilda bad först om Knewave på alla rubriker (även i Bygg eget spel) men ändrade sig och ville inte ändra rubrikerna ändå. De är kvar i Glacial Indifference enligt B43.
 - **Tillägg (av Claude):** I stället för kanten blir fältet en aning mörkare grönt när man skriver, så det syns vilket fält som är aktivt.

@@ -195,8 +195,11 @@ function Challenge(p: CardProps) {
   const { cur, me } = p;
   const minigame = cur.card.kind === 'minigame';
   const solo = isSoloCard(cur.card);
-  const mine = solo || !cur.choices[me.id];
   const involved = cur.targetIds.includes(me.id);
+  // Vem får välja dricka/spara/utmaningskort: personen på solo-kort, X och Y på X och Y-kort,
+  // alla på gruppkort och lagkort. Minigames har inga val.
+  const canSkip = !minigame && (solo || cur.card.players !== 2 || involved);
+  const mine = canSkip && (solo || !cur.choices[me.id]);
   return (
     <CardScreen
       game={p}
@@ -222,9 +225,9 @@ function Challenge(p: CardProps) {
       </div>
       {mine ? (
         <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" family={isFamily(p.state)} />
-      ) : (
+      ) : canSkip ? (
         <Chosen cur={cur} meId={me.id} family={isFamily(p.state)} />
-      )}
+      ) : null}
     </CardScreen>
   );
 }

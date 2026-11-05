@@ -189,7 +189,7 @@ const CARD_TYPES: {
     key: 'direkt',
     kind: 'direkt',
     label: 'Direkt fråga',
-    desc: 'En fråga till den vars tur det är. Bara hen ser frågan och måste svara – eller dricka.',
+    desc: 'En fråga till en person – välj vem nedan, eller låt den vars tur det är få den. Bara hen ser frågan och måste svara – eller dricka.',
     example: 'Vad är det pinsammaste du har gjort på fyllan?',
   },
   {
@@ -197,7 +197,7 @@ const CARD_TYPES: {
     kind: 'utmaning',
     players: 1,
     label: 'Utmaning till en person',
-    desc: 'Något som den vars tur det är måste göra. Vägrar hen får hen dricka eller dra ett utmaningskort.',
+    desc: 'Något som en person måste göra – välj vem nedan, eller låt den vars tur det är få den. Vägrar hen får hen dricka eller dra ett utmaningskort.',
     example: 'Härma någon i rummet tills någon gissar vem det är.',
   },
   {
@@ -225,11 +225,11 @@ const FAMILY_TYPE_TEXT: Partial<Record<CardTypeKey, { desc: string; example: str
     example: 'Vem skulle klara sig längst utan mobil?',
   },
   direkt: {
-    desc: 'En fråga till den vars tur det är. Bara hen ser frågan och måste svara – eller ta minuspoäng.',
+    desc: 'En fråga till en person – välj vem nedan, eller låt den vars tur det är få den. Bara hen ser frågan och måste svara – eller ta minuspoäng.',
     example: 'Vilken superkraft skulle du välja, och varför?',
   },
   solo: {
-    desc: 'Något som den vars tur det är måste göra. Vägrar hen får hen minuspoäng eller drar ett utmaningskort.',
+    desc: 'Något som en person måste göra – välj vem nedan, eller låt den vars tur det är få den. Vägrar hen får hen minuspoäng eller drar ett utmaningskort.',
     example: 'Härma ett djur tills någon gissar vilket.',
   },
   alla: {
@@ -252,6 +252,7 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
   const [typeKey, setTypeKey] = useState<CardTypeKey>('vem');
   const [text, setText] = useState('');
   const [title, setTitle] = useState('');
+  const [targetId, setTargetId] = useState<string | null>(null);
   const baseType = CARD_TYPES.find((t) => t.key === typeKey)!;
   const type = isFamily(state)
     ? { ...baseType, ...FAMILY_TYPE_TEXT[typeKey], titleExample: baseType.titleExample && 'Frys!' }
@@ -263,10 +264,19 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
   const canAdd = text.trim().length >= 3 && (type.kind !== 'minigame' || title.trim().length >= 2);
 
   async function add() {
-    const ok = await act({ type: 'add_custom', kind: type.kind, players: type.players, title, text });
+    const personal = type.key === 'direkt' || type.key === 'solo';
+    const ok = await act({
+      type: 'add_custom',
+      kind: type.kind,
+      players: type.players,
+      title,
+      text,
+      targetId: personal && targetId ? targetId : undefined,
+    });
     if (ok) {
       setText('');
       setTitle('');
+      setTargetId(null);
     }
   }
 
@@ -304,6 +314,31 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
         <p className="example">Exempel: ”{type.titleExample ? `${type.titleExample} – ` : ''}{type.example}”</p>
       </div>
 
+      {(type.key === 'direkt' || type.key === 'solo') && (
+        <>
+          <p className="choice-prompt" style={{ margin: '14px 0 8px' }}>
+            Till vem?
+          </p>
+          <div className="names" style={{ gap: 8 }}>
+            {[{ id: null, name: 'Vem som helst' }, ...state.players.filter((pl) => pl.id !== me.id)].map((pl) => (
+              <button
+                key={pl.id ?? 'alla'}
+                className={`name-pill white${targetId === pl.id ? ' selected' : ''}`}
+                style={{ fontSize: 15, minHeight: 40, flex: '0 1 auto' }}
+                onClick={() => setTargetId(pl.id)}
+                aria-pressed={targetId === pl.id}
+              >
+                <span>{pl.name}</span>
+              </button>
+            ))}
+          </div>
+          <p className="body-text muted" style={{ fontSize: 14, marginTop: 6 }}>
+            {targetId
+              ? `Kortet går till ${state.players.find((pl) => pl.id === targetId)?.name}.`
+              : 'Kortet går till den vars tur det är.'}
+          </p>
+        </>
+      )}
       {type.kind === 'minigame' && (
         <input
           className="input"
@@ -331,7 +366,10 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
           {mine.map((c) => (
             <div key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <span style={{ flex: 1 }}>
-                <small className="muted">{typeOf(c).label}</small>
+                <small className="muted">
+                  {typeOf(c).label}
+                  {c.targetId && ` → ${state.players.find((pl) => pl.id === c.targetId)?.name ?? '?'}`}
+                </small>
                 <br />
                 {c.title ? `${c.title}: ` : ''}
                 {c.text}
@@ -343,9 +381,12 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
           ))}
         </div>
       )}
-      <p className="progress" style={{ marginTop: 12 }}>
-        {custom ? `${Math.min(own, MIN_OWN_CARDS)} av ${MIN_OWN_CARDS} kort skrivna` : `${state.customCards.length} egna kort i spelet`}
-      </p>
+      {/* I "Bygg eget spel" visar knappen längst ner hur många kort som saknas – ingen räknare behövs. */}
+      {!custom && (
+        <p className="progress" style={{ marginTop: 12 }}>
+          {state.customCards.length} egna kort i spelet
+        </p>
+      )}
       <div className="grow" style={{ minHeight: 24 }} />
       <button className="btn ink" disabled={busy || missing > 0} onClick={onDone}>
         {missing > 0 ? `Skriv ${missing} kort till` : custom || mine.length > 0 ? 'Nästa' : 'Hoppa över'}
