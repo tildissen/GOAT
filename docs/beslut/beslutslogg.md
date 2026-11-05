@@ -374,3 +374,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - **Vems är bilden? (uppladdning):** den hemliga uppladdaren kan välja "Jag vägrar (och dricker)".
   - **Minigames:** ingen (B68).
 - **Var i koden:** `canChoose()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
+
+### B70. Minigames har bara "Nästa"
+- **Beslut:** Länken "Hoppa över" tas bort från minigames – det räcker med "Nästa". Ersätter den delen av B68.
+- **Var i koden:** `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).

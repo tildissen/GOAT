@@ -205,16 +205,7 @@ function Challenge(p: CardProps) {
       game={p}
       bg={minigame ? 'cyan' : 'coral'}
       card={minigame ? 'coral' : 'green'}
-      below={
-        <>
-          <NextButton {...p} label={solo ? 'Klar!' : 'Nästa'} />
-          {minigame && canAdvance(p) && (
-            <button className="link-btn" disabled={p.busy} onClick={() => p.act({ type: 'next' })}>
-              Hoppa över
-            </button>
-          )}
-        </>
-      }
+      below={<NextButton {...p} label={solo ? 'Klar!' : 'Nästa'} />}
     >
       <KindTag kind={minigame ? 'minigame' : 'utmaning'} />
       {minigame && cur.card.title && <p className="heading">{cur.card.title}</p>}
