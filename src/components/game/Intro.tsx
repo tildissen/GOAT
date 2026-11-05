@@ -343,9 +343,12 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
           ))}
         </div>
       )}
-      <p className="progress" style={{ marginTop: 12 }}>
-        {custom ? `${Math.min(own, MIN_OWN_CARDS)} av ${MIN_OWN_CARDS} kort skrivna` : `${state.customCards.length} egna kort i spelet`}
-      </p>
+      {/* I "Bygg eget spel" visar knappen längst ner hur många kort som saknas – ingen räknare behövs. */}
+      {!custom && (
+        <p className="progress" style={{ marginTop: 12 }}>
+          {state.customCards.length} egna kort i spelet
+        </p>
+      )}
       <div className="grow" style={{ minHeight: 24 }} />
       <button className="btn ink" disabled={busy || missing > 0} onClick={onDone}>
         {missing > 0 ? `Skriv ${missing} kort till` : custom || mine.length > 0 ? 'Nästa' : 'Hoppa över'}

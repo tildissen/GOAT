@@ -336,3 +336,12 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B64. Supabase uppdaterad via Supabase-connectorn
 - **Beslut:** Tilda kopplade Supabase-connectorn i Claude och bad Claude uppdatera databasen med den, i stället för att klistra in SQL själv.
 - **Tillägg (av Claude):** Kolumnen `occasion` lades till som migreringen `add_cards_occasion`. Bara de 220 nya korten för AW och Familjespel lades in – de 580 befintliga korten rördes inte, så eventuella ändringar i dem finns kvar. Databasen har nu 800 kort. B63 är därmed klart. Supabases säkerhetsråd visar bara att tabellerna har RLS utan regler, vilket är avsiktligt: bara spelets server får läsa och skriva.
+
+---
+
+## 2026-11-05 – Fler justeringar
+
+### B65. Ingen räknare på "Skriv dina kort"
+- **Beslut:** Texten "3 av 3 kort skrivna" tas bort, eftersom man kan skriva fler än 3 kort och räknaren då blev missvisande.
+- **Tillägg (av Claude):** Knappen längst ner visar fortfarande hur många kort som saknas ("Skriv 2 kort till") tills man har skrivit 3. I vanliga spel står "N egna kort i spelet" kvar under "Egna kort".
+- **Var i koden:** `EgnaKort` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
