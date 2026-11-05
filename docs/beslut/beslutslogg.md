@@ -378,3 +378,48 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B70. Minigames har bara "Nästa"
 - **Beslut:** Länken "Hoppa över" tas bort från minigames – det räcker med "Nästa". Ersätter den delen av B68.
 - **Var i koden:** `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+## 2026-11-05 – Rubriker och fält
+
+### B71. Ingen svart kant på fälten, rubrikerna behåller sitt typsnitt
+- **Beslut:** Fälten får inte längre en svart kant runt sig när man skriver. Tilda valde att ta bort den.
+- **Alternativ:** Tilda bad först om Knewave på alla rubriker (även i Bygg eget spel) men ändrade sig och ville inte ändra rubrikerna ändå. De är kvar i Glacial Indifference enligt B43.
+- **Tillägg (av Claude):** I stället för kanten blir fältet en aning mörkare grönt när man skriver, så det syns vilket fält som är aktivt.
+- **Var i koden:** `.input:focus-visible` i [`src/app/globals.css`](../../src/app/globals.css).
+
+## 2026-11-05 – Stör ej och tillgänglig kontrast
+
+### B72. Ny "stör ej"-skärm och kontrast enligt WCAG 2.1 AA
+- **Beslut:** Tilda tyckte att "stör ej"-skärmen (gul varningstriangel på en korallröd ruta) inte var snygg och bad Claude göra om den och kontrollera kontrasten i hela spelet enligt WCAG.
+- **Beslut:** Raden "Då slipper ni notiser mitt i spelet." ska inte vara med. Tilda ifrågasatte också om månikonen passade G.O.A.T.-temat. Den gjordes om i samma handritade streckstil som smileyn.
+- **Tillägg (av Claude):** Ny skärm på cyan bakgrund med en sovande telefon: telefonen är ritad med lösa svarta streck utan fyllning, har slutna ögon, samma vågiga mun som ikonen och Z i Knewave. Rubriken har "stör ej" markerat med gult. Knappen heter fortfarande "Klar". B23 gäller: det är bara en påminnelse.
+- **Mätning:** Claude mätte textkontrasten på 46 skärmar i alla delar och lägen (krav 4,5:1 för vanlig text och 3:1 för stor text). Ingen text föll igenom. Fem saker som mätningen inte nådde justerades efter beräkning:
+  - Felmeddelandet i formulären var korall text på vitt (3,1:1). Nu svart text med korall kant.
+  - Brödtexten på ERROR-skärmen var vit på röd (3,7:1). Nu svart (5,7:1). Själva ordet ERROR är stor text och är kvar vitt.
+  - Textfälten (grönt på cyan, 1,3:1) fick en tunn mörk kant (ca 5:1), eftersom ett fälts kant måste synas mot bakgrunden (WCAG 1.4.11). Kanten är inte svart och ändras inte när man skriver. **Ersatt av B74.**
+  - Spelare som är offline tonas inte längre ner så mycket (opacitet 0,5 gav under 4,5:1, nu 0,65). `.muted` höjdes från 0,7 till 0,75.
+  - Toppytan visar nu också siffran ("Del 1 · 8/15"), så att framsteget inte bara visas med streck.
+- **Var i koden:** `StorEj` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.input`, `.error-text`, `.storej`, `.board-row.offline` i [`src/app/globals.css`](../../src/app/globals.css), [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `Hud` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B73. Alla ikoner och bilder i G.O.A.T.-stil, plus delningsbild
+- **Beslut:** Tilda bad Claude gå igenom alla ikoner och bilder så att de passar temat.
+- **Tillägg (av Claude):** Korttaggarnas sex ikoner ritades om i samma lösa, handritade streckstil som smileyn (runda ändar, inga fyllningar, lite sneda linjer) och samlades i en gemensam `Icon`-komponent. Emojis byttes mot ritade ikoner: 💼 → portfölj, 👨‍👩‍👧 → vuxen och barn, 🎉 → partyspruta på tillfälle-valen, 🏆 → pokal på slutskärmen och 🐐 → själva smileyn efter "RÄTT!". Emojin 🤫 i texten för bildkort och tecknen ✓ och ✕ är kvar.
+- **Tillägg (av Claude):** Delningsbild (`opengraph-image.png`, 1200 × 630) och ikon för mobilens hemskärm (`apple-icon.png`) med smileyn, så att länken ser ut som G.O.A.T. när den delas.
+- **Öppen fråga:** `index.html` och `smile.png` i repots rot (B34) används inte av spelet. De är kvar tills Tilda säger till.
+- **Var i koden:** `Icon` och `KindTag` i [`src/components/ui.tsx`](../../src/components/ui.tsx), [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx), [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/app/opengraph-image.png`](../../src/app/opengraph-image.png), [`src/app/apple-icon.png`](../../src/app/apple-icon.png).
+
+### B74. Ingen kant runt textfälten
+- **Beslut:** Textfälten får ingen kant alls, varken vilande eller när man skriver. Tilda ville ta bort den svarta raden runt rutan. Fältet blir en aning mörkare grönt när man skriver.
+- **Ersätter:** kanten som lades till i B72.
+- **Obs (av Claude):** Utan kant är grönt fält mot cyan bakgrund bara 1,3:1, vilket inte når 3:1 för ett fälts kant (WCAG 1.4.11). Texten ovanför ("Vad heter du?") visar vad fältet är. Vill Tilda ha det strikt kan en kant eller understrykning läggas tillbaka.
+- **Var i koden:** `.input` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B75. Större namn och Knewave på "Del … är klar!"
+- **Beslut:** Tilda ville ha större namn och ett annat typsnitt på "Del ett är klar!", "Del två är klar!" och så vidare. Namnet över en direktfråga eller solo-utmaning går från 28 px till upp till 52 px. "Elsas tur" går från mellan till stor rubrik. Bildägarens namn på resultatkortet och namnet på utmaningskortet blev större.
+- **Tillägg (av Claude):** Claude valde Knewave för "Del … är klar!", eftersom det är det typsnitt Tilda redan valt för G.O.A.T och namn. Det gäller även slutskärmen ("Del fyra är klar!").
+- **Var i koden:** `.heading.name-big` i [`src/app/globals.css`](../../src/app/globals.css), [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+
+### B76. Minigame-rubriken får egen stil
+- **Beslut:** Tilda ville att rubriken på minigames (t.ex. "Vattenfall", "Jag har aldrig") skulle skilja sig från regeltexten och kanske få en effekt.
+- **Tillägg (av Claude):** Rubriken är större (upp till 48 px), i Knewave, med en vit förskjuten skugga och en liten lutning. Den poppar in när kortet visas. Rörelsen stängs av för den som har "minska rörelse" påslaget.
+- **Var i koden:** `.minigame-title` i [`src/app/globals.css`](../../src/app/globals.css), `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).

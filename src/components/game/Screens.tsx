@@ -18,7 +18,7 @@ export function PartEnd({ state, isLeader, busy, act }: GameProps) {
   return (
     <Screen bg={look.bg} center>
       <div className="stack" style={{ gap: 36 }}>
-        <h1 className={`display big ${look.title}`}>Del {PART_WORDS[state.part - 1]} är klar!</h1>
+        <h1 className={`display big name-font ${look.title}`}>Del {PART_WORDS[state.part - 1]} är klar!</h1>
         <p className="tagline">{look.tagline}</p>
         {isLeader ? (
           <div className="stack" style={{ marginTop: 60, gap: 28 }}>
@@ -45,7 +45,7 @@ export function Finished({ state, isLeader, busy, act }: GameProps) {
   return (
     <Screen bg="yellow">
       <div className="stack" style={{ marginTop: 48, gap: 20 }}>
-        <h1 className="display big coral">Del {PART_WORDS[state.part - 1]} är klar!</h1>
+        <h1 className="display big name-font coral">Del {PART_WORDS[state.part - 1]} är klar!</h1>
         <p className="tagline">wow, vilka GOATs</p>
       </div>
       <div style={{ width: '100%', margin: '32px 0' }}>
@@ -109,7 +109,7 @@ export function PauseOverlay({ state, me, busy, act }: GameProps) {
             Jag har druckit {sipsText(me.saved)}
           </button>
         ) : (
-          <p className="body-text" style={{ color: 'var(--white)' }}>
+          <p className="body-text">
             Spelet fortsätter när {paused.map((p) => p.name).join(' och ')} har druckit.
           </p>
         )}
@@ -126,7 +126,9 @@ export function ChallengeOverlay({ state, me, busy, act }: GameProps) {
     <div className="overlay solid-cyan" role="dialog" aria-label="Utmaningskort">
       <div className="panel green" style={{ minHeight: '70dvh' }}>
         <h2 className="display mid">
-          <span className="name-font">{possessive(me.name)}</span>
+          <span className="name-font" style={{ fontSize: '1.25em' }}>
+            {possessive(me.name)}
+          </span>
           <br />
           UTMANINGSKORT
         </h2>

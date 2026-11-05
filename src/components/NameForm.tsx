@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { api, saveCreds } from '@/lib/client';
 import type { Occasion } from '@/lib/types';
-import { Screen } from './ui';
+import { Icon, Screen, type IconName } from './ui';
 
 /** Formuläret för både "skapa" (bara namn) och "joina" (kod + namn). */
 export default function NameForm({
@@ -67,7 +67,8 @@ export default function NameForm({
                   onClick={() => setOccasion(o.key)}
                 >
                   <strong>
-                    {o.icon} {o.label}
+                    <Icon name={o.icon} size={24} />
+                    {o.label}
                   </strong>
                   <span>{o.desc}</span>
                 </button>
@@ -117,8 +118,8 @@ export default function NameForm({
   );
 }
 
-const OCCASIONS: { key: Occasion; icon: string; label: string; desc: string }[] = [
-  { key: 'aw', icon: '💼', label: 'AW', desc: 'Kollegor och vänner. Lugna frågor, inget pinsamt.' },
-  { key: 'familj', icon: '👨‍👩‍👧', label: 'Familjespel', desc: 'Alla åldrar och alkoholfritt – minuspoäng i stället för klunkar.' },
-  { key: 'fest', icon: '🎉', label: 'Fest', desc: 'Allt är tillåtet. Blir vildare för varje del.' },
+const OCCASIONS: { key: Occasion; icon: IconName; label: string; desc: string }[] = [
+  { key: 'aw', icon: 'aw', label: 'AW', desc: 'Kollegor och vänner. Lugna frågor, inget pinsamt.' },
+  { key: 'familj', icon: 'familj', label: 'Familjespel', desc: 'Alla åldrar och alkoholfritt – minuspoäng i stället för klunkar.' },
+  { key: 'fest', icon: 'fest', label: 'Fest', desc: 'Allt är tillåtet. Blir vildare för varje del.' },
 ];

@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
 import { canPressNext, isFamily, isSoloCard, MAX_SAVED } from '@/lib/engine';
 import type { Current } from '@/lib/types';
+import Face from '../Face';
 import { Avatar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
 import { Board, ChoiceButtons, choiceText, nameOf, possessive, sipsText, type GameProps } from './shared';
 
@@ -90,7 +91,9 @@ export function Hud({
       </button>
       )}
       <div className="hud-block right" role="img" aria-label={`Del ${part}, kort ${index + 1} av ${total}`}>
-        <span className="hud-label">Del {part}</span>
+        <span className="hud-label">
+          Del {part} · {index + 1}/{total}
+        </span>
         <span className="segs" aria-hidden="true">
           {Array.from({ length: total }, (_, i) => (
             <i key={i} className={i <= index ? 'on' : ''} />
@@ -128,7 +131,7 @@ function Direct(p: CardProps) {
     <CardScreen game={p}>
       <KindTag kind="direkt" />
       <div className="card-q">
-        <p className="heading name-font">{p.me.name}</p>
+        <p className="heading name-font name-big">{p.me.name}</p>
         <p className="card-text big">{p.cur.text}</p>
       </div>
       <ChoiceButtons
@@ -162,7 +165,13 @@ function Trivia(p: CardProps) {
       </div>
       <div className="card-q">
         <p className="card-text big">{cur.text}</p>
-        {answered && <p className="heading">{right ? 'RÄTT! 🐐' : 'FEL!'}</p>}
+        {answered && <p className="heading">{right ? (
+            <>
+              RÄTT! <Face size={36} className="inline-face" decorative />
+            </>
+          ) : (
+            'FEL!'
+          )}</p>}
       </div>
       <div className="options">
         {options.map((opt, i) => {
@@ -208,8 +217,8 @@ function Challenge(p: CardProps) {
       below={<NextButton {...p} label={solo ? 'Klar!' : 'Nästa'} />}
     >
       <KindTag kind={minigame ? 'minigame' : 'utmaning'} />
-      {minigame && cur.card.title && <p className="heading">{cur.card.title}</p>}
-      {solo && <p className="heading name-font">{me.name}</p>}
+      {minigame && cur.card.title && <h2 className="minigame-title">{cur.card.title}</h2>}
+      {solo && <p className="heading name-font name-big">{me.name}</p>}
       <div className="card-body">
         <p className="card-text">{cur.text}</p>
         {cur.teams && (
@@ -324,7 +333,7 @@ function ResultCard(p: CardProps) {
     headline = (
       <>
         <div className="code-box" style={{ background: 'var(--green)', fontSize: 'clamp(26px, 9vw, 40px)', cursor: 'default' }}>
-          <span className="display small name-font">{owner.toUpperCase()}</span>
+          <span className="display mid name-font">{owner.toUpperCase()}</span>
         </div>
         <p className="heading">{allRight
             ? `ägde bilden – alla gissade rätt, så ${owner} ${isFamily(state) ? 'får minuspoäng' : 'dricker'}!`
@@ -453,7 +462,7 @@ function Waiting(p: CardProps) {
   return (
     <CardScreen game={p}>
       {player && <Avatar player={player} big />}
-      <h2 className="display mid name-font">{possessive(nameOf(state, cur.turnId))} tur</h2>
+      <h2 className="display big name-font">{possessive(nameOf(state, cur.turnId))} tur</h2>
       <p className="body-text">{nameOf(state, cur.turnId)} {DOING[cur.card.kind] ?? 'spelar'}…</p>
       <Board state={state} active={p.view.active} meId={p.me.id} />
       {!p.view.active.includes(cur.turnId) && <NextButton {...p} label="Hoppa över" />}

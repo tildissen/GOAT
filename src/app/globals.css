@@ -106,7 +106,7 @@ textarea {
   text-align: center;
   margin: 0;
 }
-.muted { opacity: 0.7; }
+.muted { opacity: 0.75; }
 .italic { font-style: italic; }
 
 .tagline {
@@ -214,6 +214,7 @@ a.btn.ink { color: var(--white); }
   align-self: flex-start;
   margin: 0 0 4px 8px;
 }
+/* Ingen kant runt fältet, varken vilande eller när man skriver (Tildas val, se B74). */
 .input {
   width: 100%;
   border: 0;
@@ -224,14 +225,16 @@ a.btn.ink { color: var(--white); }
   font-size: 22px;
   outline: none;
 }
-.input:focus-visible { box-shadow: 0 0 0 3px var(--black); }
+/* Ingen svart kant när man skriver. Fältet blir bara en aning mörkare grönt. */
+.input:focus-visible { background: #b3f55e; }
 .input.code { text-transform: uppercase; letter-spacing: 0.25em; font-weight: 600; }
 textarea.input { min-height: 96px; resize: none; font-size: 18px; line-height: 1.4; padding-top: 16px; }
 
 .error-text {
   background: var(--white);
-  color: var(--coral);
-  font-weight: 600;
+  color: var(--black);
+  border: 3px solid var(--coral);
+  font-weight: 700;
   border-radius: 16px;
   padding: 10px 16px;
   text-align: center;
@@ -326,7 +329,7 @@ button.name-pill:active { transform: scale(0.97); }
 .board-row.me { background: var(--white); }
 .board-row .name { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .board-row .stat { font-size: 15px; text-align: right; line-height: 1.2; }
-.board-row.offline { opacity: 0.5; }
+.board-row.offline { opacity: 0.65; }
 
 /* ---------- Överlägg ---------- */
 .overlay {
@@ -368,6 +371,25 @@ button.name-pill:active { transform: scale(0.97); }
   line-height: 1.25;
   margin: 0;
 }
+/* Stör ej-skärmen */
+.storej { gap: 28px; }
+.storej-icon { width: min(60vw, 230px); height: auto; }
+.storej-title {
+  font-weight: 700;
+  font-size: clamp(30px, 9vw, 38px);
+  line-height: 1.2;
+  text-align: center;
+  margin: 0;
+  text-wrap: balance;
+}
+.hl {
+  background: var(--yellow);
+  border-radius: 12px;
+  padding: 0 10px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 .panel .light {
   color: var(--white);
   font-size: clamp(24px, 7vw, 32px);
@@ -640,3 +662,28 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 }
 .occasion strong { font-size: 19px; }
 .occasion.selected { background: var(--black); color: var(--white); }
+
+/* Ikoner i texten */
+.inline-face { vertical-align: middle; margin-left: 6px; }
+.inline-icon { vertical-align: -5px; margin-right: 8px; }
+.occasion strong { display: flex; align-items: center; gap: 8px; }
+.heading.name-big { font-size: clamp(38px, 12vw, 52px); line-height: 1.05; }
+
+/* Minigame-rubriken: större, Knewave, vit skugga och en liten lutning så att den skiljer sig från regeltexten. */
+.minigame-title {
+  font-family: var(--font-knewave), var(--font-glacial), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(36px, 11vw, 48px);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-shadow: 3px 3px 0 var(--white);
+  margin: 6px 0 0;
+  transform: rotate(-2deg);
+  text-wrap: balance;
+  animation: title-pop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+@keyframes title-pop {
+  from { transform: scale(0.6) rotate(-6deg); opacity: 0; }
+  to { transform: rotate(-2deg); opacity: 1; }
+}
