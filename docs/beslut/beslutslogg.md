@@ -418,3 +418,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Tilda ville ha större namn och ett annat typsnitt på "Del ett är klar!", "Del två är klar!" och så vidare. Namnet över en direktfråga eller solo-utmaning går från 28 px till upp till 52 px. "Elsas tur" går från mellan till stor rubrik. Bildägarens namn på resultatkortet och namnet på utmaningskortet blev större.
 - **Tillägg (av Claude):** Claude valde Knewave för "Del … är klar!", eftersom det är det typsnitt Tilda redan valt för G.O.A.T och namn. Det gäller även slutskärmen ("Del fyra är klar!").
 - **Var i koden:** `.heading.name-big` i [`src/app/globals.css`](../../src/app/globals.css), [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+
+### B76. Minigame-rubriken får egen stil
+- **Beslut:** Tilda ville att rubriken på minigames (t.ex. "Vattenfall", "Jag har aldrig") skulle skilja sig från regeltexten och kanske få en effekt.
+- **Tillägg (av Claude):** Rubriken är större (upp till 48 px), i Knewave, med en vit förskjuten skugga och en liten lutning. Den poppar in när kortet visas. Rörelsen stängs av för den som har "minska rörelse" påslaget.
+- **Var i koden:** `.minigame-title` i [`src/app/globals.css`](../../src/app/globals.css), `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).

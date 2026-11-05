@@ -217,7 +217,7 @@ function Challenge(p: CardProps) {
       below={<NextButton {...p} label={solo ? 'Klar!' : 'Nästa'} />}
     >
       <KindTag kind={minigame ? 'minigame' : 'utmaning'} />
-      {minigame && cur.card.title && <p className="heading">{cur.card.title}</p>}
+      {minigame && cur.card.title && <h2 className="minigame-title">{cur.card.title}</h2>}
       {solo && <p className="heading name-font name-big">{me.name}</p>}
       <div className="card-body">
         <p className="card-text">{cur.text}</p>

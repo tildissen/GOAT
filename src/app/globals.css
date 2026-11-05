@@ -668,3 +668,22 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .inline-icon { vertical-align: -5px; margin-right: 8px; }
 .occasion strong { display: flex; align-items: center; gap: 8px; }
 .heading.name-big { font-size: clamp(38px, 12vw, 52px); line-height: 1.05; }
+
+/* Minigame-rubriken: större, Knewave, vit skugga och en liten lutning så att den skiljer sig från regeltexten. */
+.minigame-title {
+  font-family: var(--font-knewave), var(--font-glacial), system-ui, sans-serif;
+  font-weight: 400;
+  font-size: clamp(36px, 11vw, 48px);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-shadow: 3px 3px 0 var(--white);
+  margin: 6px 0 0;
+  transform: rotate(-2deg);
+  text-wrap: balance;
+  animation: title-pop 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+@keyframes title-pop {
+  from { transform: scale(0.6) rotate(-6deg); opacity: 0; }
+  to { transform: rotate(-2deg); opacity: 1; }
+}
