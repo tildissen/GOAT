@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
 import { canPressNext, isFamily, isSoloCard, MAX_SAVED } from '@/lib/engine';
 import type { Current } from '@/lib/types';
+import Face from '../Face';
 import { Avatar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
 import { Board, ChoiceButtons, choiceText, nameOf, possessive, sipsText, type GameProps } from './shared';
 
@@ -164,7 +165,13 @@ function Trivia(p: CardProps) {
       </div>
       <div className="card-q">
         <p className="card-text big">{cur.text}</p>
-        {answered && <p className="heading">{right ? 'RÄTT! 🐐' : 'FEL!'}</p>}
+        {answered && <p className="heading">{right ? (
+            <>
+              RÄTT! <Face size={36} className="inline-face" decorative />
+            </>
+          ) : (
+            'FEL!'
+          )}</p>}
       </div>
       <div className="options">
         {options.map((opt, i) => {

@@ -2,7 +2,7 @@
 
 import type { Action, Choice, GameView, Player, PublicState } from '@/lib/types';
 import { isFamily } from '@/lib/engine';
-import { Avatar } from '../ui';
+import { Avatar, Icon, type IconName } from '../ui';
 
 export interface GameProps {
   view: GameView;
@@ -107,7 +107,7 @@ export function Stats({ state }: { state: PublicState }) {
   const rows = [
     ...(family
       ? [
-          { label: '🏆 Vinnare', p: fewest, value: (p: Player) => sipsText(p.drank, true), always: true },
+          { label: 'Vinnare', icon: 'trofe' as IconName, p: fewest, value: (p: Player) => sipsText(p.drank, true), always: true },
           { label: 'Flest minuspoäng', p: top('drank'), value: (p: Player) => sipsText(p.drank, true) },
         ]
       : [{ label: 'Drack mest', p: top('drank'), value: (p: Player) => sipsText(p.drank) }]),
@@ -120,6 +120,7 @@ export function Stats({ state }: { state: PublicState }) {
         <div key={r.label} className="board-row">
           <Avatar player={r.p} />
           <span className="name">
+            {'icon' in r && r.icon && <Icon name={r.icon} size={22} className="inline-icon" />}
             {r.label}: {r.p.name}
           </span>
           <span className="stat">{r.value(r.p)}</span>

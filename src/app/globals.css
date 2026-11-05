@@ -214,10 +214,10 @@ a.btn.ink { color: var(--white); }
   align-self: flex-start;
   margin: 0 0 4px 8px;
 }
-/* Fältets kant måste synas mot bakgrunden (minst 3:1). Grönt mot cyan är bara 1,3:1, så fältet får en mörk kant. */
+/* Ingen kant runt fältet, varken vilande eller när man skriver (Tildas val, se B74). */
 .input {
   width: 100%;
-  border: 2px solid rgba(0, 0, 0, 0.6);
+  border: 0;
   border-radius: var(--radius-btn);
   background: var(--green);
   min-height: 60px;
@@ -662,3 +662,8 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 }
 .occasion strong { font-size: 19px; }
 .occasion.selected { background: var(--black); color: var(--white); }
+
+/* Ikoner i texten */
+.inline-face { vertical-align: middle; margin-left: 6px; }
+.inline-icon { vertical-align: -5px; margin-right: 8px; }
+.occasion strong { display: flex; align-items: center; gap: 8px; }

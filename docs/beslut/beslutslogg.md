@@ -396,7 +396,20 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Mätning:** Claude mätte textkontrasten på 46 skärmar i alla delar och lägen (krav 4,5:1 för vanlig text och 3:1 för stor text). Ingen text föll igenom. Fem saker som mätningen inte nådde justerades efter beräkning:
   - Felmeddelandet i formulären var korall text på vitt (3,1:1). Nu svart text med korall kant.
   - Brödtexten på ERROR-skärmen var vit på röd (3,7:1). Nu svart (5,7:1). Själva ordet ERROR är stor text och är kvar vitt.
-  - Textfälten (grönt på cyan, 1,3:1) fick en tunn mörk kant (ca 5:1), eftersom ett fälts kant måste synas mot bakgrunden (WCAG 1.4.11). Kanten är inte svart och ändras inte när man skriver.
+  - Textfälten (grönt på cyan, 1,3:1) fick en tunn mörk kant (ca 5:1), eftersom ett fälts kant måste synas mot bakgrunden (WCAG 1.4.11). Kanten är inte svart och ändras inte när man skriver. **Ersatt av B74.**
   - Spelare som är offline tonas inte längre ner så mycket (opacitet 0,5 gav under 4,5:1, nu 0,65). `.muted` höjdes från 0,7 till 0,75.
   - Toppytan visar nu också siffran ("Del 1 · 8/15"), så att framsteget inte bara visas med streck.
 - **Var i koden:** `StorEj` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.input`, `.error-text`, `.storej`, `.board-row.offline` i [`src/app/globals.css`](../../src/app/globals.css), [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `Hud` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B73. Alla ikoner och bilder i G.O.A.T.-stil, plus delningsbild
+- **Beslut:** Tilda bad Claude gå igenom alla ikoner och bilder så att de passar temat.
+- **Tillägg (av Claude):** Korttaggarnas sex ikoner ritades om i samma lösa, handritade streckstil som smileyn (runda ändar, inga fyllningar, lite sneda linjer) och samlades i en gemensam `Icon`-komponent. Emojis byttes mot ritade ikoner: 💼 → portfölj, 👨‍👩‍👧 → vuxen och barn, 🎉 → partyspruta på tillfälle-valen, 🏆 → pokal på slutskärmen och 🐐 → själva smileyn efter "RÄTT!". Emojin 🤫 i texten för bildkort och tecknen ✓ och ✕ är kvar.
+- **Tillägg (av Claude):** Delningsbild (`opengraph-image.png`, 1200 × 630) och ikon för mobilens hemskärm (`apple-icon.png`) med smileyn, så att länken ser ut som G.O.A.T. när den delas.
+- **Öppen fråga:** `index.html` och `smile.png` i repots rot (B34) används inte av spelet. De är kvar tills Tilda säger till.
+- **Var i koden:** `Icon` och `KindTag` i [`src/components/ui.tsx`](../../src/components/ui.tsx), [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx), [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/app/opengraph-image.png`](../../src/app/opengraph-image.png), [`src/app/apple-icon.png`](../../src/app/apple-icon.png).
+
+### B74. Ingen kant runt textfälten
+- **Beslut:** Textfälten får ingen kant alls, varken vilande eller när man skriver. Tilda ville ta bort den svarta raden runt rutan. Fältet blir en aning mörkare grönt när man skriver.
+- **Ersätter:** kanten som lades till i B72.
+- **Obs (av Claude):** Utan kant är grönt fält mot cyan bakgrund bara 1,3:1, vilket inte når 3:1 för ett fälts kant (WCAG 1.4.11). Texten ovanför ("Vad heter du?") visar vad fältet är. Vill Tilda ha det strikt kan en kant eller understrykning läggas tillbaka.
+- **Var i koden:** `.input` i [`src/app/globals.css`](../../src/app/globals.css).
