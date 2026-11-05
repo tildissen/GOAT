@@ -90,7 +90,9 @@ export function Hud({
       </button>
       )}
       <div className="hud-block right" role="img" aria-label={`Del ${part}, kort ${index + 1} av ${total}`}>
-        <span className="hud-label">Del {part}</span>
+        <span className="hud-label">
+          Del {part} · {index + 1}/{total}
+        </span>
         <span className="segs" aria-hidden="true">
           {Array.from({ length: total }, (_, i) => (
             <i key={i} className={i <= index ? 'on' : ''} />

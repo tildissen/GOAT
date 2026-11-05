@@ -109,7 +109,7 @@ export function PauseOverlay({ state, me, busy, act }: GameProps) {
             Jag har druckit {sipsText(me.saved)}
           </button>
         ) : (
-          <p className="body-text" style={{ color: 'var(--white)' }}>
+          <p className="body-text">
             Spelet fortsätter när {paused.map((p) => p.name).join(' och ')} har druckit.
           </p>
         )}

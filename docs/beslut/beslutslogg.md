@@ -386,3 +386,16 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Alternativ:** Tilda bad först om Knewave på alla rubriker (även i Bygg eget spel) men ändrade sig och ville inte ändra rubrikerna ändå. De är kvar i Glacial Indifference enligt B43.
 - **Tillägg (av Claude):** I stället för kanten blir fältet en aning mörkare grönt när man skriver, så det syns vilket fält som är aktivt.
 - **Var i koden:** `.input:focus-visible` i [`src/app/globals.css`](../../src/app/globals.css).
+
+## 2026-11-05 – Stör ej och tillgänglig kontrast
+
+### B72. Ny "stör ej"-skärm och kontrast enligt WCAG 2.1 AA
+- **Beslut:** Tilda tyckte att "stör ej"-skärmen (gul varningstriangel på en korallröd ruta) inte var snygg och bad Claude göra om den och kontrollera kontrasten i hela spelet enligt WCAG.
+- **Tillägg (av Claude):** Ny skärm på cyan bakgrund med en telefon och en måne på en gul cirkel, rubriken med "stör ej" markerad med gult, och en kort rad ("Då slipper ni notiser mitt i spelet."). Knappen heter fortfarande "Klar". B23 gäller: det är bara en påminnelse.
+- **Mätning:** Claude mätte textkontrasten på 46 skärmar i alla delar och lägen (krav 4,5:1 för vanlig text och 3:1 för stor text). Ingen text föll igenom. Fem saker som mätningen inte nådde justerades efter beräkning:
+  - Felmeddelandet i formulären var korall text på vitt (3,1:1). Nu svart text med korall kant.
+  - Brödtexten på ERROR-skärmen var vit på röd (3,7:1). Nu svart (5,7:1). Själva ordet ERROR är stor text och är kvar vitt.
+  - Textfälten (grönt på cyan, 1,3:1) fick en tunn mörk kant (ca 5:1), eftersom ett fälts kant måste synas mot bakgrunden (WCAG 1.4.11). Kanten är inte svart och ändras inte när man skriver.
+  - Spelare som är offline tonas inte längre ner så mycket (opacitet 0,5 gav under 4,5:1, nu 0,65). `.muted` höjdes från 0,7 till 0,75.
+  - Toppytan visar nu också siffran ("Del 1 · 8/15"), så att framsteget inte bara visas med streck.
+- **Var i koden:** `StorEj` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.input`, `.error-text`, `.storej`, `.board-row.offline` i [`src/app/globals.css`](../../src/app/globals.css), [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `Hud` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).

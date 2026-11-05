@@ -33,27 +33,29 @@ export default function Intro(props: GameProps) {
 
 function StorEj({ onDone }: { onDone: () => void }) {
   return (
-    <Screen bg="green" center>
-      <div className="overlay" style={{ position: 'relative', inset: 'auto', background: 'none', padding: 0 }}>
-        <div className="panel coral" style={{ gap: 40, padding: '48px 24px 40px' }}>
-          <svg width="150" height="132" viewBox="0 0 150 132" aria-hidden="true">
-            <path
-              d="M64 10 Q75 -4 86 10 L144 112 Q150 126 134 126 L16 126 Q0 126 6 112 Z"
-              fill="#ffe600"
-              stroke="#000"
-              strokeWidth="8"
-              strokeLinejoin="round"
-            />
-            <path d="M75 38 L75 86" stroke="#000" strokeWidth="14" strokeLinecap="round" />
-            <circle cx="75" cy="106" r="8" fill="#000" />
-          </svg>
-          <p className="light">
-            Sätt din telefon på <strong>stör ej</strong> för att fortsätta
-          </p>
-          <button className="btn ink" onClick={onDone} style={{ boxShadow: 'none' }}>
-            Klar
-          </button>
-        </div>
+    <Screen bg="cyan" center>
+      <div className="stack storej">
+        <svg className="storej-icon" viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="96" fill="#ffde59" />
+          <rect x="62" y="30" width="76" height="140" rx="18" fill="#fff" stroke="#111" strokeWidth="5" strokeLinejoin="round" />
+          <path d="M88 46h24" stroke="#111" strokeWidth="5" strokeLinecap="round" />
+          <path
+            d="M108 76a28 28 0 1 0 16 44a23 23 0 0 1-16-44z"
+            fill="#ffde59"
+            stroke="#111"
+            strokeWidth="4.5"
+            strokeLinejoin="round"
+          />
+          <path d="M124 70v10M119 75h10" stroke="#111" strokeWidth="4" strokeLinecap="round" />
+          <path d="M80 150h40" stroke="#111" strokeWidth="5" strokeLinecap="round" />
+        </svg>
+        <h1 className="storej-title">
+          Sätt din telefon på <span className="hl">stör ej</span> för att fortsätta
+        </h1>
+        <p className="body-text">Då slipper ni notiser mitt i spelet.</p>
+        <button className="btn ink" onClick={onDone}>
+          Klar
+        </button>
       </div>
     </Screen>
   );

@@ -106,7 +106,7 @@ textarea {
   text-align: center;
   margin: 0;
 }
-.muted { opacity: 0.7; }
+.muted { opacity: 0.75; }
 .italic { font-style: italic; }
 
 .tagline {
@@ -214,9 +214,10 @@ a.btn.ink { color: var(--white); }
   align-self: flex-start;
   margin: 0 0 4px 8px;
 }
+/* Fältets kant måste synas mot bakgrunden (minst 3:1). Grönt mot cyan är bara 1,3:1, så fältet får en mörk kant. */
 .input {
   width: 100%;
-  border: 0;
+  border: 2px solid rgba(0, 0, 0, 0.6);
   border-radius: var(--radius-btn);
   background: var(--green);
   min-height: 60px;
@@ -231,8 +232,9 @@ textarea.input { min-height: 96px; resize: none; font-size: 18px; line-height: 1
 
 .error-text {
   background: var(--white);
-  color: var(--coral);
-  font-weight: 600;
+  color: var(--black);
+  border: 3px solid var(--coral);
+  font-weight: 700;
   border-radius: 16px;
   padding: 10px 16px;
   text-align: center;
@@ -327,7 +329,7 @@ button.name-pill:active { transform: scale(0.97); }
 .board-row.me { background: var(--white); }
 .board-row .name { flex: 1; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .board-row .stat { font-size: 15px; text-align: right; line-height: 1.2; }
-.board-row.offline { opacity: 0.5; }
+.board-row.offline { opacity: 0.65; }
 
 /* ---------- Överlägg ---------- */
 .overlay {
@@ -369,6 +371,25 @@ button.name-pill:active { transform: scale(0.97); }
   line-height: 1.25;
   margin: 0;
 }
+/* Stör ej-skärmen */
+.storej { gap: 28px; }
+.storej-icon { width: min(60vw, 230px); height: auto; }
+.storej-title {
+  font-weight: 700;
+  font-size: clamp(30px, 9vw, 38px);
+  line-height: 1.2;
+  text-align: center;
+  margin: 0;
+  text-wrap: balance;
+}
+.hl {
+  background: var(--yellow);
+  border-radius: 12px;
+  padding: 0 10px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 .panel .light {
   color: var(--white);
   font-size: clamp(24px, 7vw, 32px);
