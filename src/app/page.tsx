@@ -45,6 +45,9 @@ export default function Home() {
           <Link href="/join" className="btn yellow" style={linkBtn}>
             Joina ett spel
           </Link>
+          <Link href="/skapa?eget=1" className="btn coral" style={linkBtn}>
+            Bygg eget spel
+          </Link>
         </div>
         <div className="chips" style={{ marginTop: 16 }}>
           <span>4 delar</span>

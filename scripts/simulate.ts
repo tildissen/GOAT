@@ -6,13 +6,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CONTENT_FILES, parseContent, type ContentFiles } from '../src/lib/content';
-import { buildDeck, CARDS_PER_PART, PARTS } from '../src/lib/deck';
+import { buildCustomDeck, buildDeck, CARDS_PER_PART, PARTS } from '../src/lib/deck';
 import {
   addPlayer,
   applyAction,
   GameError,
   isSoloCard,
   MAX_SAVED,
+  MIN_OWN_CARDS,
   newGameState,
   newPlayer,
   pausedPlayers,
@@ -20,7 +21,7 @@ import {
   toPublic,
   type Ctx,
 } from '../src/lib/engine';
-import type { Action, CardRow, GameState } from '../src/lib/types';
+import type { Action, CardRow, GameMode, GameState } from '../src/lib/types';
 
 const files = Object.fromEntries(
   Object.entries(CONTENT_FILES).map(([key, file]) => [key, readFileSync(path.join('content', file), 'utf8')]),
@@ -46,39 +47,68 @@ for (const kind of ['vem', 'direkt', 'trivia', 'utmaning', 'minigame', 'bild']) 
   console.log(`  ${kind}: ${cards.filter((c) => c.kind === kind).length}`);
 }
 
-function play(seed: number, playerCount: number) {
+function play(seed: number, playerCount: number, mode: GameMode = 'classic') {
   const rng = makeRng(seed);
   let now = 1000;
   const ids = Array.from({ length: playerCount }, (_, i) => `p${i}`);
-  let s: GameState = newGameState(newPlayer(ids[0], 'Värd', now));
+  let s: GameState = newGameState(newPlayer(ids[0], 'Värd', now), mode);
   for (const id of ids.slice(1)) s = addPlayer(s, `Spelare ${id}`, id, now).state;
   const active = new Set(ids);
   const ctx = (deck = false): Ctx => ({
     active,
     rng,
     now: now++,
-    deck: deck ? buildDeck(cards, s.customCards, rng) : undefined,
+    deck: deck ? (mode === 'custom' ? buildCustomDeck : buildDeck)(cards, s.customCards, rng) : undefined,
   });
   const act = (pid: string, action: Action, withDeck = false) => {
     s = applyAction(s, pid, action, ctx(withDeck));
   };
 
   act(ids[0], { type: 'start_intro' });
-  act(ids[1], { type: 'add_custom', kind: 'vem', text: 'Vem är egentligen värst på det här spelet?' });
-  act(ids[2], { type: 'add_custom', kind: 'utmaning', text: 'Alla som har på sig något rött tar 2 klunkar.' });
+  let ownCards = 0;
+  if (mode === 'custom') {
+    // Alla måste skriva minst 3 kort; minigames räknas inte.
+    const kinds: Action[] = [
+      { type: 'add_custom', kind: 'vem', text: 'Vem skulle överleva längst i en zombieapokalyps?' },
+      { type: 'add_custom', kind: 'direkt', text: 'Vad är det pinsammaste du gjort på fyllan?' },
+      { type: 'add_custom', kind: 'utmaning', players: 1, text: 'Härma någon i rummet tills någon gissar vem.' },
+      { type: 'add_custom', kind: 'utmaning', players: 0, text: 'Alla som har på sig svart tar 2 klunkar.' },
+    ];
+    act(ids[0], { type: 'add_custom', kind: 'minigame', title: 'Tyst minut', text: 'Ingen får prata. Den som pratar tar 2 klunkar.' });
+    assert.throws(() => act(ids[0], { type: 'add_custom', kind: 'minigame', text: 'Utan namn' }), GameError, 'minigame utan namn');
+    for (const id of ids) {
+      const extra = Math.floor(rng() * 4);
+      for (let i = 0; i < MIN_OWN_CARDS + extra; i++) {
+        if (i === 2) assert.throws(() => act(id, { type: 'ready' }), GameError, 'redo med för få kort');
+        act(id, kinds[Math.floor(rng() * kinds.length)]);
+        ownCards++;
+      }
+    }
+  } else {
+    act(ids[1], { type: 'add_custom', kind: 'vem', text: 'Vem är egentligen värst på det här spelet?' });
+    act(ids[2], { type: 'add_custom', kind: 'utmaning', text: 'Alla som har på sig något rött tar 2 klunkar.' });
+  }
   assert.throws(() => act(ids[0], { type: 'start_game' }, true), GameError);
   for (const id of ids) act(id, { type: 'ready' });
   assert.throws(() => act(ids[1], { type: 'start_game' }, true), GameError, 'bara värden får starta');
   act(ids[0], { type: 'start_game' }, true);
 
-  // Kortleken: 4 delar à 15 kort, inga dubbletter, egna kort med.
-  assert.equal(s.deck.length, PARTS);
   const all = s.deck.flat();
-  s.deck.forEach((part) => assert.equal(part.length, CARDS_PER_PART));
   assert.equal(new Set(all.map((c) => c.id)).size, all.length, 'dubbletter i kortleken');
-  assert.equal(all.filter((c) => c.custom).length, 2, 'egna kort saknas');
+  if (mode === 'custom') {
+    // Alla egna kort och det egna minigamet är med, 1–4 delar, trivia blandas in.
+    assert.ok(s.deck.length >= 1 && s.deck.length <= PARTS);
+    assert.equal(all.filter((c) => c.custom).length, ownCards + 1, 'egna kort saknas');
+    assert.ok(all.some((c) => c.kind === 'trivia'), 'trivia saknas');
+    assert.ok(all.some((c) => c.custom && c.kind === 'minigame' && c.title === 'Tyst minut'));
+  } else {
+    // Kortleken: 4 delar à 15 kort, egna kort med.
+    assert.equal(s.deck.length, PARTS);
+    s.deck.forEach((part) => assert.equal(part.length, CARDS_PER_PART));
+    assert.equal(all.filter((c) => c.custom).length, 2, 'egna kort saknas');
+  }
   s.deck.forEach((part, i) => {
-    for (const c of part) assert.ok(c.level <= i + 1, `för grovt kort i del ${i + 1}: ${c.text}`);
+    for (const c of part) assert.ok(mode === 'custom' || c.level <= i + 1, `för grovt kort i del ${i + 1}: ${c.text}`);
     for (const c of part.filter((c) => c.kind === 'trivia')) {
       assert.equal(c.options?.length, 4);
       assert.ok(c.answerIndex != null && c.answerIndex >= 0);
@@ -183,3 +213,6 @@ for (let seed = 1; seed <= 200; seed++) {
 }
 assert.deepEqual([...kinds].sort(), ['bild', 'direkt', 'minigame', 'trivia', 'utmaning', 'vem']);
 console.log('200 simulerade spel med 3–15 spelare: OK');
+
+for (let seed = 1; seed <= 100; seed++) play(seed, 3 + (seed % 13), 'custom');
+console.log('100 simulerade "Bygg eget spel" med 3–15 spelare: OK');

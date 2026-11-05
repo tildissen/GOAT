@@ -6,7 +6,16 @@ import { api, saveCreds } from '@/lib/client';
 import { Screen } from './ui';
 
 /** Formuläret för både "skapa" (bara namn) och "joina" (kod + namn). */
-export default function NameForm({ mode, initialCode = '' }: { mode: 'create' | 'join'; initialCode?: string }) {
+export default function NameForm({
+  mode,
+  initialCode = '',
+  custom = false,
+}: {
+  mode: 'create' | 'join';
+  initialCode?: string;
+  /** "Bygg eget spel" – alla spelare skriver egna kort. */
+  custom?: boolean;
+}) {
   const router = useRouter();
   const [code, setCode] = useState(initialCode.toUpperCase());
   const [name, setName] = useState('');
@@ -20,7 +29,7 @@ export default function NameForm({ mode, initialCode = '' }: { mode: 'create' | 
     if (!name.trim()) return setError('Skriv ditt namn');
     setBusy(true);
     try {
-      const res = mode === 'create' ? await api.create(name) : await api.join(code, name);
+      const res = mode === 'create' ? await api.create(name, custom ? 'custom' : 'classic') : await api.join(code, name);
       saveCreds(res.code, { playerId: res.playerId, token: res.token });
       router.push(`/spel/${res.code}`);
     } catch (err) {
@@ -33,8 +42,14 @@ export default function NameForm({ mode, initialCode = '' }: { mode: 'create' | 
     <Screen bg="cyan">
       <form onSubmit={submit} className="stack grow" style={{ gap: 0 }}>
         <h1 className="display mid coral" style={{ marginTop: 48, marginBottom: 48 }}>
-          {mode === 'create' ? 'SKAPA G.O.A.T.' : 'JOINA G.O.A.T.'}
+          {mode === 'join' ? 'JOINA G.O.A.T.' : custom ? 'BYGG EGET SPEL' : 'SKAPA G.O.A.T.'}
         </h1>
+        {custom && (
+          <p className="body-text" style={{ marginTop: -24, marginBottom: 36 }}>
+            Ni gör spelet själva! Alla som är med skriver minst 3 egna frågor eller utmaningar. Trivia, minigames och
+            bildkort blandas in automatiskt.
+          </p>
+        )}
         {mode === 'join' && (
           <>
             <label className="field-label" htmlFor="code">

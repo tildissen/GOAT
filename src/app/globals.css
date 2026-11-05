@@ -610,3 +610,16 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 
 /* Spelarnamn som står stort (vem som röstades fram, vems tur det är) skrivs i Knewave. */
 .name-font { font-family: var(--font-knewave), var(--font-glacial), system-ui, sans-serif; font-weight: 400; letter-spacing: 0.01em; }
+
+/* Beskrivning av vald korttyp på "Skriv dina kort" */
+.type-help {
+  width: 100%;
+  margin-top: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 20px;
+  padding: 14px 16px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+.type-help p { margin: 6px 0 0; }
+.type-help .example { font-style: italic; opacity: 0.8; }

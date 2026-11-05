@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { compressImage, loadLocal, saveLocal } from '@/lib/client';
-import { MIN_PLAYERS } from '@/lib/engine';
+import { MAX_OWN_CARDS, MIN_OWN_CARDS, MIN_PLAYERS, ownCardCount } from '@/lib/engine';
+import type { CustomCard, CustomKind } from '@/lib/types';
 import Face from '../Face';
 import { Avatar, Screen } from '../ui';
 import { nameOf, type GameProps } from './shared';
@@ -143,51 +144,149 @@ function Selfie({ me, busy, upload, onDone }: GameProps & { onDone: () => void }
   );
 }
 
+type CardTypeKey = 'vem' | 'direkt' | 'solo' | 'alla' | 'minigame';
+
+/** Korttyperna spelarna kan skriva, med beskrivning och exempel så att de fylls i rätt. */
+const CARD_TYPES: {
+  key: CardTypeKey;
+  kind: CustomKind;
+  players?: number;
+  label: string;
+  desc: string;
+  example: string;
+  titleExample?: string;
+}[] = [
+  {
+    key: 'vem',
+    kind: 'vem',
+    label: 'Vem i rummet?',
+    desc: 'Ett påstående som alla röstar på. Börja gärna med "Vem …". Den som får flest röster dricker.',
+    example: 'Vem skulle överleva längst i en zombieapokalyps?',
+  },
+  {
+    key: 'direkt',
+    kind: 'direkt',
+    label: 'Direkt fråga',
+    desc: 'En fråga till den vars tur det är. Bara hen ser frågan och måste svara – eller dricka.',
+    example: 'Vad är det pinsammaste du har gjort på fyllan?',
+  },
+  {
+    key: 'solo',
+    kind: 'utmaning',
+    players: 1,
+    label: 'Utmaning till en person',
+    desc: 'Något som den vars tur det är måste göra. Vägrar hen får hen dricka eller dra ett utmaningskort.',
+    example: 'Härma någon i rummet tills någon gissar vem det är.',
+  },
+  {
+    key: 'alla',
+    kind: 'utmaning',
+    players: 0,
+    label: 'Utmaning för alla',
+    desc: 'Gäller hela gruppen. Skriv vem som ska dricka och hur många klunkar – antalet ökar automatiskt för varje del.',
+    example: 'Alla som har på sig något svart tar 2 klunkar.',
+  },
+  {
+    key: 'minigame',
+    kind: 'minigame',
+    label: 'Minigame (frivilligt)',
+    desc: 'En lek eller regel som alla gör tillsammans. Ge den ett namn och förklara reglerna. Räknas inte till dina kort.',
+    example: 'Ingen får prata förrän nästa kort. Den som pratar dricker 2 klunkar.',
+    titleExample: 'Tyst minut',
+  },
+];
+
+function typeOf(c: CustomCard) {
+  if (c.kind === 'utmaning') return CARD_TYPES.find((t) => t.key === (c.players === 1 ? 'solo' : 'alla'))!;
+  return CARD_TYPES.find((t) => t.kind === c.kind)!;
+}
+
 function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => void }) {
-  const [kind, setKind] = useState<'vem' | 'utmaning'>('vem');
+  const custom = state.mode === 'custom';
+  const [typeKey, setTypeKey] = useState<CardTypeKey>('vem');
   const [text, setText] = useState('');
+  const [title, setTitle] = useState('');
+  const type = CARD_TYPES.find((t) => t.key === typeKey)!;
   const mine = state.customCards.filter((c) => c.by === me.id);
+  const own = ownCardCount(state, me.id);
+  const missing = custom ? Math.max(0, MIN_OWN_CARDS - own) : 0;
+  const full = mine.length >= MAX_OWN_CARDS;
+  const canAdd = text.trim().length >= 3 && (type.kind !== 'minigame' || title.trim().length >= 2);
 
   async function add() {
-    if (await act({ type: 'add_custom', kind, text })) setText('');
+    const ok = await act({ type: 'add_custom', kind: type.kind, players: type.players, title, text });
+    if (ok) {
+      setText('');
+      setTitle('');
+    }
   }
 
   return (
     <Screen bg="cyan">
       <h1 className="display mid coral" style={{ marginTop: 24 }}>
-        EGNA KORT
+        {custom ? 'SKRIV DINA KORT' : 'EGNA KORT'}
       </h1>
-      <p className="body-text" style={{ margin: '14px 0 22px' }}>
-        Hitta på egna frågor eller utmaningar. De blandas in i just det här spelet – ingen vet vem som skrev vad.
+      <p className="body-text" style={{ margin: '14px 0 20px' }}>
+        {custom
+          ? `Skriv minst ${MIN_OWN_CARDS} kort. De blandas med trivia, bildkort och minigames – ingen vet vem som skrev vad.`
+          : 'Hitta på egna frågor eller utmaningar. De blandas in i just det här spelet – ingen vet vem som skrev vad.'}
       </p>
-      <div className="names" style={{ gap: 12 }}>
-        {(['vem', 'utmaning'] as const).map((k) => (
+
+      <p className="choice-prompt" style={{ marginBottom: 10 }}>
+        Välj korttyp
+      </p>
+      <div className="names" style={{ gap: 10 }}>
+        {CARD_TYPES.map((t) => (
           <button
-            key={k}
-            className={`name-pill yellow${kind === k ? ' selected' : ''}`}
-            style={{ fontSize: 17, minHeight: 50 }}
-            onClick={() => setKind(k)}
+            key={t.key}
+            className={`name-pill yellow${typeKey === t.key ? ' selected' : ''}`}
+            style={{ fontSize: 15, minHeight: 44, flex: '1 1 auto' }}
+            onClick={() => setTypeKey(t.key)}
+            aria-pressed={typeKey === t.key}
           >
-            {k === 'vem' ? 'Vem i rummet?' : 'Utmaning'}
+            {t.label}
           </button>
         ))}
       </div>
+
+      <div className="type-help">
+        <strong>{type.label}</strong>
+        <p>{type.desc}</p>
+        <p className="example">Exempel: ”{type.titleExample ? `${type.titleExample} – ` : ''}{type.example}”</p>
+      </div>
+
+      {type.kind === 'minigame' && (
+        <input
+          className="input"
+          style={{ marginTop: 12, background: 'var(--white)' }}
+          placeholder={`Namn, t.ex. ${type.titleExample}`}
+          value={title}
+          maxLength={40}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+      )}
       <textarea
         className="input"
-        style={{ marginTop: 16, background: 'var(--white)' }}
-        placeholder={kind === 'vem' ? 'Vem i rummet skulle…' : 'Alla som har … tar 2 klunkar.'}
+        style={{ marginTop: 12, background: 'var(--white)' }}
+        placeholder={type.example}
         value={text}
         maxLength={200}
         onChange={(e) => setText(e.target.value)}
       />
-      <button className="btn yellow" style={{ marginTop: 12 }} disabled={busy || text.trim().length < 3} onClick={add}>
-        Lägg till
+      <button className="btn yellow" style={{ marginTop: 12 }} disabled={busy || !canAdd || full} onClick={add}>
+        {full ? `Max ${MAX_OWN_CARDS} kort` : 'Lägg till'}
       </button>
+
       {mine.length > 0 && (
         <div className="votes-list" style={{ marginTop: 18 }}>
           {mine.map((c) => (
             <div key={c.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <span style={{ flex: 1 }}>{c.text}</span>
+              <span style={{ flex: 1 }}>
+                <small className="muted">{typeOf(c).label}</small>
+                <br />
+                {c.title ? `${c.title}: ` : ''}
+                {c.text}
+              </span>
               <button className="link-btn" onClick={() => act({ type: 'remove_custom', id: c.id })} aria-label="Ta bort">
                 ✕
               </button>
@@ -196,11 +295,11 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
         </div>
       )}
       <p className="progress" style={{ marginTop: 12 }}>
-        {state.customCards.length} egna kort i spelet
+        {custom ? `${Math.min(own, MIN_OWN_CARDS)} av ${MIN_OWN_CARDS} kort skrivna` : `${state.customCards.length} egna kort i spelet`}
       </p>
       <div className="grow" style={{ minHeight: 24 }} />
-      <button className="btn ink" disabled={busy} onClick={onDone}>
-        {mine.length > 0 ? 'Nästa' : 'Hoppa över'}
+      <button className="btn ink" disabled={busy || missing > 0} onClick={onDone}>
+        {missing > 0 ? `Skriv ${missing} kort till` : custom || mine.length > 0 ? 'Nästa' : 'Hoppa över'}
       </button>
     </Screen>
   );

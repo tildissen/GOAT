@@ -74,12 +74,22 @@ export interface Overlay {
   advancesCard: boolean;
 }
 
+/** Korttyper som spelarna själva kan skriva. */
+export type CustomKind = 'vem' | 'direkt' | 'utmaning' | 'minigame';
+
 export interface CustomCard {
   id: string;
-  kind: 'vem' | 'utmaning';
+  kind: CustomKind;
   text: string;
+  /** Namn på minigame. */
+  title?: string;
+  /** Utmaningar: 1 = till den vars tur det är, 0 = för alla. */
+  players?: number;
   by: string;
 }
+
+/** classic = vanliga G.O.A.T., custom = "Bygg eget spel" där alla skriver kort. */
+export type GameMode = 'classic' | 'custom';
 
 export type Status = 'lobby' | 'intro' | 'playing' | 'partEnd' | 'finished' | 'ended';
 
@@ -94,6 +104,8 @@ export interface GameState {
   current: Current | null;
   overlays: Record<string, Overlay>;
   customCards: CustomCard[];
+  /** Saknas i spel som skapades innan "Bygg eget spel" fanns – räknas då som classic. */
+  mode?: GameMode;
   lastTurnId: string | null;
   seq: number;
 }
@@ -101,6 +113,8 @@ export interface GameState {
 /** Det klienterna får se: framtida kort skickas aldrig ut. */
 export type PublicState = Omit<GameState, 'deck' | 'challengePool'> & {
   cardsInPart: number;
+  /** Antal delar i spelet (4 i vanliga spel, 1–4 i "Bygg eget spel"). */
+  parts: number;
 };
 
 export interface GameView {
@@ -114,7 +128,7 @@ export type Action =
   | { type: 'start_intro' }
   | { type: 'ready' }
   | { type: 'set_selfie'; url: string }
-  | { type: 'add_custom'; kind: 'vem' | 'utmaning'; text: string }
+  | { type: 'add_custom'; kind: CustomKind; text: string; title?: string; players?: number }
   | { type: 'remove_custom'; id: string }
   | { type: 'start_game' }
   | { type: 'vote'; targetId: string }

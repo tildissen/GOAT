@@ -267,12 +267,41 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Tillägg (av Claude):** Även "Visa resultatet nu" vid röstningar är bara för värden. De andra ser "Väntar på att Tilda (värd) trycker nästa…". Är värden borta kan vem som helst trycka, så att spelet inte fastnar. Rättade samtidigt en bugg där "Det gäller dig!" visades på minigames och gruppkort – nu bara på X och Y-kort.
 - **Var i koden:** `canPressNext()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `canAdvance`/`NextButton` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
 
-### B43. Stor text i Glacial Indifference, Playfair tas bort
+### B51. Stor text i Glacial Indifference, Playfair tas bort
 - **Beslut:** All stor text (rubriker, spelarnamn på resultatkorten och liknande) byter från Playfair Display i kursiv till Glacial Indifference i fet stil. Knewave finns kvar på G.O.A.T och "Låt oss spela".
 - **Ersätter:** den del av B39 som lät Playfair vara kvar på skärmrubriker.
 - **Var i koden:** `.display` i [`src/app/globals.css`](../../src/app/globals.css), [`src/app/layout.tsx`](../../src/app/layout.tsx).
 
-### B44. Knewave på stora spelarnamn
+### B52. Knewave på stora spelarnamn
 - **Beslut:** Spelarnamn som står stort skrivs i Knewave: den som röstas fram på resultatkortet, "Elsas tur" när någon annan spelar, namnet på ditt utmaningskort och namnet över din egen fråga eller utmaning.
 - **Tillägg (av Claude):** Övriga namn (topplistor, knappar, rösta-knapparna) är kvar i Glacial Indifference.
 - **Var i koden:** `.name-font` i [`src/app/globals.css`](../../src/app/globals.css), [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+
+---
+
+## 2026-11-05 – Bygg eget spel
+
+*(B51 och B52 hette först B43 och B44, men de numren var redan använda. De döptes om 2026-11-05.)*
+
+### B53. Nytt spelläge: "Bygg eget spel"
+- **Beslut:** Startsidan får ett tredje alternativ, **"Bygg eget spel"**. I det läget gör spelarna spelet själva genom att skriva egna kort.
+- **Tillägg (av Claude):** Knappen ligger under "Joina ett spel" och är korallfärgad. Flödet är som ett vanligt spel: namn, lobby med spelkod, stör ej, regler, selfie – men skärmen "Egna kort" blir obligatorisk och heter "Skriv dina kort". Lobbyn visar "Bygg eget spel". Spelet sparas inte – det raderas efter 12 timmar som andra spel, så villkoren behövde inte ändras.
+- **Var i koden:** `mode` i [`src/lib/types.ts`](../../src/lib/types.ts), knappen i [`src/app/page.tsx`](../../src/app/page.tsx), [`src/app/skapa/page.tsx`](../../src/app/skapa/page.tsx) (`/skapa?eget=1`), [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx).
+
+### B54. Alla spelare måste skriva minst 3 kort
+- **Beslut:** I "Bygg eget spel" är det obligatoriskt för alla spelare att skriva minst 3 frågor, påståenden eller utmaningar.
+- **Tillägg (av Claude):** Man kan inte gå vidare (och servern godkänner inte "redo") förrän man skrivit 3. Max 10 kort per person. Egna minigames räknas inte till de 3. Den som joinar efter att spelet startat slipper skriva.
+- **Var i koden:** `MIN_OWN_CARDS`, `ownCardCount()` och `ready` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `EgnaKort` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B55. Trivia förvald, minigames förvalda plus frivilliga egna
+- **Beslut:** Triviafrågorna är förvalda (de som finns i dag). Minigames: Tilda var osäker – Claude rekommenderade och byggde att de befintliga minigamesen följer med och att spelarna dessutom *kan* skriva egna, men det är frivilligt.
+- **Tillägg (av Claude):** Egna minigames kommer alltid med och går före de förvalda. "Vems är bilden?"-korten är också förvalda och blandas in.
+
+### B56. Beskrivning och exempel för varje korttyp
+- **Beslut:** Varje korttyp har en beskrivning så att korten fylls i rätt.
+- **Tillägg (av Claude):** Spelarna väljer typ för varje kort: **Vem i rummet?**, **Direkt fråga**, **Utmaning till en person**, **Utmaning för alla** och **Minigame (frivilligt)**, med beskrivning och exempel för den valda typen. Minigames har ett namnfält. Samma typer går nu också att välja under "Egna kort" i vanliga spel (frivilligt där).
+- **Var i koden:** `CARD_TYPES` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B57. Längden styrs av hur många kort som skrivs
+- **Tillägg (av Claude):** Ungefär 12 egna kort per del, 1–4 delar. Varje del får trivia (ungefär en per tre egna kort), en "Vems är bilden?" och ett minigame. Klunkarna ökar per del och trivian blir svårare per del, som i vanliga spel. Utmaningskorten man drar är de förvalda solo-utmaningarna.
+- **Var i koden:** `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts).

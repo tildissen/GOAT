@@ -1,7 +1,7 @@
 'use client';
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import type { Action, GameView } from './types';
+import type { Action, GameMode, GameView } from './types';
 
 export interface Creds {
   playerId: string;
@@ -66,11 +66,11 @@ async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
-  create: (name: string) =>
+  create: (name: string, mode: GameMode = 'classic') =>
     request<{ code: string } & Creds>('/api/games', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, mode }),
     }),
   join: (code: string, name: string) =>
     request<{ code: string } & Creds>(`/api/games/${encodeURIComponent(code)}/join`, {

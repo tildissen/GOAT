@@ -45,7 +45,7 @@ export function Finished({ state, isLeader, busy, act }: GameProps) {
   return (
     <Screen bg="yellow">
       <div className="stack" style={{ marginTop: 48, gap: 20 }}>
-        <h1 className="display big coral">Del fyra är klar!</h1>
+        <h1 className="display big coral">Del {PART_WORDS[state.part - 1]} är klar!</h1>
         <p className="tagline">wow, vilka GOATs</p>
       </div>
       <div style={{ width: '100%', margin: '32px 0' }}>

@@ -1,11 +1,14 @@
 import { CARDS_PER_PART, PARTS, shuffle, type Rng } from './deck';
-import type { Action, Current, DeckCard, GameState, Player, PublicState } from './types';
+import type { Action, Current, CustomCard, CustomKind, DeckCard, GameMode, GameState, Player, PublicState } from './types';
 
 export const MIN_PLAYERS = 3;
 export const MAX_PLAYERS = 15;
 /** Fler sparade klunkar än så här pausar spelet. */
 export const MAX_SAVED = 5;
 export const MAX_NAME_LENGTH = 20;
+/** I "Bygg eget spel" måste alla skriva minst så här många kort (minigames räknas inte). */
+export const MIN_OWN_CARDS = 3;
+export const MAX_OWN_CARDS = 10;
 
 export class GameError extends Error {
   constructor(
@@ -40,8 +43,9 @@ export function newPlayer(id: string, name: string, now: number): Player {
   };
 }
 
-export function newGameState(host: Player): GameState {
+export function newGameState(host: Player, mode: GameMode = 'classic'): GameState {
   return {
+    mode,
     status: 'lobby',
     hostId: host.id,
     players: [host],
@@ -55,6 +59,11 @@ export function newGameState(host: Player): GameState {
     lastTurnId: null,
     seq: 0,
   };
+}
+
+/** Antal kort spelaren skrivit som räknas mot kravet i "Bygg eget spel". */
+export function ownCardCount(state: GameState | PublicState, playerId: string): number {
+  return state.customCards.filter((c) => c.by === playerId && c.kind !== 'minigame').length;
 }
 
 export function cleanName(raw: string): string {
@@ -188,7 +197,7 @@ function advance(s: GameState, ctx: Ctx) {
   s.cardIndex += 1;
   if (s.cardIndex >= s.deck[s.part - 1].length) {
     s.current = null;
-    s.status = s.part >= PARTS ? 'finished' : 'partEnd';
+    s.status = s.part >= s.deck.length ? 'finished' : 'partEnd';
     return;
   }
   deal(s, ctx);
@@ -268,6 +277,10 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       break;
     }
     case 'ready': {
+      const writing = s.mode === 'custom' && (s.status === 'lobby' || s.status === 'intro');
+      if (writing && ownCardCount(s, playerId) < MIN_OWN_CARDS) {
+        throw new GameError(`Skriv minst ${MIN_OWN_CARDS} kort först`);
+      }
       me.ready = true;
       break;
     }
@@ -280,13 +293,19 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       const text = action.text.replace(/\s+/g, ' ').trim();
       if (text.length < 3) throw new GameError('Skriv lite mer');
       if (text.length > 200) throw new GameError('Max 200 tecken');
-      if (s.customCards.filter((c) => c.by === playerId).length >= 10) throw new GameError('Max 10 egna kort per person');
-      s.customCards.push({
-        id: `custom-${ctx.now}-${Math.floor(ctx.rng() * 1e6)}`,
-        kind: action.kind === 'utmaning' ? 'utmaning' : 'vem',
-        text,
-        by: playerId,
-      });
+      if (s.customCards.filter((c) => c.by === playerId).length >= MAX_OWN_CARDS) {
+        throw new GameError(`Max ${MAX_OWN_CARDS} egna kort per person`);
+      }
+      const kind: CustomKind = (['vem', 'direkt', 'utmaning', 'minigame'] as const).includes(action.kind) ? action.kind : 'vem';
+      const card: CustomCard = { id: `custom-${ctx.now}-${Math.floor(ctx.rng() * 1e6)}`, kind, text, by: playerId };
+      if (kind === 'utmaning') card.players = action.players === 1 ? 1 : 0;
+      if (kind === 'minigame') {
+        const title = (action.title ?? '').replace(/\s+/g, ' ').trim();
+        if (title.length < 2) throw new GameError('Ge minigamet ett namn');
+        if (title.length > 40) throw new GameError('Namnet får vara max 40 tecken');
+        card.title = title;
+      }
+      s.customCards.push(card);
       break;
     }
     case 'remove_custom': {
@@ -428,7 +447,11 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
 export function toPublic(s: GameState, viewerId: string | null): PublicState {
   const { deck, challengePool, ...rest } = s;
   void challengePool;
-  const pub: PublicState = structuredClone({ ...rest, cardsInPart: deck[s.part - 1]?.length ?? CARDS_PER_PART });
+  const pub: PublicState = structuredClone({
+    ...rest,
+    cardsInPart: deck[s.part - 1]?.length ?? CARDS_PER_PART,
+    parts: deck.length || PARTS,
+  });
   const cur = pub.current;
   if (cur) {
     if (cur.card.kind === 'trivia' && cur.triviaPick == null) delete cur.card.answerIndex;
