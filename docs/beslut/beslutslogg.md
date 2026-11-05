@@ -336,3 +336,14 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B64. Supabase uppdaterad via Supabase-connectorn
 - **Beslut:** Tilda kopplade Supabase-connectorn i Claude och bad Claude uppdatera databasen med den, i stället för att klistra in SQL själv.
 - **Tillägg (av Claude):** Kolumnen `occasion` lades till som migreringen `add_cards_occasion`. Bara de 220 nya korten för AW och Familjespel lades in – de 580 befintliga korten rördes inte, så eventuella ändringar i dem finns kvar. Databasen har nu 800 kort. B63 är därmed klart. Supabases säkerhetsråd visar bara att tabellerna har RLS utan regler, vilket är avsiktligt: bara spelets server får läsa och skriva.
+
+---
+
+## 2026-11-05 – Rubriker och fält
+
+### B65. Alla rubriker i Knewave, ingen svart kant på fälten
+- **Beslut:** Tilda bad om Knewave på rubrikerna, även i de nya delarna ("Bygg eget spel"). Alla stora rubriker (`.display`) skrivs nu i Knewave. Frågor i formulär ("Vad heter du?", "Vilket tillfälle?") och underrubriker är kvar i Glacial Indifference.
+- **Beslut:** Fälten får inte längre en svart kant runt sig när man skriver. Tilda valde att ta bort den.
+- **Tillägg (av Claude):** I stället för kanten blir fältet en aning mörkare grönt när man skriver, så det syns vilket fält som är aktivt.
+- **Ändrar:** B38 och B43 (rubrikerna var Glacial Indifference sedan B43).
+- **Var i koden:** `.display` och `.input:focus-visible` i [`src/app/globals.css`](../../src/app/globals.css).
