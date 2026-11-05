@@ -94,7 +94,7 @@ export default function NameForm({
           </>
         )}
         <label className="field-label" htmlFor="name">
-          Vad heter du?
+          Vad ska vi kalla dig?
         </label>
         <input
           id="name"

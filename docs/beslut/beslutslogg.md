@@ -423,3 +423,9 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Tilda ville att rubriken på minigames (t.ex. "Vattenfall", "Jag har aldrig") skulle skilja sig från regeltexten och kanske få en effekt.
 - **Tillägg (av Claude):** Rubriken är större (upp till 48 px), i Knewave, med en vit förskjuten skugga och en liten lutning. Den poppar in när kortet visas. Rörelsen stängs av för den som har "minska rörelse" påslaget.
 - **Var i koden:** `.minigame-title` i [`src/app/globals.css`](../../src/app/globals.css), `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+## 2026-11-05 – Texter
+
+### B77. "Vad ska vi kalla dig?" i stället för "Vad heter du?"
+- **Beslut:** Frågan över namnfältet heter "Vad ska vi kalla dig?" i alla versioner: Skapa, Joina och Bygg eget spel (AW, Familjespel och Fest).
+- **Var i koden:** [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx). Alla lägen använder samma formulär, så texten finns på ett ställe.
