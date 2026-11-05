@@ -131,7 +131,7 @@ function Direct(p: CardProps) {
     <CardScreen game={p}>
       <KindTag kind="direkt" />
       <div className="card-q">
-        <p className="heading name-font">{p.me.name}</p>
+        <p className="heading name-font name-big">{p.me.name}</p>
         <p className="card-text big">{p.cur.text}</p>
       </div>
       <ChoiceButtons
@@ -218,7 +218,7 @@ function Challenge(p: CardProps) {
     >
       <KindTag kind={minigame ? 'minigame' : 'utmaning'} />
       {minigame && cur.card.title && <p className="heading">{cur.card.title}</p>}
-      {solo && <p className="heading name-font">{me.name}</p>}
+      {solo && <p className="heading name-font name-big">{me.name}</p>}
       <div className="card-body">
         <p className="card-text">{cur.text}</p>
         {cur.teams && (
@@ -333,7 +333,7 @@ function ResultCard(p: CardProps) {
     headline = (
       <>
         <div className="code-box" style={{ background: 'var(--green)', fontSize: 'clamp(26px, 9vw, 40px)', cursor: 'default' }}>
-          <span className="display small name-font">{owner.toUpperCase()}</span>
+          <span className="display mid name-font">{owner.toUpperCase()}</span>
         </div>
         <p className="heading">{allRight
             ? `ägde bilden – alla gissade rätt, så ${owner} ${isFamily(state) ? 'får minuspoäng' : 'dricker'}!`
@@ -462,7 +462,7 @@ function Waiting(p: CardProps) {
   return (
     <CardScreen game={p}>
       {player && <Avatar player={player} big />}
-      <h2 className="display mid name-font">{possessive(nameOf(state, cur.turnId))} tur</h2>
+      <h2 className="display big name-font">{possessive(nameOf(state, cur.turnId))} tur</h2>
       <p className="body-text">{nameOf(state, cur.turnId)} {DOING[cur.card.kind] ?? 'spelar'}…</p>
       <Board state={state} active={p.view.active} meId={p.me.id} />
       {!p.view.active.includes(cur.turnId) && <NextButton {...p} label="Hoppa över" />}

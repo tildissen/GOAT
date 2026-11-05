@@ -413,3 +413,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Ersätter:** kanten som lades till i B72.
 - **Obs (av Claude):** Utan kant är grönt fält mot cyan bakgrund bara 1,3:1, vilket inte når 3:1 för ett fälts kant (WCAG 1.4.11). Texten ovanför ("Vad heter du?") visar vad fältet är. Vill Tilda ha det strikt kan en kant eller understrykning läggas tillbaka.
 - **Var i koden:** `.input` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B75. Större namn och Knewave på "Del … är klar!"
+- **Beslut:** Tilda ville ha större namn och ett annat typsnitt på "Del ett är klar!", "Del två är klar!" och så vidare. Namnet över en direktfråga eller solo-utmaning går från 28 px till upp till 52 px. "Elsas tur" går från mellan till stor rubrik. Bildägarens namn på resultatkortet och namnet på utmaningskortet blev större.
+- **Tillägg (av Claude):** Claude valde Knewave för "Del … är klar!", eftersom det är det typsnitt Tilda redan valt för G.O.A.T och namn. Det gäller även slutskärmen ("Del fyra är klar!").
+- **Var i koden:** `.heading.name-big` i [`src/app/globals.css`](../../src/app/globals.css), [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).

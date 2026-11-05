@@ -667,3 +667,4 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .inline-face { vertical-align: middle; margin-left: 6px; }
 .inline-icon { vertical-align: -5px; margin-right: 8px; }
 .occasion strong { display: flex; align-items: center; gap: 8px; }
+.heading.name-big { font-size: clamp(38px, 12vw, 52px); line-height: 1.05; }
