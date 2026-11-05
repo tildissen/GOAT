@@ -341,9 +341,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ## 2026-11-05 – Rubriker och fält
 
-### B65. Alla rubriker i Knewave, ingen svart kant på fälten
-- **Beslut:** Tilda bad om Knewave på rubrikerna, även i de nya delarna ("Bygg eget spel"). Alla stora rubriker (`.display`) skrivs nu i Knewave. Frågor i formulär ("Vad heter du?", "Vilket tillfälle?") och underrubriker är kvar i Glacial Indifference.
+### B65. Ingen svart kant på fälten, rubrikerna behåller sitt typsnitt
 - **Beslut:** Fälten får inte längre en svart kant runt sig när man skriver. Tilda valde att ta bort den.
+- **Alternativ:** Tilda bad först om Knewave på alla rubriker (även i Bygg eget spel) men ändrade sig och ville inte ändra rubrikerna ändå. De är kvar i Glacial Indifference enligt B43.
 - **Tillägg (av Claude):** I stället för kanten blir fältet en aning mörkare grönt när man skriver, så det syns vilket fält som är aktivt.
-- **Ändrar:** B38 och B43 (rubrikerna var Glacial Indifference sedan B43).
-- **Var i koden:** `.display` och `.input:focus-visible` i [`src/app/globals.css`](../../src/app/globals.css).
+- **Var i koden:** `.input:focus-visible` i [`src/app/globals.css`](../../src/app/globals.css).
