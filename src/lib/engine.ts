@@ -267,6 +267,10 @@ function canChoose(s: GameState, cur: Current, player: Player): boolean {
     if (cur.card.kind === 'trivia') return cur.triviaPick != null && cur.triviaPick !== cur.card.answerIndex;
     return true;
   }
+  // Minigames har inga val – värden trycker bara Nästa eller Hoppa över.
+  if (cur.card.kind === 'minigame') return false;
+  // X och Y: bara de två som utmaningen gäller kan välja att hoppa över.
+  if (cur.card.players === 2) return player.ready && cur.targetIds.includes(player.id);
   return player.ready;
 }
 

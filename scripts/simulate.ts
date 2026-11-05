@@ -104,9 +104,11 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
   assert.equal(new Set(all.map((c) => c.id)).size, all.length, 'dubbletter i kortleken');
   if (mode === 'custom') {
     // Alla egna kort och det egna minigamet är med, 1–4 delar, trivia blandas in.
-    assert.ok(s.deck.length >= 1 && s.deck.length <= PARTS);
+    assert.ok(s.deck.length >= 2 && s.deck.length <= PARTS);
+    // 10 kort per del, om inte spelarna skrivit så många kort att de inte får plats.
+    if (ownCards <= PARTS * 7) s.deck.forEach((part) => assert.ok(part.length <= CARDS_PER_PART, `för lång del: ${part.length}`));
     assert.equal(all.filter((c) => c.custom).length, ownCards + 1, 'egna kort saknas');
-    assert.ok(all.some((c) => c.kind === 'trivia'), 'trivia saknas');
+    if (ownCards <= PARTS * 7) assert.ok(all.some((c) => c.kind === 'trivia'), 'trivia saknas');
     assert.ok(all.some((c) => c.custom && c.kind === 'minigame' && c.title === 'Tyst minut'));
   } else {
     // Kortleken: 4 delar à 15 kort, egna kort med.
@@ -196,8 +198,19 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       else if (rng() < 0.3) act(c.turnId, { type: 'next' });
       else act(c.turnId, { type: 'choose', choice: chooseAny() });
     } else {
-      for (const id of ids) {
-        if (!s.current?.choices[id] && pausedPlayers(s).length === 0 && rng() < 0.3) act(id, { type: 'choose', choice: chooseAny() });
+      if (c.card.kind === 'minigame') {
+        // Minigames har inga val – bara Nästa/Hoppa över.
+        if (pausedPlayers(s).length === 0) assert.throws(() => act(ids[0], { type: 'choose', choice: 'drink' }), GameError, 'val på minigame');
+      } else {
+        for (const id of ids) {
+          if (s.current?.choices[id] || pausedPlayers(s).length > 0) continue;
+          // X och Y: bara de två kan välja.
+          if (c.card.players === 2 && !c.targetIds.includes(id)) {
+            assert.throws(() => act(id, { type: 'choose', choice: 'drink' }), GameError, 'fel spelare valde på X och Y');
+          } else if (rng() < 0.3) {
+            act(id, { type: 'choose', choice: chooseAny() });
+          }
+        }
       }
       if (s.current?.seq === c.seq && pausedPlayers(s).length === 0) {
         // Gruppkort: bara värden går vidare.

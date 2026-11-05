@@ -1,7 +1,7 @@
 import type { CardRow, Category, CustomCard, DeckCard, Occasion } from './types';
 
 export const PARTS = 4;
-export const CARDS_PER_PART = 15;
+export const CARDS_PER_PART = 10;
 
 const PART_CATEGORY: Category[] = ['casual', 'party', 'cheeky', 'dirty'];
 const LEVEL: Record<Category, number> = { casual: 1, party: 2, cheeky: 3, dirty: 4, framtid: 1 };
@@ -53,16 +53,17 @@ function customToDeckCard(custom: CustomCard): DeckCard {
   return card;
 }
 
-/** Ungefär så många frågor och utmaningar (egna plus påfyllda) per del i "Bygg eget spel". */
-export const OWN_CARDS_PER_PART = 12;
+/** Frågor och utmaningar (egna plus påfyllda) per del i "Bygg eget spel". Plus minigame, trivia och bildkort = 10. */
+export const OWN_CARDS_PER_PART = 7;
 
 /**
  * "Bygg eget spel": spelarnas egna kort är stommen. Har de skrivit för få fylls
- * varje del upp till 12 frågor och utmaningar med förvalda kort för tillfället
+ * varje del upp till 7 frågor och utmaningar med förvalda kort för tillfället
  * (AW och Familjespel har egna kort, Fest använder de vanliga och blir vildare
- * per del). Per del blandas också in trivia (ungefär ett per tre kort), en
- * "Vems är bilden?" och ett minigame – spelarnas egna minigames först.
- * 2–4 delar beroende på hur många kort som skrivits.
+ * per del). Sedan ett minigame (spelarnas egna först), ett triviakort och en
+ * "Vems är bilden?" – så länge delen har färre än 10 kort. 2–4 delar beroende
+ * på hur många kort som skrivits; har väldigt många skrivit blir delarna
+ * längre, eftersom alla egna kort alltid kommer med.
  */
 export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rng, occasion: Occasion = 'fest') {
   const classic = cards.filter((c) => !c.occasion);
@@ -112,13 +113,18 @@ export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rn
       const kind = fillKinds[k % fillKinds.length];
       extra.push(takeOne(of(preset, kind).filter(allowed)) ?? takeOne(of(preset, kind)));
     }
-    const core = part.filter((c) => c.kind !== 'minigame').length + extra.length;
-    for (let t = 0; t < Math.max(1, Math.round(core / 3)); t++) {
-      extra.push(takeOne(trivia.filter((c) => TRIVIA_DIFFICULTY[tier].includes(c.difficulty ?? 1))) ?? takeOne(trivia));
-    }
-    extra.push(takeOne(of(preset, 'bild').filter(allowed)) ?? takeOne(of(preset, 'bild')));
-    if (!part.some((c) => c.kind === 'minigame')) extra.push(takeOne(minigames));
     for (const c of extra) if (c) part.push(toDeckCard(c, rng));
+    // Minigame, trivia och bildkort fyller ut delen till 10 kort.
+    const fillers: (() => CardRow | undefined)[] = [
+      () => (part.some((c) => c.kind === 'minigame') ? undefined : takeOne(minigames)),
+      () => takeOne(trivia.filter((c) => TRIVIA_DIFFICULTY[tier].includes(c.difficulty ?? 1))) ?? takeOne(trivia),
+      () => takeOne(of(preset, 'bild').filter(allowed)) ?? takeOne(of(preset, 'bild')),
+    ];
+    for (const next of fillers) {
+      if (part.length >= CARDS_PER_PART) break;
+      const c = next();
+      if (c) part.push(toDeckCard(c, rng));
+    }
     deck[i] = shuffle(part, rng);
   });
 
@@ -129,8 +135,8 @@ export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rn
 }
 
 /**
- * Bygger 4 delar à 15 kort: 4 "vem i rummet", 1 "vems är bilden",
- * 3 direkta frågor, 3 trivia, 3 utmaningar och 1 minigame per del.
+ * Bygger 4 delar à 10 kort: 3 "vem i rummet", 1 "vems är bilden",
+ * 2 direkta frågor, 1 trivia, 2 utmaningar och 1 minigame per del.
  */
 export function buildDeck(allCards: CardRow[], customs: CustomCard[], rng: Rng) {
   // Korten för AW och Familjespel används bara i "Bygg eget spel".
@@ -172,14 +178,14 @@ export function buildDeck(allCards: CardRow[], customs: CustomCard[], rng: Rng) 
     const exact = (pool: CardRow[]) => pool.filter((c) => levelOf(c) === p);
 
     const part: CardRow[] = [
-      ...takeFrom([ofCat(vem)], 3),
+      ...takeFrom([ofCat(vem)], 2),
       ...takeFrom([framtid(vem), ofCat(vem), upTo(vem)], 1),
       ...takeFrom([exact(bild), upTo(bild)], 1),
-      ...takeFrom([ofCat(direkt)], 2),
+      ...takeFrom([ofCat(direkt)], 1),
       ...takeFrom([framtid(direkt), ofCat(direkt), upTo(direkt)], 1),
-      ...takeFrom([trivia.filter((c) => TRIVIA_DIFFICULTY[p - 1].includes(c.difficulty ?? 1)), trivia], 3),
+      ...takeFrom([trivia.filter((c) => TRIVIA_DIFFICULTY[p - 1].includes(c.difficulty ?? 1)), trivia], 1),
       ...takeFrom([exact(utmaning)], p > 1 ? 1 : 0),
-      ...takeFrom([upTo(utmaning)], p > 1 ? 2 : 3),
+      ...takeFrom([upTo(utmaning)], p > 1 ? 1 : 2),
       ...takeFrom([minigame], 1),
     ];
     // Om någon kategori tog slut fylls delen på med vad som finns kvar.

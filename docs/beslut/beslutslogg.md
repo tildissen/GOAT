@@ -351,3 +351,26 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Alternativ:** den som skrev frågan får den aldrig själv · visa frågan för alla.
 - **Tillägg (av Claude):** Samma val finns för "Utmaning till en person". Man väljer "Vem som helst" (som tidigare) eller en av de andra spelarna – inte sig själv. Kortet går till den valda personen när det dyker upp. Är personen inte uppkopplad då går det till den vars tur det är, så att spelet inte fastnar. Listan över ens kort visar mottagaren ("Direkt fråga → Lucas"). Fungerar både i "Bygg eget spel" och under "Egna kort" i vanliga spel.
 - **Var i koden:** `targetId` i [`src/lib/types.ts`](../../src/lib/types.ts), `add_custom` och `deal()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), "Till vem?" i `EgnaKort` ([`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx)).
+
+### B67. 10 kort per del
+- **Beslut:** Varje del har 10 kort i stället för 15, eftersom spelet blev för långt och tråkigt. Ersätter B10.
+- **Tillägg (av Claude):** Vanliga spel: 3 "Vem i rummet?" (varav 1 Framtid), 1 "Vems är bilden?", 2 direkta frågor (varav 1 Framtid), 1 trivia, 2 utmaningar och 1 minigame per del. "Bygg eget spel": 7 frågor och utmaningar (egna, fyllda med förvalda om det behövs) plus minigame, trivia och bildkort. Har spelarna skrivit fler än 28 kort blir delarna längre, eftersom alla egna kort alltid kommer med. Ersätter delvis B29, B57 och B62.
+- **Var i koden:** `CARDS_PER_PART`, `OWN_CARDS_PER_PART`, `buildDeck()` och `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts).
+
+### B68. Minigames har bara "Nästa" och "Hoppa över"
+- **Beslut:** Knapparna "Jag dricker", "Jag vill spara" och "Dra ett utmaningskort" tas bort från minigames. Där finns bara "Nästa" och "Hoppa över". Ersätter B49 och B16 för minigames.
+- **Tillägg (av Claude):** Båda knapparna är värdens (se B50) och går vidare till nästa kort. De andra ser "Väntar på att … (värd) trycker nästa…". Servern godkänner inte heller val på minigames.
+- **Var i koden:** `canChoose()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B69. Vem som får välja dricka/spara/utmaningskort (genomgång)
+- **Beslut:** Tilda bad Claude dubbelkolla vem som får knapparna "Jag svarar", "Jag dricker", "Jag vill spara" och "Dra ett utmaningskort".
+- **Tillägg (av Claude):** Genomgången visade att alla spelare fick knapparna på X och Y-kort, fast utmaningen bara gäller två personer. Nu får bara X och Y dem. Reglerna är:
+  - **Direkt fråga:** bara den som frågan är till – "Jag svarar!" plus dricka/spara/utmaningskort.
+  - **Trivia:** bara den som svarar, och bara efter fel svar (inte "Jag svarar").
+  - **Utmaning till en person:** bara den personen, plus "Klar!".
+  - **X och Y:** bara de två.
+  - **Utmaning för alla och lag:** alla.
+  - **Alla röstar / Vems är bilden?:** bara de som förlorade röstningen (flest röster, eller gissade fel).
+  - **Vems är bilden? (uppladdning):** den hemliga uppladdaren kan välja "Jag vägrar (och dricker)".
+  - **Minigames:** ingen (B68).
+- **Var i koden:** `canChoose()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
