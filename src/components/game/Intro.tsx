@@ -31,28 +31,30 @@ export default function Intro(props: GameProps) {
   return <EgnaKort {...props} onDone={finish} />;
 }
 
+/** Sovande telefon i samma lösa streckstil som G.O.A.T.-ikonen: samma mun, slutna ögon och Z i Knewave. */
+const SOVER_MUN =
+  'M55 174 C52 188 50 202 64 203 C80 204 96 194 108 205 C122 218 140 268 158 268 C178 268 190 230 208 232 C224 234 228 252 242 248 C256 244 254 212 270 210 C286 208 300 206 303 172';
+
 function StorEj({ onDone }: { onDone: () => void }) {
   return (
     <Screen bg="cyan" center>
       <div className="stack storej">
-        <svg className="storej-icon" viewBox="0 0 200 200" aria-hidden="true">
-          <circle cx="100" cy="100" r="96" fill="#ffde59" />
-          <rect x="62" y="30" width="76" height="140" rx="18" fill="#fff" stroke="#111" strokeWidth="5" strokeLinejoin="round" />
-          <path d="M88 46h24" stroke="#111" strokeWidth="5" strokeLinecap="round" />
-          <path
-            d="M108 76a28 28 0 1 0 16 44a23 23 0 0 1-16-44z"
-            fill="#ffde59"
-            stroke="#111"
-            strokeWidth="4.5"
-            strokeLinejoin="round"
-          />
-          <path d="M124 70v10M119 75h10" stroke="#111" strokeWidth="4" strokeLinecap="round" />
-          <path d="M80 150h40" stroke="#111" strokeWidth="5" strokeLinecap="round" />
+        <svg className="storej-icon" viewBox="0 0 210 220" fill="none" stroke="#111" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M58 30C58 24 64 19 72 20L128 21C137 21 142 26 142 34L141 186C141 195 135 200 127 200L72 199C63 199 58 194 58 186Z" />
+          <path d="M88 37L112 36" />
+          <path d="M86 187L114 188" />
+          <path d="M75 92C80 101 90 101 95 92" />
+          <path d="M105 92C110 101 120 101 125 92" />
+          <path d={SOVER_MUN} transform="translate(64.6 85.6) scale(0.2)" vectorEffect="non-scaling-stroke" />
+          <g fill="#111" stroke="none" fontFamily="var(--font-knewave), sans-serif">
+            <text x="156" y="78" fontSize="38">Z</text>
+            <text x="177" y="50" fontSize="30">z</text>
+            <text x="194" y="26" fontSize="22">z</text>
+          </g>
         </svg>
         <h1 className="storej-title">
           Sätt din telefon på <span className="hl">stör ej</span> för att fortsätta
         </h1>
-        <p className="body-text">Då slipper ni notiser mitt i spelet.</p>
         <button className="btn ink" onClick={onDone}>
           Klar
         </button>

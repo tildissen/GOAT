@@ -391,7 +391,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ### B72. Ny "stör ej"-skärm och kontrast enligt WCAG 2.1 AA
 - **Beslut:** Tilda tyckte att "stör ej"-skärmen (gul varningstriangel på en korallröd ruta) inte var snygg och bad Claude göra om den och kontrollera kontrasten i hela spelet enligt WCAG.
-- **Tillägg (av Claude):** Ny skärm på cyan bakgrund med en telefon och en måne på en gul cirkel, rubriken med "stör ej" markerad med gult, och en kort rad ("Då slipper ni notiser mitt i spelet."). Knappen heter fortfarande "Klar". B23 gäller: det är bara en påminnelse.
+- **Beslut:** Raden "Då slipper ni notiser mitt i spelet." ska inte vara med. Tilda ifrågasatte också om månikonen passade G.O.A.T.-temat. Den gjordes om i samma handritade streckstil som smileyn.
+- **Tillägg (av Claude):** Ny skärm på cyan bakgrund med en sovande telefon: telefonen är ritad med lösa svarta streck utan fyllning, har slutna ögon, samma vågiga mun som ikonen och Z i Knewave. Rubriken har "stör ej" markerat med gult. Knappen heter fortfarande "Klar". B23 gäller: det är bara en påminnelse.
 - **Mätning:** Claude mätte textkontrasten på 46 skärmar i alla delar och lägen (krav 4,5:1 för vanlig text och 3:1 för stor text). Ingen text föll igenom. Fem saker som mätningen inte nådde justerades efter beräkning:
   - Felmeddelandet i formulären var korall text på vitt (3,1:1). Nu svart text med korall kant.
   - Brödtexten på ERROR-skärmen var vit på röd (3,7:1). Nu svart (5,7:1). Själva ordet ERROR är stor text och är kvar vitt.
