@@ -332,3 +332,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ### B63. Supabase behöver uppdateras
 - **Tillägg (av Claude):** Tabellen `cards` har fått kolumnen `occasion`. `supabase/schema.sql` och `supabase/seed.sql` (nu 800 kort) måste köras igen i Supabase. Tills dess fungerar spelet som vanligt, men AW och Familjespel får inga förvalda kort.
+
+### B64. Supabase uppdaterad via Supabase-connectorn
+- **Beslut:** Tilda kopplade Supabase-connectorn i Claude och bad Claude uppdatera databasen med den, i stället för att klistra in SQL själv.
+- **Tillägg (av Claude):** Kolumnen `occasion` lades till som migreringen `add_cards_occasion`. Bara de 220 nya korten för AW och Familjespel lades in – de 580 befintliga korten rördes inte, så eventuella ändringar i dem finns kvar. Databasen har nu 800 kort. B63 är därmed klart. Supabases säkerhetsråd visar bara att tabellerna har RLS utan regler, vilket är avsiktligt: bara spelets server får läsa och skriva.
