@@ -1,4 +1,6 @@
 export type Category = 'casual' | 'party' | 'cheeky' | 'dirty' | 'framtid';
+/** Tillfälle i "Bygg eget spel". Fest använder de vanliga korten; AW och Familjespel har egna förvalda kort. */
+export type Occasion = 'fest' | 'aw' | 'familj';
 export type CardKind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild';
 
 /** Ett kort som det ligger i databasen (tabellen cards). */
@@ -12,6 +14,8 @@ export interface CardRow {
   answer?: string | null;
   wrong_answers?: string[] | null;
   players?: number | null;
+  /** null = vanliga kort (och Fest). 'aw'/'familj' = förvalda kort för det tillfället. */
+  occasion?: Occasion | null;
 }
 
 /** Ett kort i en blandad kortlek. */
@@ -106,6 +110,8 @@ export interface GameState {
   customCards: CustomCard[];
   /** Saknas i spel som skapades innan "Bygg eget spel" fanns – räknas då som classic. */
   mode?: GameMode;
+  /** Bara i "Bygg eget spel". */
+  occasion?: Occasion;
   lastTurnId: string | null;
   seq: number;
 }

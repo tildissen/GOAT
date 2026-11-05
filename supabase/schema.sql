@@ -20,6 +20,8 @@ create table if not exists public.cards (
   players int not null default 1 check (players between 0 and 3),
   -- Sätt till false för att plocka bort ett kort utan att radera det
   active boolean not null default true,
+  -- Tom = vanliga kort (och Fest). 'aw' eller 'familj' = förvalda kort för det tillfället i "Bygg eget spel".
+  occasion text check (occasion in ('aw', 'familj')),
   created_at timestamptz not null default now()
 );
 
@@ -41,6 +43,9 @@ create table if not exists public.presence (
   last_seen timestamptz not null default now(),
   primary key (game_id, player_id)
 );
+
+-- För databaser som skapades innan tillfällen fanns. Gör ingenting om kolumnen redan finns.
+alter table public.cards add column if not exists occasion text check (occasion in ('aw', 'familj'));
 
 create index if not exists games_created_at_idx on public.games (created_at);
 

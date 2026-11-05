@@ -2,10 +2,10 @@
 
 import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
-import { canPressNext, isSoloCard, MAX_SAVED } from '@/lib/engine';
+import { canPressNext, isFamily, isSoloCard, MAX_SAVED } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import { Avatar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
-import { Board, CHOICE_TEXT, ChoiceButtons, nameOf, possessive, sipsText, type GameProps } from './shared';
+import { Board, ChoiceButtons, choiceText, nameOf, possessive, sipsText, type GameProps } from './shared';
 
 /** Visar kortet som spelas just nu – olika beroende på korttyp och vems tur det är. */
 export default function Playing(props: GameProps) {
@@ -43,7 +43,7 @@ function CardScreen({
   const theme = partTheme(game.state.part);
   return (
     <Screen bg={bg ?? theme.bg}>
-      <Hud me={game.me} part={game.state.part} index={game.state.cardIndex} total={game.state.cardsInPart} />
+      <Hud me={game.me} part={game.state.part} index={game.state.cardIndex} total={game.state.cardsInPart} family={isFamily(game.state)} />
       <div className={`card ${card ?? theme.card}`}>{children}</div>
       {below && <div className="stack" style={{ marginTop: 18 }}>{below}</div>}
     </Screen>
@@ -51,10 +51,28 @@ function CardScreen({
 }
 
 /** Toppytan: sparade klunkar (max 5, sedan ERROR) och hur långt det är kvar i delen. */
-export function Hud({ me, part, index, total }: { me: GameProps['me']; part: number; index: number; total: number }) {
+export function Hud({
+  me,
+  part,
+  index,
+  total,
+  family = false,
+}: {
+  me: GameProps['me'];
+  part: number;
+  index: number;
+  total: number;
+  /** Familjespel: inga sparade klunkar, bara dina minuspoäng. */
+  family?: boolean;
+}) {
   const filled = Math.min(me.saved, MAX_SAVED);
   return (
     <div className="hud">
+      {family ? (
+        <div className="hud-block">
+          <span className="hud-label">Minuspoäng {me.drank}</span>
+        </div>
+      ) : (
       <button
         className="hud-block"
         onClick={() => window.dispatchEvent(new Event('goat:saved'))}
@@ -70,6 +88,7 @@ export function Hud({ me, part, index, total }: { me: GameProps['me']; part: num
           {me.saved > MAX_SAVED && <span className="more">+{me.saved - MAX_SAVED}</span>}
         </span>
       </button>
+      )}
       <div className="hud-block right" role="img" aria-label={`Del ${part}, kort ${index + 1} av ${total}`}>
         <span className="hud-label">Del {part}</span>
         <span className="segs" aria-hidden="true">
@@ -98,9 +117,9 @@ function NextButton(p: CardProps & { label?: string; color?: 'white' | 'cyan' | 
   );
 }
 
-function Chosen({ cur, meId }: { cur: Current; meId: string }) {
+function Chosen({ cur, meId, family = false }: { cur: Current; meId: string; family?: boolean }) {
   const choice = cur.choices[meId];
-  return choice ? <p className="body-text">Du {CHOICE_TEXT[choice](cur.sips)} ✓</p> : null;
+  return choice ? <p className="body-text">Du {choiceText(choice, cur.sips, family)} ✓</p> : null;
 }
 
 /* ---------- Direkt fråga ---------- */
@@ -116,6 +135,7 @@ function Direct(p: CardProps) {
         sips={p.cur.sips}
         act={p.act}
         busy={p.busy}
+        family={isFamily(p.state)}
         extra={
           <button className="btn yellow" disabled={p.busy} onClick={() => p.act({ type: 'choose', choice: 'answered' })}>
             Jag svarar!
@@ -160,8 +180,12 @@ function Trivia(p: CardProps) {
           );
         })}
       </div>
-      {!answered && <p className="hint">Fel svar: drick, spara eller dra en utmaning</p>}
-      {answered && !right && <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} />}
+      {!answered && (
+        <p className="hint">
+          {isFamily(p.state) ? 'Fel svar: ta minuspoäng eller dra en utmaning' : 'Fel svar: drick, spara eller dra en utmaning'}
+        </p>
+      )}
+      {answered && !right && <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={isFamily(p.state)} />}
     </CardScreen>
   );
 }
@@ -196,7 +220,11 @@ function Challenge(p: CardProps) {
         )}
         {cur.card.players === 2 && involved && <p className="body-text">Det gäller dig!</p>}
       </div>
-      {mine ? <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" /> : <Chosen cur={cur} meId={me.id} />}
+      {mine ? (
+        <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" family={isFamily(p.state)} />
+      ) : (
+        <Chosen cur={cur} meId={me.id} family={isFamily(p.state)} />
+      )}
     </CardScreen>
   );
 }
@@ -283,7 +311,11 @@ function ResultCard(p: CardProps) {
 
   let headline: React.ReactNode;
   if (photo && cur.photoSkipped) {
-    headline = <p className="card-text">{owner} vägrade ladda upp en bild – och får dricka!</p>;
+    headline = (
+      <p className="card-text">
+        {owner} vägrade ladda upp en bild – och {isFamily(state) ? 'får minuspoäng' : 'får dricka'}!
+      </p>
+    );
   } else if (photo) {
     const allRight = cur.losers.length === 1 && cur.losers[0] === cur.turnId;
     headline = (
@@ -291,7 +323,9 @@ function ResultCard(p: CardProps) {
         <div className="code-box" style={{ background: 'var(--green)', fontSize: 'clamp(26px, 9vw, 40px)', cursor: 'default' }}>
           <span className="display small name-font">{owner.toUpperCase()}</span>
         </div>
-        <p className="heading">{allRight ? `ägde bilden – alla gissade rätt, så ${owner} dricker!` : 'ägde bilden! Alla som gissade fel dricker.'}</p>
+        <p className="heading">{allRight
+            ? `ägde bilden – alla gissade rätt, så ${owner} ${isFamily(state) ? 'får minuspoäng' : 'dricker'}!`
+            : `ägde bilden! Alla som gissade fel ${isFamily(state) ? 'får minuspoäng' : 'dricker'}.`}</p>
       </>
     );
   } else {
@@ -327,14 +361,14 @@ function ResultCard(p: CardProps) {
         </div>
       )}
       {iLost && !cur.choices[me.id] ? (
-        <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} />
+        <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={isFamily(state)} />
       ) : (
         <div className="votes-list">
           {cur.losers
             .filter((id) => cur.choices[id])
             .map((id) => (
               <div key={id}>
-                {nameOf(state, id)} {CHOICE_TEXT[cur.choices[id]](cur.sips)}
+                {nameOf(state, id)} {choiceText(cur.choices[id], cur.sips, isFamily(state))}
               </div>
             ))}
         </div>
@@ -396,7 +430,7 @@ function PhotoUpload(p: CardProps) {
           {working ? 'Laddar upp…' : 'Ladda upp här!'}
         </button>
         <button className="link-btn" disabled={working || p.busy} onClick={() => p.act({ type: 'skip_photo' })}>
-          Jag vägrar (och dricker {sipsText(cur.sips)})
+          {isFamily(p.state) ? `Jag vägrar (och tar ${sipsText(cur.sips, true)})` : `Jag vägrar (och dricker ${sipsText(cur.sips)})`}
         </button>
       </div>
     </CardScreen>

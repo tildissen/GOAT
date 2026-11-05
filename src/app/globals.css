@@ -623,3 +623,20 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 }
 .type-help p { margin: 6px 0 0; }
 .type-help .example { font-style: italic; opacity: 0.8; }
+
+/* Val av tillfälle i "Bygg eget spel" */
+.occasions { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-bottom: 36px; }
+.occasion {
+  border: 0;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 12px 18px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  font-size: 15px;
+}
+.occasion strong { font-size: 19px; }
+.occasion.selected { background: var(--black); color: var(--white); }

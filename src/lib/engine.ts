@@ -1,5 +1,5 @@
 import { CARDS_PER_PART, PARTS, shuffle, type Rng } from './deck';
-import type { Action, Current, CustomCard, CustomKind, DeckCard, GameMode, GameState, Player, PublicState } from './types';
+import type { Action, Current, CustomCard, CustomKind, DeckCard, GameMode, GameState, Occasion, Player, PublicState } from './types';
 
 export const MIN_PLAYERS = 3;
 export const MAX_PLAYERS = 15;
@@ -43,9 +43,10 @@ export function newPlayer(id: string, name: string, now: number): Player {
   };
 }
 
-export function newGameState(host: Player, mode: GameMode = 'classic'): GameState {
+export function newGameState(host: Player, mode: GameMode = 'classic', occasion?: Occasion): GameState {
   return {
     mode,
+    ...(mode === 'custom' ? { occasion: occasion ?? 'fest' } : {}),
     status: 'lobby',
     hostId: host.id,
     players: [host],
@@ -87,10 +88,25 @@ export function addPlayer(state: GameState, rawName: string, id: string, now: nu
 
 /** Byter siffror före "klunk" så att det blir fler klunkar för varje del. */
 export function scaleSips(text: string, part: number): string {
-  return text.replace(/(\d+)(\s+(?:extra\s+)?)klunk(?:ar)?/g, (_, n: string, space: string) => {
+  return text.replace(/(\d+)(\s+(?:extra\s+)?)(klunk(?:ar)?|minuspoäng)/g, (_, n: string, space: string, unit: string) => {
     const sips = Number(n) + part - 1;
+    if (unit === 'minuspoäng') return `${sips}${space}minuspoäng`;
     return `${sips}${space}${sips === 1 ? 'klunk' : 'klunkar'}`;
   });
+}
+
+/** Familjespel: alkoholfritt – man får minuspoäng i stället för att dricka. */
+export function isFamily(state: Pick<GameState, 'mode' | 'occasion'>): boolean {
+  return state.mode === 'custom' && state.occasion === 'familj';
+}
+
+/** Skriver om dryckesord till minuspoäng, för kort som spelarna skrivit i ett familjespel. */
+export function familyText(text: string): string {
+  return text
+    .replace(/\b(dricker|tar)\s+(\d+)\s+(?:extra\s+)?klunk(?:ar)?/gi, 'får $2 minuspoäng')
+    .replace(/\bdrick\s+(\d+)\s+(?:extra\s+)?klunk(?:ar)?/gi, 'ta $1 minuspoäng')
+    .replace(/(\d+)\s+(?:extra\s+)?klunk(?:ar)?/gi, '$1 minuspoäng')
+    .replace(/\bdricker\b/gi, 'får minuspoäng');
 }
 
 export function isSoloCard(card: DeckCard): boolean {
@@ -171,7 +187,9 @@ function deal(s: GameState, ctx: Ctx) {
   }
 
   // På utmaningar och minigames gäller antalet klunkar som står på kortet.
-  const sipsOnCard = card.kind === 'utmaning' || card.kind === 'minigame' ? text.match(/(\d+)\s+(?:extra\s+)?klunk/) : null;
+  if (isFamily(s)) text = familyText(text);
+  const sipsOnCard =
+    card.kind === 'utmaning' || card.kind === 'minigame' ? text.match(/(\d+)\s+(?:extra\s+)?(?:klunk|minuspoäng)/) : null;
 
   s.seq += 1;
   s.current = {
@@ -253,7 +271,8 @@ function canChoose(s: GameState, cur: Current, player: Player): boolean {
 function drawChallenge(s: GameState, ctx: Ctx): string {
   const pool = s.challengePool.filter((c) => c.level <= s.part);
   const card = pick(pool.length > 0 ? pool : s.challengePool, ctx.rng);
-  return card ? scaleSips(card.text, s.part) : 'Gör en segerpose i 10 sekunder.';
+  const text = card ? scaleSips(card.text, s.part) : 'Gör en segerpose i 10 sekunder.';
+  return isFamily(s) ? familyText(text) : text;
 }
 
 export function applyAction(input: GameState, playerId: string, action: Action, ctx: Ctx): GameState {
@@ -349,6 +368,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       } else if (action.choice === 'drink') {
         me.drank += c.sips;
       } else if (action.choice === 'save') {
+        if (isFamily(s)) throw new GameError('Man kan inte spara i familjespel');
         me.saved += c.sips;
       } else if (action.choice === 'challenge') {
         s.overlays[playerId] = { text: drawChallenge(s, ctx), advancesCard: solo };

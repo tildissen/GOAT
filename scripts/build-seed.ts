@@ -15,7 +15,7 @@ const arr = (v: string[] | null | undefined) => (v == null ? 'null' : `array[${v
 
 const rows = cards.map(
   (c) =>
-    `(${str(c.kind)}, ${str(c.text)}, ${str(c.title)}, ${str(c.category)}, ${c.difficulty ?? 'null'}, ${str(c.answer)}, ${arr(c.wrong_answers)}, ${c.players ?? 1})`,
+    `(${str(c.kind)}, ${str(c.text)}, ${str(c.title)}, ${str(c.category)}, ${c.difficulty ?? 'null'}, ${str(c.answer)}, ${arr(c.wrong_answers)}, ${c.players ?? 1}, ${str(c.occasion)})`,
 );
 
 const sql = `-- G.O.A.T. – alla kort. Skapad automatiskt från content/ med "npm run seed".
@@ -24,7 +24,7 @@ const sql = `-- G.O.A.T. – alla kort. Skapad automatiskt från content/ med "n
 
 delete from public.cards;
 
-insert into public.cards (kind, text, title, category, difficulty, answer, wrong_answers, players) values
+insert into public.cards (kind, text, title, category, difficulty, answer, wrong_answers, players, occasion) values
 ${rows.join(',\n')};
 `;
 

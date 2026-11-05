@@ -1,0 +1,128 @@
+# Förvalda kort för tillfället Familjespel i "Bygg eget spel".
+# Alla åldrar, alkoholfritt: i stället för klunkar får man minuspoäng. Minst minuspoäng vinner.
+# Format:
+#   vem|påstående              – Vem i rummet? (alla röstar)
+#   direkt|fråga               – fråga till den vars tur det är
+#   solo|utmaning              – utmaning till den vars tur det är (används också som utmaningskort)
+#   alla|utmaning              – utmaning för hela gruppen
+#   minigame|namn|beskrivning
+#   bild|uppmaning             – Vems är bilden?
+# Antal minuspoäng i utmaningar och minigames ökar automatiskt per del.
+
+vem|Vem skulle klara sig längst utan mobil?
+vem|Vem äter mest godis i smyg?
+vem|Vem skulle bli kändis på TikTok först?
+vem|Vem skulle vinna en dansbattle?
+vem|Vem skulle bli bäst som rektor?
+vem|Vem somnar först på filmkvällen?
+vem|Vem tar längst tid på sig i badrummet?
+vem|Vem skulle klara sig längst på en öde ö?
+vem|Vem är bäst på att hitta på ursäkter?
+vem|Vem skulle bli bäst som kock?
+vem|Vem skrattar högst?
+vem|Vem tappar bort sina saker oftast?
+vem|Vem skulle vinna en tävling i att vara tyst längst?
+vem|Vem har bäst humor?
+vem|Vem skulle bli bäst på att ta hand om ett husdjur?
+vem|Vem skulle våga åka den läskigaste berg-och-dalbanan?
+vem|Vem är bäst på sällskapsspel?
+vem|Vem blir surast när hen förlorar?
+vem|Vem skulle bli bäst som detektiv?
+vem|Vem sjunger mest i duschen?
+vem|Vem skulle klara sig längst utan godis?
+vem|Vem har flest strumpor utan par?
+vem|Vem blir astronaut först?
+vem|Vem skulle hitta på den bästa uppfinningen?
+vem|Vem är först uppe på morgonen?
+
+direkt|Vilken superkraft skulle du välja, och varför?
+direkt|Vilket djur skulle du vilja vara?
+direkt|Om du fick bestämma middagen varje dag i en vecka, vad skulle vi äta?
+direkt|Vad är det roligaste som har hänt dig i skolan eller på jobbet?
+direkt|Vilken är din favoritfilm genom tiderna?
+direkt|Om du fick resa vart som helst i världen, vart skulle du åka?
+direkt|Vad är det godaste du har ätit?
+direkt|Vilken kändis skulle du vilja träffa?
+direkt|Vad skulle du göra om du var osynlig en dag?
+direkt|Vilken är din bästa semester?
+direkt|Vad är du bäst på?
+direkt|Om du fick vilket husdjur som helst, vilket skulle du välja?
+direkt|Vad är det läskigaste du har gjort?
+direkt|Vilket är ditt bästa minne med familjen?
+direkt|Vilket spel tycker du är roligast?
+direkt|Vad vill du bli när du blir stor – eller vad ville du bli?
+direkt|Om du fick uppfinna något, vad skulle det vara?
+direkt|Vilken låt får dig alltid att dansa?
+direkt|Vad skulle du göra med en miljon kronor?
+direkt|Vilken är den roligaste present du har fått?
+direkt|Vilken sagofigur skulle du vilja vara?
+direkt|Vad gör dig glad direkt?
+direkt|Om du fick välja ett nytt namn, vad skulle du heta?
+direkt|Vilken är din favoritårstid, och varför?
+direkt|Vad är det konstigaste du har ätit?
+
+solo|Härma någon i rummet tills någon gissar vem det är.
+solo|Prata som en robot tills det blir din tur igen.
+solo|Säg alfabetet baklänges från K.
+solo|Härma ett djur tills någon gissar vilket.
+solo|Gör din bästa segerdans.
+solo|Nämn fem frukter på 10 sekunder, annars får du 2 minuspoäng.
+solo|Berätta ett skämt. Skrattar ingen får du 2 minuspoäng.
+solo|Sjung refrängen på en låt som de andra väljer.
+solo|Stå på ett ben i 20 sekunder.
+solo|Säg tre snälla saker om personen till vänster.
+solo|Gör en grimas och håll den i 10 sekunder utan att skratta.
+solo|Nämn fem länder på 10 sekunder.
+solo|Berätta om din dag som om du vore nyhetsuppläsare.
+solo|Säg ditt namn baklänges.
+solo|Rita en katt i luften med stängda ögon. De andra bedömer om den blev godkänd.
+solo|Gör tio hopp på stället.
+solo|Beskriv en film utan att säga vad den heter. De andra gissar.
+solo|Prata bara på rim tills det blir din tur igen.
+solo|Nämn fem saker som är gröna på 10 sekunder.
+solo|Viska en hemlighet (en påhittad går bra) till personen till höger.
+
+alla|Alla som har randiga strumpor får 2 minuspoäng.
+alla|Den som senast åt glass delar ut 2 minuspoäng.
+alla|Den yngsta i rummet delar ut 2 minuspoäng.
+alla|Alla som har ett husdjur får 1 minuspoäng.
+alla|Den längsta i rummet delar ut 2 minuspoäng.
+alla|Alla som har något blått på sig får 2 minuspoäng.
+alla|Den som senast borstade tänderna delar ut 2 minuspoäng.
+alla|Alla som har varit utomlands i år får 2 minuspoäng.
+alla|Den som har flest bokstäver i sitt namn delar ut 2 minuspoäng.
+alla|Alla som gillar pizza mer än tacos får 1 minuspoäng.
+alla|Den som senast fyllde år delar ut 2 minuspoäng.
+alla|Alla som kan vissla får 1 minuspoäng.
+alla|Den som har längst hår delar ut 2 minuspoäng.
+alla|Alla som har sovit över hos en kompis i år får 2 minuspoäng.
+alla|Den som vaknade först idag delar ut 2 minuspoäng.
+alla|Alla som har ett syskon i rummet får 1 minuspoäng.
+alla|Den som har minst skor delar ut 2 minuspoäng.
+alla|Alla som har glasögon får 2 minuspoäng.
+alla|Den som kan säga flest länder på 15 sekunder delar ut 3 minuspoäng.
+alla|Alla som någon gång har gått vilse får 1 minuspoäng.
+
+minigame|Kategorier|Den vars tur det är väljer en enkel kategori, till exempel bilmärken, frukter eller djur. Säg något i kategorin varannan gång medsols. Den som tvekar eller upprepar något får 2 minuspoäng.
+minigame|Alfabetsleken|Välj en kategori, till exempel mat. Säg något i tur och ordning som börjar på A, B, C och så vidare. Den som fastnar får 2 minuspoäng.
+minigame|Gissa låten|Den vars tur det är nynnar på en låt. Den som gissar rätt först delar ut 2 minuspoäng.
+minigame|Frys!|Alla står stilla som statyer i 20 sekunder. Den som rör sig först får 2 minuspoäng.
+minigame|Rimma|Säg ett ord. Nästa person medsols ska rimma på det, och så vidare. Den som inte kommer på något får 2 minuspoäng.
+minigame|Tumregeln|Sätt tummen på bordet utan att säga något. Alla andra ska därefter sätta sin tumme på bordet. Den som är sist får 3 minuspoäng.
+minigame|Härmapan|Den vars tur det är gör en rörelse. Nästa härmar den och lägger till en egen, och så vidare. Den som glömmer en rörelse får 2 minuspoäng.
+minigame|Inga namn|Ny regel! Ingen får säga någons namn de kommande 5 korten. Den som gör det får 2 minuspoäng.
+minigame|Simon säger|Den vars tur det är är Simon i en minut. Gör bara det Simon säger när hen börjar med "Simon säger". Den som gör fel får 1 minuspoäng.
+minigame|Två sanningar och en lögn|Den vars tur det är säger tre saker om sig själv – två är sanna och en är lögn. Alla som gissar fel på lögnen får 2 minuspoäng.
+minigame|Viskleken|Personen till höger viskar en fråga i ditt öra. Du säger svaret högt och bestämmer hur många minuspoäng man får för att få veta frågan. De andra kan välja att ta minuspoängen för att få veta frågan. Vill ingen det viskar du en ny fråga i nästa persons öra.
+minigame|Nej-förbud|Ny regel! Ingen får säga "nej" de kommande 5 korten. Den som gör det får 2 minuspoäng.
+minigame|Frågemästaren|Ny regel! Den vars tur det är blir frågemästare de kommande 5 korten. Den som svarar på en fråga från frågemästaren får 1 minuspoäng.
+minigame|Jag har aldrig|Alla håller upp tre fingrar. Säg i tur och ordning något du aldrig har gjort. De som har gjort det fäller ett finger. Den som först har noll fingrar kvar får 3 minuspoäng.
+
+bild|Ladda upp den sötaste djurbilden du har i mobilen.
+bild|Ladda upp den senaste bilden du tog på mat.
+bild|Ladda upp den senaste skärmdumpen du tog.
+bild|Ladda upp en bild från en resa.
+bild|Ladda upp en bild på din favoritsak.
+bild|Ladda upp den senaste bilden du tog utomhus.
+bild|Ladda upp en bild på något som får dig att skratta.
+bild|Ladda upp den 10:e senaste bilden i din kamerarulle.

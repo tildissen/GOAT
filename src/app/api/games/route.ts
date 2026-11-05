@@ -4,6 +4,7 @@ import { handle, readJson, str } from '@/lib/http';
 export async function POST(req: Request) {
   return handle(async () => {
     const body = await readJson(req);
-    return createGame(str(body.name), body.mode === 'custom' ? 'custom' : 'classic');
+    const occasion = body.occasion === 'aw' || body.occasion === 'familj' ? body.occasion : 'fest';
+    return createGame(str(body.name), body.mode === 'custom' ? 'custom' : 'classic', occasion);
   });
 }

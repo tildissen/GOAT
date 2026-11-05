@@ -86,11 +86,18 @@ class SupabaseStore implements Store {
   }
 
   async loadCards() {
-    const { data, error } = await this.db
+    const columns = 'id, kind, text, title, category, difficulty, answer, wrong_answers, players';
+    let result: { data: unknown[] | null; error: { code?: string } | null } = await this.db
       .from('cards')
-      .select('id, kind, text, title, category, difficulty, answer, wrong_answers, players')
+      .select(`${columns}, occasion`)
       .eq('active', true)
       .limit(5000);
+    if (result.error?.code === '42703') {
+      // Databasen har inte kolumnen occasion än (schema.sql har inte körts om) – spela vidare med de vanliga korten.
+      console.warn('cards.occasion saknas – kör supabase/schema.sql och seed.sql igen');
+      result = await this.db.from('cards').select(columns).eq('active', true).limit(5000);
+    }
+    const { data, error } = result;
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('Inga kort i databasen – kör supabase/seed.sql');
     return data as CardRow[];

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { compressImage, loadLocal, saveLocal } from '@/lib/client';
-import { MAX_OWN_CARDS, MIN_OWN_CARDS, MIN_PLAYERS, ownCardCount } from '@/lib/engine';
+import { isFamily, MAX_OWN_CARDS, MIN_OWN_CARDS, MIN_PLAYERS, ownCardCount } from '@/lib/engine';
 import type { CustomCard, CustomKind } from '@/lib/types';
 import Face from '../Face';
 import { Avatar, Screen } from '../ui';
@@ -26,7 +26,7 @@ export default function Intro(props: GameProps) {
   const finish = () => act({ type: 'ready' });
 
   if (step === 'storej') return <StorEj onDone={() => go('regler')} />;
-  if (step === 'regler') return <Regler onDone={() => go('selfie')} />;
+  if (step === 'regler') return <Regler state={state} onDone={() => go('selfie')} />;
   if (step === 'selfie') return <Selfie {...props} onDone={() => (canAddCards ? go('egna') : finish())} />;
   return <EgnaKort {...props} onDone={finish} />;
 }
@@ -59,32 +59,54 @@ function StorEj({ onDone }: { onDone: () => void }) {
   );
 }
 
-function Regler({ onDone }: { onDone: () => void }) {
+function Regler({ state, onDone }: { state: GameProps['state']; onDone: () => void }) {
+  const parts = state.mode === 'custom' ? 'flera delar' : '4 delar';
   return (
     <Screen bg="coral">
       <h1 className="display big" style={{ marginTop: 12, marginBottom: 16 }}>
         SPELREGLER
       </h1>
       <div className="card green" style={{ padding: '24px 18px', gap: 16 }}>
-        <p className="body-text">
-          <strong>Välkommen</strong> till spelet som börjar oskyldigt… och slutar i fullständigt <em>kaos</em>.
-        </p>
-        <p className="body-text">
-          Spelet är uppdelat i 4 delar, och för varje del blir frågorna sjukare, minigamesen mer kaotiska och tempot så
-          högt att du börjar ifrågasätta dina livsval.
-        </p>
-        <p className="body-text">
-          Här styr nästa kort allt. Det kan vara en fråga, ett spel eller en utmaning – och nej, ingen vet vad som
-          väntar.
-        </p>
-        <p className="body-text">
-          <strong>Är du nykter?</strong> Tråkigt. Men lugn, du kan alltid dra ett utmaningskort i stället för att dricka.
-          Men då måste du också göra utmaningen. Inga ursäkter, inga kompromisser, inga ”jag gör det sen”.
-        </p>
-        <p className="body-text">
-          Du får <strong>spara</strong> klunkar – men bara upp till 5 stycken. Får du fler än så pausas spelet tills du
-          druckit ikapp. Det här är ett dryckesspel, inte en sparbank.
-        </p>
+        {isFamily(state) ? (
+          <>
+            <p className="body-text">
+              <strong>Välkommen</strong> till G.O.A.T. – familjeversionen!
+            </p>
+            <p className="body-text">
+              Spelet är uppdelat i {parts}, och för varje del blir utmaningarna lite svårare. Här styr nästa kort allt.
+              Det kan vara en fråga, ett spel eller en utmaning – och ingen vet vad som väntar.
+            </p>
+            <p className="body-text">
+              <strong>Vill du inte svara?</strong> Då tar du minuspoäng – eller drar ett utmaningskort. Men då måste du
+              också göra utmaningen. Inga ursäkter, inga ”jag gör det sen”.
+            </p>
+            <p className="body-text">
+              Den som har <strong>minst minuspoäng</strong> när spelet är slut vinner.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="body-text">
+              <strong>Välkommen</strong> till spelet som börjar oskyldigt… och slutar i fullständigt <em>kaos</em>.
+            </p>
+            <p className="body-text">
+              Spelet är uppdelat i {parts}, och för varje del blir frågorna sjukare, minigamesen mer kaotiska och tempot
+              så högt att du börjar ifrågasätta dina livsval.
+            </p>
+            <p className="body-text">
+              Här styr nästa kort allt. Det kan vara en fråga, ett spel eller en utmaning – och nej, ingen vet vad som
+              väntar.
+            </p>
+            <p className="body-text">
+              <strong>Är du nykter?</strong> Tråkigt. Men lugn, du kan alltid dra ett utmaningskort i stället för att
+              dricka. Men då måste du också göra utmaningen. Inga ursäkter, inga kompromisser, inga ”jag gör det sen”.
+            </p>
+            <p className="body-text">
+              Du får <strong>spara</strong> klunkar – men bara upp till 5 stycken. Får du fler än så pausas spelet tills
+              du druckit ikapp. Det här är ett dryckesspel, inte en sparbank.
+            </p>
+          </>
+        )}
         <button className="btn ink" onClick={onDone} style={{ marginTop: 8 }}>
           Nästa
         </button>
@@ -196,6 +218,30 @@ const CARD_TYPES: {
   },
 ];
 
+/** Familjespel: samma korttyper, men med minuspoäng i stället för att dricka. */
+const FAMILY_TYPE_TEXT: Partial<Record<CardTypeKey, { desc: string; example: string }>> = {
+  vem: {
+    desc: 'Ett påstående som alla röstar på. Börja gärna med "Vem …". Den som får flest röster får minuspoäng.',
+    example: 'Vem skulle klara sig längst utan mobil?',
+  },
+  direkt: {
+    desc: 'En fråga till den vars tur det är. Bara hen ser frågan och måste svara – eller ta minuspoäng.',
+    example: 'Vilken superkraft skulle du välja, och varför?',
+  },
+  solo: {
+    desc: 'Något som den vars tur det är måste göra. Vägrar hen får hen minuspoäng eller drar ett utmaningskort.',
+    example: 'Härma ett djur tills någon gissar vilket.',
+  },
+  alla: {
+    desc: 'Gäller hela gruppen. Skriv vem som får minuspoäng och hur många – antalet ökar automatiskt för varje del.',
+    example: 'Alla som har randiga strumpor får 2 minuspoäng.',
+  },
+  minigame: {
+    desc: 'En lek eller regel som alla gör tillsammans. Ge den ett namn och förklara reglerna. Räknas inte till dina kort.',
+    example: 'Alla står stilla som statyer i 20 sekunder. Den som rör sig först får 2 minuspoäng.',
+  },
+};
+
 function typeOf(c: CustomCard) {
   if (c.kind === 'utmaning') return CARD_TYPES.find((t) => t.key === (c.players === 1 ? 'solo' : 'alla'))!;
   return CARD_TYPES.find((t) => t.kind === c.kind)!;
@@ -206,7 +252,10 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
   const [typeKey, setTypeKey] = useState<CardTypeKey>('vem');
   const [text, setText] = useState('');
   const [title, setTitle] = useState('');
-  const type = CARD_TYPES.find((t) => t.key === typeKey)!;
+  const baseType = CARD_TYPES.find((t) => t.key === typeKey)!;
+  const type = isFamily(state)
+    ? { ...baseType, ...FAMILY_TYPE_TEXT[typeKey], titleExample: baseType.titleExample && 'Frys!' }
+    : baseType;
   const mine = state.customCards.filter((c) => c.by === me.id);
   const own = ownCardCount(state, me.id);
   const missing = custom ? Math.max(0, MIN_OWN_CARDS - own) : 0;

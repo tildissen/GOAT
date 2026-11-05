@@ -50,7 +50,7 @@ export default function Lobby({ state, view, isLeader, busy, act, code }: GamePr
       </div>
 
       <div className="sub-label">
-        {state.mode === 'custom' && 'Bygg eget spel · '}
+        {state.mode === 'custom' && `Bygg eget spel · ${OCCASION_LABEL[state.occasion ?? 'fest']} · `}
         {state.players.length} spelare · minst {MIN_PLAYERS}
       </div>
       <div className="players">
@@ -77,3 +77,5 @@ export default function Lobby({ state, view, isLeader, busy, act, code }: GamePr
     </Screen>
   );
 }
+
+const OCCASION_LABEL = { aw: 'AW', familj: 'Familjespel', fest: 'Fest' } as const;

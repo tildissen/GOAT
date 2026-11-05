@@ -1,0 +1,124 @@
+# Förvalda kort för tillfället AW i "Bygg eget spel".
+# Kollegor och vuxna, med alkohol – inget pinsamt eller sexuellt.
+# Format:
+#   vem|påstående              – Vem i rummet? (alla röstar)
+#   direkt|fråga               – fråga till den vars tur det är
+#   solo|utmaning              – utmaning till den vars tur det är (används också som utmaningskort)
+#   alla|utmaning              – utmaning för hela gruppen
+#   minigame|namn|beskrivning
+#   bild|uppmaning             – Vems är bilden?
+# Antal klunkar i utmaningar och minigames ökar automatiskt per del.
+
+vem|Vem svarar på mejl klockan 23?
+vem|Vem har flest flikar öppna i webbläsaren just nu?
+vem|Vem säger "vi tar det offline" oftast?
+vem|Vem skulle slåss om sista kanelbullen i fikarummet?
+vem|Vem skulle sova på kontoret om det var tillåtet?
+vem|Vem kommer alltid fem minuter sent till mötet?
+vem|Vem har det stökigaste skrivbordet?
+vem|Vem skulle bli bäst på att leda en kickoff?
+vem|Vem glömmer oftast att slå av mikrofonen?
+vem|Vem har flest olästa mejl?
+vem|Vem skulle klara sig längst utan kaffe?
+vem|Vem startar eget företag först?
+vem|Vem är bäst på att låtsas lyssna på ett möte?
+vem|Vem kommer ihåg allas födelsedagar?
+vem|Vem tar alltid sista biten på fikabordet?
+vem|Vem skulle bli bäst som stå upp-komiker?
+vem|Vem har bäst spellista till en AW?
+vem|Vem är först med att föreslå en runda till?
+vem|Vem skulle vinna en karaoketävling?
+vem|Vem planerar semestern redan i januari?
+vem|Vem skulle råka säga "älskar dig" när hen lägger på med chefen?
+vem|Vem har flest appar i telefonen?
+vem|Vem skulle överleva längst i en dokusåpa?
+vem|Vem bakar godast till fikat?
+vem|Vem blir VD först?
+
+direkt|Vilket är det konstigaste jobb du har haft?
+direkt|Vad ville du bli när du var liten?
+direkt|Vad är ditt bästa tips för att överleva en måndag?
+direkt|Vilket kontorsmissöde skrattar du fortfarande åt?
+direkt|Vilken är den bästa semester du har haft?
+direkt|Om du vann en miljon i morgon, vad skulle du göra först?
+direkt|Vilken app skulle du ha svårast att leva utan?
+direkt|Vad är din mest oanvändbara talang?
+direkt|Vilken låt sjunger du helst på karaoke?
+direkt|Vilket är det bästa råd du har fått?
+direkt|Vilken kändis skulle du vilja ta en öl med?
+direkt|Vad är det pinsammaste som har hänt dig på ett möte?
+direkt|Vilken maträtt skulle du kunna äta varje dag?
+direkt|Vad var din första lön, och vad köpte du för den?
+direkt|Om du fick byta jobb med någon här i en vecka, vem skulle det bli?
+direkt|Vilken är den sämsta present du har fått?
+direkt|Vad skulle din självbiografi heta?
+direkt|Vilken serie har du sett flest gånger?
+direkt|Vad gör du helst en ledig söndag?
+direkt|Vilket land vill du helst resa till härnäst?
+direkt|Vilket ljud irriterar dig mest?
+direkt|Vad är det modigaste du har gjort?
+direkt|Vilken trend hoppas du aldrig kommer tillbaka?
+direkt|Vilken lärare minns du bäst, och varför?
+direkt|Vilken superkraft skulle hjälpa dig mest på jobbet?
+
+solo|Håll ett 20 sekunders säljtal för saken närmast dig.
+solo|Beskriv ditt jobb utan att säga "jobb", "möte" eller "mejl".
+solo|Nämn fem bilmärken på 10 sekunder, annars ta 2 klunkar.
+solo|Härma en känd person tills någon gissar vem.
+solo|Berätta ett skämt. Skrattar ingen tar du 2 klunkar.
+solo|Säg tre saker du gillar med personen till vänster.
+solo|Visa den senaste skärmdumpen du tog.
+solo|Gör din bästa imitation av en tv-reklam.
+solo|Nämn fem länder i Europa på 10 sekunder.
+solo|Sjung refrängen på en låt som gruppen väljer.
+solo|Prata i 30 sekunder utan att säga "eh" eller "liksom".
+solo|Ge personen till höger en komplimang som får hen att skratta.
+solo|Ställ dig upp och gör din bästa segerdans.
+solo|Hitta tre saker i rummet som börjar på samma bokstav på 15 sekunder.
+solo|Berätta om din helg som om det vore en actionfilm.
+solo|Nämn fyra glassorter på 10 sekunder.
+solo|Stava ditt efternamn baklänges. Blir det fel tar du 2 klunkar.
+solo|Säg alfabetet baklänges från K.
+solo|Sportkommentera det som händer i rummet i 20 sekunder.
+solo|Låtsas att du är guide och visa gruppen runt i rummet.
+
+alla|Alla som har haft ett möte i veckan som kunde ha varit ett mejl tar 2 klunkar.
+alla|Den som kom sist till jobbet idag tar 2 klunkar.
+alla|Den som har jobbat längst på samma ställe delar ut 2 klunkar.
+alla|Alla som har en kaffefläck på kläderna just nu tar 2 klunkar.
+alla|Den som senast var på semester delar ut 2 klunkar.
+alla|Alla som har fler än 100 olästa mejl tar 2 klunkar.
+alla|Den som har kortast resväg hem delar ut 2 klunkar.
+alla|Alla som någon gång har somnat på ett möte tar 2 klunkar.
+alla|Den som har flest syskon delar ut 2 klunkar.
+alla|Alla som har glömt en kollegas namn tar 2 klunkar.
+alla|Den som senast fyllde år delar ut 3 klunkar.
+alla|Alla som cyklade hit tar 1 klunk.
+alla|Alla som har en växt på skrivbordet tar 2 klunkar.
+alla|Den som har lägst batteri i mobilen tar 2 klunkar.
+alla|Alla som har sjukanmält sig för att det var fint väder tar 2 klunkar.
+alla|Den som har rest längst bort delar ut 2 klunkar.
+alla|Alla som har skickat ett mejl till fel person tar 2 klunkar.
+alla|Gruppen röstar fram den som är snyggast klädd ikväll. Hen delar ut 3 klunkar.
+alla|Alla som har sagt "du är på mute" den här veckan tar 2 klunkar.
+alla|Den yngsta i rummet delar ut 2 klunkar.
+
+minigame|Kategorier|Den vars tur det är väljer en enkel kategori, till exempel bilmärken, länder eller glassorter. Säg något i kategorin varannan gång medsols. Den som tvekar eller upprepar något tar 2 klunkar.
+minigame|Alfabetsleken|Välj en kategori, till exempel mat. Säg något i tur och ordning som börjar på A, B, C och så vidare. Den som fastnar tar 2 klunkar.
+minigame|Rimma|Säg ett ord. Nästa person medsols ska rimma på det, och så vidare. Den som inte kommer på något tar 2 klunkar.
+minigame|Tumregeln|Sätt tummen på bordet utan att säga något. Alla andra ska därefter sätta sin tumme på bordet. Den som är sist tar 3 klunkar.
+minigame|Buzz|Räkna i tur och ordning från 1. Säg "buzz" i stället för varje tal som är delbart med 7 eller innehåller en 7:a. Den som gör fel tar 2 klunkar.
+minigame|Två sanningar och en lögn|Den vars tur det är säger tre saker om sig själv – två är sanna och en är lögn. Alla som gissar fel på lögnen tar 2 klunkar.
+minigame|Gissa låten|Den vars tur det är nynnar på en låt. Den som gissar rätt först delar ut 2 klunkar.
+minigame|Inga namn|Ny regel! Ingen får säga någons namn de kommande 5 korten. Den som gör det tar 2 klunkar.
+minigame|Frågemästaren|Ny regel! Den vars tur det är blir frågemästare de kommande 5 korten. Den som svarar på en fråga från frågemästaren tar 1 klunk.
+minigame|Skål!|Ny regel! Varje gång någon säger "jobb" de kommande 5 korten ska alla skåla. Den som missar tar 1 klunk.
+
+bild|Ladda upp den senaste bilden du tog på mat.
+bild|Ladda upp den senaste skärmdumpen du tog.
+bild|Ladda upp en bild från din senaste semester.
+bild|Ladda upp den sötaste djurbilden du har i mobilen.
+bild|Ladda upp den senaste bilden du tog på en utsikt eller solnedgång.
+bild|Ladda upp den 10:e senaste bilden i din kamerarulle.
+bild|Ladda upp en bild på något du har köpt nyligen.
+bild|Ladda upp den äldsta bilden du har i mobilen.

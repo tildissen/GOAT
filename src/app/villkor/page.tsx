@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const ISSUES_URL = 'https://github.com/tildissen/GOAT/issues';
-const UPDATED = '28 oktober 2026';
+const UPDATED = '5 november 2026';
 
 export default function TermsPage() {
   return (
@@ -35,10 +35,16 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2>2. Du måste vara 18 år</h2>
+          <h2>2. Åldersgräns: 18 år – utom i Familjespel</h2>
           <p>
             Spelet handlar om alkohol och innehåller vuxna frågor. Du måste vara minst 18 år för att spela. Spelet
             kontrollerar inte åldern – det ansvaret ligger på er som spelar.
+          </p>
+          <p>
+            <strong>Undantag:</strong> Tillfället <strong>Familjespel</strong> i ”Bygg eget spel” är alkoholfritt (man får
+            minuspoäng i stället för att dricka) och får spelas av alla åldrar tillsammans med en vuxen. Den vuxne som
+            skapar spelet ansvarar för att det passar dem som är med – spelarna skriver själva en del av korten. Barn
+            under 13 år ska ha en förälders tillåtelse innan de laddar upp en selfie eller en bild.
           </p>
         </section>
 

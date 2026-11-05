@@ -305,3 +305,30 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B57. Längden styrs av hur många kort som skrivs
 - **Tillägg (av Claude):** Ungefär 12 egna kort per del, 1–4 delar. Varje del får trivia (ungefär en per tre egna kort), en "Vems är bilden?" och ett minigame. Klunkarna ökar per del och trivian blir svårare per del, som i vanliga spel. Utmaningskorten man drar är de förvalda solo-utmaningarna.
 - **Var i koden:** `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts).
+
+### B58. Värden väljer tillfälle i "Bygg eget spel": AW, Familjespel eller Fest
+- **Beslut:** När man bygger ett eget spel väljer värden tillfälle, och korten anpassas efter det. Tillfällena är **AW**, **Familjespel** och **Fest**. Valet finns bara i "Bygg eget spel", inte i vanliga spel.
+- **Alternativ:** båda spellägena · bara vanliga spel. Dejt valdes bort (kräver spel för 2 personer).
+- **Tillägg (av Claude):** Tillfället väljs på samma skärm som namnet och syns i lobbyn ("Bygg eget spel · AW"). Fest använder de vanliga korten och blir vildare per del. Ändrar delvis B57.
+- **Var i koden:** `occasion` i [`src/lib/types.ts`](../../src/lib/types.ts), `OCCASIONS` i [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx).
+
+### B59. Familjespel är alkoholfritt och för alla åldrar
+- **Beslut:** Barn ska kunna vara med i Familjespel, så det är alkoholfritt.
+- **Tillägg (av Claude):** "Klunkar" blir **minuspoäng**, och den med minst minuspoäng vinner. Knappen "spara" och ERROR-skärmen finns inte i familjespel. Spelreglerna har en egen familjeversion. Om spelarna själva skriver "dricker 2 klunkar" skrivs det om till "får 2 minuspoäng". Användarvillkoren har ett undantag från 18-årsgränsen för Familjespel (tillsammans med en vuxen; barn under 13 behöver förälderns tillåtelse för att ladda upp bilder).
+- **Var i koden:** `isFamily()`, `familyText()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `Regler` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), avsnitt 2 i [`src/app/villkor/page.tsx`](../../src/app/villkor/page.tsx).
+
+### B60. Claude skriver förvalda kort för AW och Familjespel
+- **Beslut:** Det fanns för få lugna kort, så Claude skrev egna kort. Tilda godkände tonen utifrån exempel. AW-minigamesen ska vara enkla kategorilekar (bilmärken o.d.) i stället för kontorsord.
+- **Tillägg (av Claude):** Per tillfälle: 25 "Vem i rummet?", 25 direkta frågor, 20 solo-utmaningar (används också som utmaningskort), 20 utmaningar för alla och 8 bilduppmaningar. Totalt 220 nya kort. Tilda kan ändra dem i Supabase eller i filerna.
+- **Var i koden:** [`content/aw.txt`](../../content/aw.txt), [`content/familj.txt`](../../content/familj.txt), kolumnen `occasion` i tabellen `cards`.
+
+### B61. Kategorilekar och passande vanliga minigames i alla tillfällen
+- **Beslut:** Kategorileken (bilmärken, länder osv.) ska finnas i alla minigames. Vanliga minigames som passar, t.ex. Viskleken och Tumregeln, ska också finnas i AW och Familjespel.
+- **Tillägg (av Claude):** AW får alla vanliga minigames plus 10 egna (AW-versionen vinner om namnet finns i båda). Familjespel har 14 alkoholfria minigames, bland andra Kategorier, Viskleken, Tumregeln, Nej-förbud, Frågemästaren och Jag har aldrig med minuspoäng. Minigames som går ut på att dricka (Vattenfall, Thunder, Vänsterhanden) är inte med i Familjespel.
+
+### B62. Förvalda kort fyller på när spelarna skrivit få
+- **Tillägg (av Claude):** Varje del fylls upp till 12 frågor och utmaningar med förvalda kort för tillfället, så att spelet blir lagom långt även om alla bara skriver 3 kort. Spelet har minst 2 och högst 4 delar. Ersätter delvis B57 (som bara använde spelarnas egna kort).
+- **Var i koden:** `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts).
+
+### B63. Supabase behöver uppdateras
+- **Tillägg (av Claude):** Tabellen `cards` har fått kolumnen `occasion`. `supabase/schema.sql` och `supabase/seed.sql` (nu 800 kort) måste köras igen i Supabase. Tills dess fungerar spelet som vanligt, men AW och Familjespel får inga förvalda kort.

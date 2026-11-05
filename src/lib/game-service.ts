@@ -3,7 +3,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { buildCustomDeck, buildDeck } from './deck';
 import { addPlayer, applyAction, GameError, newGameState, newPlayer, cleanName, toPublic, type Ctx } from './engine';
 import { getStore, type GameRecord } from './store';
-import type { Action, GameMode, GameState, GameView } from './types';
+import type { Action, GameMode, GameState, GameView, Occasion } from './types';
 
 /** Så länge räknas en spelare som uppkopplad efter senaste kontakten. */
 const ACTIVE_MS = 45_000;
@@ -66,14 +66,14 @@ function authorize(record: GameRecord, playerId: string, token: string) {
   }
 }
 
-export async function createGame(rawName: string, mode: GameMode = 'classic') {
+export async function createGame(rawName: string, mode: GameMode = 'classic', occasion?: Occasion) {
   const store = getStore();
   const name = cleanName(rawName);
   store.cleanup(new Date(Date.now() - MAX_GAME_AGE_MS)).catch((err) => console.error('cleanup', err));
   const host = newPlayer(randomUUID(), name, Date.now());
   const token = newToken();
   for (let attempt = 0; attempt < 10; attempt++) {
-    const record = await store.createGame(newCode(), newGameState(host, mode), { [host.id]: token });
+    const record = await store.createGame(newCode(), newGameState(host, mode, occasion), { [host.id]: token });
     if (record) {
       await store.touch(record.id, host.id);
       return { code: record.code, playerId: host.id, token };
@@ -123,7 +123,9 @@ export async function performAction(code: string, playerId: string, token: strin
         rng: Math.random,
         now: Date.now(),
         deck: cards
-          ? (record.state.mode === 'custom' ? buildCustomDeck : buildDeck)(cards, record.state.customCards, Math.random)
+          ? record.state.mode === 'custom'
+            ? buildCustomDeck(cards, record.state.customCards, Math.random, record.state.occasion)
+            : buildDeck(cards, record.state.customCards, Math.random)
           : undefined,
       };
       return { state: applyAction(record.state, playerId, action, ctx) };

@@ -10,6 +10,7 @@ import { buildCustomDeck, buildDeck, CARDS_PER_PART, PARTS } from '../src/lib/de
 import {
   addPlayer,
   applyAction,
+  familyText,
   GameError,
   isSoloCard,
   MAX_SAVED,
@@ -21,7 +22,7 @@ import {
   toPublic,
   type Ctx,
 } from '../src/lib/engine';
-import type { Action, CardRow, GameMode, GameState } from '../src/lib/types';
+import type { Action, CardRow, GameMode, GameState, Occasion } from '../src/lib/types';
 
 const files = Object.fromEntries(
   Object.entries(CONTENT_FILES).map(([key, file]) => [key, readFileSync(path.join('content', file), 'utf8')]),
@@ -47,18 +48,19 @@ for (const kind of ['vem', 'direkt', 'trivia', 'utmaning', 'minigame', 'bild']) 
   console.log(`  ${kind}: ${cards.filter((c) => c.kind === kind).length}`);
 }
 
-function play(seed: number, playerCount: number, mode: GameMode = 'classic') {
+function play(seed: number, playerCount: number, mode: GameMode = 'classic', occasion: Occasion = 'fest') {
   const rng = makeRng(seed);
   let now = 1000;
   const ids = Array.from({ length: playerCount }, (_, i) => `p${i}`);
-  let s: GameState = newGameState(newPlayer(ids[0], 'Värd', now), mode);
+  let s: GameState = newGameState(newPlayer(ids[0], 'Värd', now), mode, occasion);
+  const family = occasion === 'familj' && mode === 'custom';
   for (const id of ids.slice(1)) s = addPlayer(s, `Spelare ${id}`, id, now).state;
   const active = new Set(ids);
   const ctx = (deck = false): Ctx => ({
     active,
     rng,
     now: now++,
-    deck: deck ? (mode === 'custom' ? buildCustomDeck : buildDeck)(cards, s.customCards, rng) : undefined,
+    deck: deck ? (mode === 'custom' ? buildCustomDeck(cards, s.customCards, rng, occasion) : buildDeck(cards, s.customCards, rng)) : undefined,
   });
   const act = (pid: string, action: Action, withDeck = false) => {
     s = applyAction(s, pid, action, ctx(withDeck));
@@ -137,9 +139,16 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic') {
     }
     const c = s.current!;
     seen.add(c.card.kind);
+    if (family) {
+      // Familjespel: aldrig något om att dricka, och man kan inte spara.
+      // Spelarnas egna kort kan handla om vad som helst, men klunkar och drickande skrivs om.
+      const words = c.card.custom ? /klunk|drick/i : /klunk|drick|druck|alkohol|\bfyll(?:a|an|o)\b/i;
+      assert.ok(!words.test(c.text), `dryckesord i familjespel: ${c.text}`);
+    }
     assert.ok(!/\bX\b|\bY\b|LAG1|LAG2/.test(c.text), `oersatt namn: ${c.text}`);
     assert.ok(s.players.find((p) => p.id === c.turnId), 'turen saknar spelare');
-    const chooseAny = () => (['drink', 'save', 'challenge'] as const)[Math.floor(rng() * 3)];
+    const choices = family ? (['drink', 'challenge'] as const) : (['drink', 'save', 'challenge'] as const);
+    const chooseAny = () => choices[Math.floor(rng() * choices.length)];
 
     if (c.phase === 'upload') {
       if (rng() < 0.2) act(c.turnId, { type: 'skip_photo' });
@@ -214,5 +223,15 @@ for (let seed = 1; seed <= 200; seed++) {
 assert.deepEqual([...kinds].sort(), ['bild', 'direkt', 'minigame', 'trivia', 'utmaning', 'vem']);
 console.log('200 simulerade spel med 3–15 spelare: OK');
 
-for (let seed = 1; seed <= 100; seed++) play(seed, 3 + (seed % 13), 'custom');
-console.log('100 simulerade "Bygg eget spel" med 3–15 spelare: OK');
+for (const occasion of ['fest', 'aw', 'familj'] as const) {
+  for (let seed = 1; seed <= 60; seed++) play(seed, 3 + (seed % 13), 'custom', occasion);
+}
+// Utmaningskort i familjespel är också alkoholfria.
+for (const c of cards.filter((c) => c.occasion === 'familj')) {
+  assert.ok(!/klunk|drick|druck|alkohol|\bfyll(?:a|an|o)\b/i.test(`${c.title ?? ''} ${c.text}`), `dryckesord i familj.txt: ${c.text}`);
+}
+assert.ok(!buildDeck(cards, [], makeRng(1)).deck.flat().some((c) => c.text.includes('minuspoäng')), 'familjekort i vanligt spel');
+assert.equal(familyText('Den som pratar dricker 2 klunkar.'), 'Den som pratar får 2 minuspoäng.');
+assert.equal(familyText('Nämn en stad, annars drick 3 klunkar.'), 'Nämn en stad, annars ta 3 minuspoäng.');
+assert.equal(familyText('Den yngsta dricker.'), 'Den yngsta får minuspoäng.');
+console.log('180 simulerade "Bygg eget spel" (Fest, AW, Familjespel) med 3–15 spelare: OK');

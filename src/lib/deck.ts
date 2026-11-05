@@ -1,4 +1,4 @@
-import type { CardRow, Category, CustomCard, DeckCard } from './types';
+import type { CardRow, Category, CustomCard, DeckCard, Occasion } from './types';
 
 export const PARTS = 4;
 export const CARDS_PER_PART = 15;
@@ -52,16 +52,22 @@ function customToDeckCard(custom: CustomCard): DeckCard {
   return card;
 }
 
-/** Ungefär så många egna kort per del i "Bygg eget spel". */
+/** Ungefär så många frågor och utmaningar (egna plus påfyllda) per del i "Bygg eget spel". */
 export const OWN_CARDS_PER_PART = 12;
 
 /**
- * "Bygg eget spel": spelarnas egna kort är stommen. Per del blandas in trivia
- * (ungefär ett per tre egna kort), en "Vems är bilden?" och ett minigame –
- * spelarnas egna minigames först, sedan de förvalda. 1–4 delar beroende på
- * hur många kort som skrivits; klunkar och trivia blir svårare per del.
+ * "Bygg eget spel": spelarnas egna kort är stommen. Har de skrivit för få fylls
+ * varje del upp till 12 frågor och utmaningar med förvalda kort för tillfället
+ * (AW och Familjespel har egna kort, Fest använder de vanliga och blir vildare
+ * per del). Per del blandas också in trivia (ungefär ett per tre kort), en
+ * "Vems är bilden?" och ett minigame – spelarnas egna minigames först.
+ * 2–4 delar beroende på hur många kort som skrivits.
  */
-export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rng) {
+export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rng, occasion: Occasion = 'fest') {
+  const classic = cards.filter((c) => !c.occasion);
+  const preset = occasion === 'fest' ? classic : cards.filter((c) => c.occasion === occasion);
+  const of = (pool: CardRow[], kind: CardRow['kind']) => pool.filter((c) => c.kind === kind);
+
   const own = shuffle(
     customs.filter((c) => c.kind !== 'minigame'),
     rng,
@@ -70,7 +76,7 @@ export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rn
     customs.filter((c) => c.kind === 'minigame'),
     rng,
   ).map(customToDeckCard);
-  const parts = Math.min(PARTS, Math.max(1, Math.round(own.length / OWN_CARDS_PER_PART)));
+  const parts = Math.min(PARTS, Math.max(2, Math.ceil(own.length / OWN_CARDS_PER_PART)));
 
   const used = new Set<string>();
   const takeOne = (pool: CardRow[]): CardRow | undefined => {
@@ -81,30 +87,41 @@ export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rn
     if (card) used.add(String(card.id));
     return card;
   };
-  const of = (kind: CardRow['kind']) => cards.filter((c) => c.kind === kind);
-  const trivia = of('trivia');
-  const bild = of('bild');
-  const minigame = of('minigame');
+
+  // AW får alla vanliga minigames också (AW-versionen vinner om namnet finns i båda).
+  let minigames = of(preset, 'minigame');
+  if (occasion === 'aw') {
+    const titles = new Set(minigames.map((c) => c.title));
+    minigames = [...minigames, ...of(classic, 'minigame').filter((c) => !titles.has(c.title))];
+  }
+  const trivia = of(classic, 'trivia');
+  const fillKinds: CardRow['kind'][] = ['vem', 'direkt', 'utmaning'];
 
   const deck: DeckCard[][] = Array.from({ length: parts }, () => []);
   own.forEach((c, i) => deck[i % parts].push(customToDeckCard(c)));
   ownMinigames.forEach((c, i) => deck[i % parts].push(c));
 
   deck.forEach((part, i) => {
-    // Hur långt in i spelet delen ligger, 0–3, styr trivians svårighet och bildkortens nivå.
+    // Hur långt in i spelet delen ligger, 0–3, styr trivians svårighet och hur vilda Fest-korten blir.
     const tier = parts === 1 ? 1 : Math.round((i * 3) / (parts - 1));
-    const ownInPart = part.filter((c) => c.kind !== 'minigame').length;
+    const allowed = (c: CardRow) => levelOf(c) <= tier + 1;
     const extra: (CardRow | undefined)[] = [];
-    for (let t = 0; t < Math.max(1, Math.round(ownInPart / 3)); t++) {
+
+    for (let k = part.filter((c) => c.kind !== 'minigame').length; k < OWN_CARDS_PER_PART; k++) {
+      const kind = fillKinds[k % fillKinds.length];
+      extra.push(takeOne(of(preset, kind).filter(allowed)) ?? takeOne(of(preset, kind)));
+    }
+    const core = part.filter((c) => c.kind !== 'minigame').length + extra.length;
+    for (let t = 0; t < Math.max(1, Math.round(core / 3)); t++) {
       extra.push(takeOne(trivia.filter((c) => TRIVIA_DIFFICULTY[tier].includes(c.difficulty ?? 1))) ?? takeOne(trivia));
     }
-    extra.push(takeOne(bild.filter((c) => levelOf(c) <= tier + 1)) ?? takeOne(bild));
-    if (!part.some((c) => c.kind === 'minigame')) extra.push(takeOne(minigame));
+    extra.push(takeOne(of(preset, 'bild').filter(allowed)) ?? takeOne(of(preset, 'bild')));
+    if (!part.some((c) => c.kind === 'minigame')) extra.push(takeOne(minigames));
     for (const c of extra) if (c) part.push(toDeckCard(c, rng));
     deck[i] = shuffle(part, rng);
   });
 
-  const challengePool = of('utmaning')
+  const challengePool = of(preset, 'utmaning')
     .filter((c) => (c.players ?? 1) === 1)
     .map((c) => toDeckCard(c, rng));
   return { deck, challengePool };
@@ -114,7 +131,9 @@ export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rn
  * Bygger 4 delar à 15 kort: 4 "vem i rummet", 1 "vems är bilden",
  * 3 direkta frågor, 3 trivia, 3 utmaningar och 1 minigame per del.
  */
-export function buildDeck(cards: CardRow[], customs: CustomCard[], rng: Rng) {
+export function buildDeck(allCards: CardRow[], customs: CustomCard[], rng: Rng) {
+  // Korten för AW och Familjespel används bara i "Bygg eget spel".
+  const cards = allCards.filter((c) => !c.occasion);
   const used = new Set<string>();
 
   const take = (pool: CardRow[], count: number): CardRow[] => {
