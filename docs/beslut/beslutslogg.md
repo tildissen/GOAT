@@ -548,3 +548,13 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Ställningen visas under kortet som förut.
   - Bildkorten är fortfarande hemliga.
 - **Var i koden:** `Waiting` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B83. Klunkar och minuspoäng räknas även när ingen väljer något
+- **Beslut:** Tilda märkte att kort som säger att någon får minuspoäng (t.ex. "Den som har lägst batteri i mobilen får 2 minuspoäng") aldrig räknades, eftersom ingen aktivt valde något. På sådana kort ska man välja vem som får poängen.
+- **Tillägg (av Claude):**
+  - **Gruppkort, lagkort, minigames och kaoskort:** under kortet står "Vem fick 2 minuspoäng?" (eller "Vem fick dricka 2 klunkar?") med alla spelare. Tryck på namnet för att ge personen kortets klunkar eller minuspoäng. Man kan trycka flera gånger, t.ex. i ett minigame, och "−" tar bort en gång.
+  - Vem som helst kan trycka. Alla ser det i bannern ("Tuva gav Elsa 2 minuspoäng"), så att ingen kan fuska. Ingen måste få något – värden kan trycka Nästa direkt om kortet inte gällde någon.
+  - **Förlorare som inte väljer:** den som förlorar en röstning (Vem i rummet? eller Vems är bilden?) eller svarar fel på trivia, men inte trycker på något innan kortet går vidare, får klunkarna eller minuspoängen automatiskt.
+  - Gäller både klunkar och poäng.
+- **Inte byggt:** regler som gäller flera kort ("Ny regel! … de kommande 5 korten") kan bara registreras på kortet där regeln kom.
+- **Var i koden:** `canTake()`, `autoDrink()` och åtgärderna `take`/`untake` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `TakeButtons` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `.take-*` i [`src/app/globals.css`](../../src/app/globals.css).

@@ -791,3 +791,19 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .choices { display: flex; flex-direction: column; gap: 16px; width: 100%; align-items: center; margin-top: 28px; }
 .choice { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
 .choice-hint { font-size: 15px; line-height: 1.3; text-align: center; margin: 0; }
+
+/* Vem fick klunkarna/minuspoängen? (gruppkort, minigames, kaoskort) */
+.take-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.take-row { display: flex; gap: 8px; }
+.take-name {
+  flex: 1; display: flex; justify-content: space-between; align-items: center;
+  border: 0; border-radius: 999px; padding: 12px 20px; min-height: 48px;
+  background: rgba(255, 255, 255, 0.75); color: var(--black); font: inherit; font-size: 17px; cursor: pointer;
+}
+.take-row.on .take-name { background: var(--black); color: var(--white); }
+.take-undo {
+  width: 48px; min-height: 48px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.75);
+  color: var(--black); font-size: 24px; cursor: pointer;
+}
+.card.kaos .take-name, .card.kaos .take-undo { background: rgba(255, 255, 255, 0.9); }
+.card.kaos .take-row.on .take-name { background: var(--yellow); color: var(--black); }

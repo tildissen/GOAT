@@ -152,6 +152,17 @@ export function isSoloCard(card: DeckCard): boolean {
   return card.kind === 'direkt' || card.kind === 'trivia' || (card.kind === 'utmaning' && card.players === 1);
 }
 
+/**
+ * Kort där ingen väljer något, men där texten säger att någon dricker eller får minuspoäng
+ * ("Den som har lägst batteri får 2 minuspoäng", minigames, kaoskort). Där trycker man på den eller de
+ * som fick klunkarna/poängen – annars räknas de aldrig. Vem som helst kan trycka, alla ser vem som gav vem.
+ */
+export function canTake(cur: Current, player: Pick<Player, 'ready'>): boolean {
+  if (!player.ready || cur.phase !== 'play') return false;
+  if (cur.card.kind === 'minigame' || cur.card.kind === 'kaos') return true;
+  return cur.card.kind === 'utmaning' && (cur.card.players === 0 || cur.card.players === 3);
+}
+
 export function pausedPlayers(state: GameState | PublicState): Player[] {
   return state.players.filter((p) => p.saved >= savedCap(state.part));
 }
@@ -252,6 +263,21 @@ function deal(s: GameState, ctx: Ctx) {
   };
   turn.turns += 1;
   s.lastTurnId = turn.id;
+}
+
+/**
+ * Den som måste dricka (förlorare i en röstning, fel svar på trivia) men inte valt något när kortet
+ * går vidare får klunkarna/minuspoängen ändå – annars kunde man slippa genom att låta bli att trycka.
+ */
+function autoDrink(s: GameState, c: Current) {
+  const must = c.phase === 'result' ? c.losers : c.card.kind === 'trivia' && c.triviaPick != null && c.triviaPick !== c.card.answerIndex ? [c.turnId] : [];
+  for (const id of must) {
+    const p = s.players.find((pl) => pl.id === id);
+    if (!p || c.choices[id]) continue;
+    c.choices[id] = 'drink';
+    p.drank += c.sips;
+    logEvent(s, id, usesPoints(s) ? `fick ${sipsWord(c.sips, true)}` : `drack ${sipsWord(c.sips, false)}`);
+  }
 }
 
 function advance(s: GameState, ctx: Ctx) {
@@ -484,12 +510,35 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       me.saved = 0;
       break;
     }
+    case 'take':
+    case 'untake': {
+      const c = requireCurrent();
+      if (!canTake(c, me)) throw new GameError('Det här kortet är redan klart – kolla skärmen', 409);
+      const target = s.players.find((pl) => pl.id === action.targetId);
+      if (!target) throw new GameError('Spelaren finns inte', 404);
+      const taken = (c.taken ??= {});
+      const family = usesPoints(s);
+      const what = sipsWord(c.sips, family);
+      const self = target.id === playerId;
+      if (action.type === 'take') {
+        taken[target.id] = (taken[target.id] ?? 0) + 1;
+        target.drank += c.sips;
+        logEvent(s, playerId, self ? (family ? `fick ${what}` : `drack ${what}`) : `gav ${target.name} ${what}`);
+      } else {
+        if (!taken[target.id]) throw new GameError(`${target.name} har inte fått några på det här kortet`, 409);
+        taken[target.id] -= 1;
+        target.drank = Math.max(0, target.drank - c.sips);
+        logEvent(s, playerId, `tog bort ${what} från ${self ? 'sig själv' : target.name}`);
+      }
+      break;
+    }
     case 'next': {
       const c = requireCurrent();
       if (!canPressNext(s, c, playerId, ctx)) {
         throw new GameError(isSoloCard(c.card) ? 'Det är inte din tur' : 'Bara värden kan gå vidare på gruppkort', 403);
       }
       assertNotPaused(s, ctx);
+      autoDrink(s, c);
       advance(s, ctx);
       break;
     }

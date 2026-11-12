@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
-import { canPressNext, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
+import { canPressNext, canTake, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import Face from '../Face';
 import { KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
@@ -240,8 +240,54 @@ function Challenge(p: CardProps) {
         <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" family={usesPoints(p.state)} />
       ) : canSkip ? (
         <Chosen cur={cur} meId={me.id} family={usesPoints(p.state)} />
+      ) : canTake(cur, me) ? (
+        <TakeButtons {...p} />
       ) : null}
     </CardScreen>
+  );
+}
+
+/**
+ * Gruppkort, minigames och kaoskort: tryck på den eller de som fick klunkarna/minuspoängen, så att det räknas.
+ * Vem som helst kan trycka, och alla ser vem som gav vem.
+ */
+function TakeButtons(p: CardProps) {
+  const { cur, state } = p;
+  const family = usesPoints(state);
+  const taken = cur.taken ?? {};
+  const players = state.players.filter((pl) => pl.ready);
+  return (
+    <div className="actions">
+      <p className="choice-prompt">{family ? `Vem fick ${sipsText(cur.sips, true)}?` : `Vem fick dricka ${sipsText(cur.sips)}?`}</p>
+      <div className="take-list">
+        {players.map((pl) => {
+          const n = taken[pl.id] ?? 0;
+          return (
+            <div key={pl.id} className={`take-row${n > 0 ? ' on' : ''}`}>
+              <button
+                className="take-name"
+                disabled={p.busy}
+                onClick={() => p.act({ type: 'take', targetId: pl.id })}
+                aria-label={`Ge ${pl.name} ${sipsText(cur.sips, family)}`}
+              >
+                <span>{pl.name}</span>
+                <strong>{n > 0 ? `+${n * cur.sips}` : '+'}</strong>
+              </button>
+              {n > 0 && (
+                <button
+                  className="take-undo"
+                  disabled={p.busy}
+                  onClick={() => p.act({ type: 'untake', targetId: pl.id })}
+                  aria-label={`Ta bort ${sipsText(cur.sips, family)} från ${pl.name}`}
+                >
+                  −
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
