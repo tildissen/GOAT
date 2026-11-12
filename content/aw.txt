@@ -68,7 +68,7 @@ solo|Nämn fem bilmärken på 10 sekunder, annars ta 2 klunkar.
 solo|Härma en känd person tills någon gissar vem.
 solo|Berätta ett skämt. Skrattar ingen tar du 2 klunkar.
 solo|Säg tre saker du gillar med personen till vänster.
-solo|Visa den senaste skärmdumpen du tog.
+solo|Visa din favoritbild från i somras och berätta om den.
 solo|Gör din bästa imitation av en tv-reklam.
 solo|Nämn fem länder i Europa på 10 sekunder.
 solo|Sjung refrängen på en låt som gruppen väljer.
@@ -123,10 +123,10 @@ kaos|Alla reser sig upp. Den som sätter sig sist tar 3 klunkar.
 kaos|Byt namn med personen till vänster resten av delen. Säger någon fel namn tar hen 2 klunkar.
 
 bild|Ladda upp den senaste bilden du tog på mat.
-bild|Ladda upp den senaste skärmdumpen du tog.
+bild|Ladda upp en bild från en konsert, match eller annat evenemang du har varit på.
 bild|Ladda upp en bild från din senaste semester.
 bild|Ladda upp den sötaste djurbilden du har i mobilen.
 bild|Ladda upp den senaste bilden du tog på en utsikt eller solnedgång.
-bild|Ladda upp den 10:e senaste bilden i din kamerarulle.
+bild|Ladda upp en bild från i somras.
 bild|Ladda upp en bild på något du har köpt nyligen.
-bild|Ladda upp den äldsta bilden du har i mobilen.
+bild|Ladda upp en bild på något du har lagat eller bakat.

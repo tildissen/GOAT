@@ -184,12 +184,15 @@ export function SavedSheet({ state, me, busy, act }: GameProps) {
 /**
  * Visar för alla andra vad någon valde – "Moa drack 2 klunkar" – så att ingen kan fuska.
  * Gamla händelser visas inte när man öppnar appen, bara de som sker medan man tittar.
+ * Bara en notis i taget (den senaste) i 4 sekunder, så att den inte täcker kortet (B91).
+ * Kommer flera samtidigt står det "+1 till" så att man vet att något mer hände.
  */
 export function EventBanner({ state, me }: GameProps) {
   const events = state.events ?? [];
   const latest = events[events.length - 1]?.id ?? 0;
   const seen = useRef<number | null>(null);
-  const [shown, setShown] = useState<{ id: number; text: string }[]>([]);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [shown, setShown] = useState<{ id: number; text: string; more: number } | null>(null);
 
   useEffect(() => {
     if (seen.current === null) {
@@ -199,18 +202,23 @@ export function EventBanner({ state, me }: GameProps) {
     const fresh = events.filter((e) => e.id > (seen.current ?? 0) && e.actorId !== me.id);
     seen.current = Math.max(seen.current, latest);
     if (fresh.length === 0) return;
-    const items = fresh.map((e) => ({ id: e.id, text: `${nameOf(state, e.actorId)} ${e.text}` }));
-    setShown((cur) => [...cur, ...items].slice(-3));
-    const t = setTimeout(() => setShown((cur) => cur.filter((x) => !items.some((i) => i.id === x.id))), 6000);
-    return () => clearTimeout(t);
+    const last = fresh[fresh.length - 1];
+    setShown({ id: last.id, text: `${nameOf(state, last.actorId)} ${last.text}`, more: fresh.length - 1 });
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => setShown(null), 4000);
   }, [latest]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (shown.length === 0) return null;
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
+
+  if (!shown) return null;
   return (
     <div className="event-banner" role="status" aria-live="polite">
-      {shown.map((e) => (
-        <div key={e.id}>{e.text}</div>
-      ))}
+      <div key={shown.id}>
+        {shown.text}
+        {shown.more > 0 && <span className="event-more"> +{shown.more} till</span>}
+      </div>
     </div>
   );
 }
@@ -236,7 +244,7 @@ export function PartIntro({ state }: GameProps) {
   const last = state.part >= state.parts;
   const name = last && state.parts < 4 ? PART_NAMES[3] : PART_NAMES[Math.min(state.part, 4) - 1];
   const family = usesPoints(state);
-  const sips = sipsForPart(state.part);
+  const sips = sipsForPart(state.part, state.occasion);
   return (
     <div className={`overlay part-intro part-${Math.min(state.part, 4)}`} onClick={() => setCount(null)} role="dialog" aria-label={`Del ${state.part} börjar`}>
       <div className="part-intro-inner">

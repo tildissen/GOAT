@@ -617,3 +617,47 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Spelreglerna ska säga att man läser sitt kort högt, så länge det inte står något annat på kortet.
 - **Tillägg (av Claude):** Det är en ny första punkt, "Läs högt – Läs ditt kort högt för alla – om det inte står något annat.", i alla fem versionerna av reglerna. Reglerna har nu fyra punkter och får fortfarande plats på en iPhone SE. Ändrar B87.
 - **Var i koden:** `rulesFor()` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+---
+
+## 2026-11-12 – Inför AW med kollegor
+
+### B90. AW stegrar lugnare (**Max antal klunkar ändrat av B93**)
+- **Beslut:** I AW ska det inte bli lika mycket att dricka mot slutet. Det gäller AW-versionen i "Bygg eget spel". Fest och vanligt spel är som förut.
+- **Alternativ:** samma stegring i alla lägen · spela AW med poäng i stället.
+- **Varför:** I ett testspel med fem kollegor drack den som drack mest 71 klunkar, och korten i del 4 sa 6–7 klunkar.
+- **Tillägg (av Claude):**
+  - AW har 1, 2, 3 och 3 klunkar per kort i del 1–4, i stället för 1, 2, 4 och 6.
+  - Siffrorna på utmaningar, minigames och kaoskort ökar med som mest 2 (0, +1, +2, +2), i stället för +5.
+  - Sparataket är oförändrat: 5, 4, 3, 2.
+  - Gäller AW med både klunkar och poäng.
+  - I ett nytt testspel blev det som mest 5 klunkar på ett kort och 52 klunkar för den som drack mest.
+- **Var i koden:** `AW_SIPS_PER_PART`, `sipsForPart()` och `scaleSips()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `PartIntro` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+
+### B91. En notis i taget
+- **Beslut:** Notiserna högst upp ("Tilda gav Johan 6 klunkar") visas en i taget och kortare tid, så att de inte täcker kortet.
+- **Alternativ:** flytta dem längst ned · lämna som det är.
+- **Tillägg (av Claude):**
+  - Bara den senaste notisen syns, med mindre text, i 4 sekunder i stället för 6. Tidigare kunde tre ligga staplade i 6 sekunder.
+  - Kommer flera samtidigt står det "+1 till" efter texten.
+  - Rättar också ett fel: när notiser kom tätt kunde en notis bli kvar, eftersom tidtagningen nollställdes.
+- **Var i koden:** `EventBanner` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `.event-banner` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B92. Inga privata bilder i AW
+- **Beslut:** AW-korten som ber kollegor visa privata saker ur mobilen byts ut.
+- **Tillägg (av Claude):**
+  - "Ladda upp den senaste skärmdumpen du tog" → "Ladda upp en bild från en konsert, match eller annat evenemang du har varit på."
+  - "Ladda upp den 10:e senaste bilden i din kamerarulle" → "Ladda upp en bild från i somras."
+  - "Ladda upp den äldsta bilden du har i mobilen" → "Ladda upp en bild på något du har lagat eller bakat."
+  - Utmaningen "Visa den senaste skärmdumpen du tog" → "Visa din favoritbild från i somras och berätta om den."
+  - De fyra korten är uppdaterade direkt i Supabase via connectorn (bara de fyra raderna ändrades). Familjespel och vanligt spel är inte ändrade.
+- **Var i koden:** [`content/aw.txt`](../../content/aw.txt), [`supabase/seed.sql`](../../supabase/seed.sql).
+
+### B93. Max 4 klunkar på ett kort i AW
+- **Beslut:** I AW ska det vara som mest 4 klunkar på ett kort.
+- **Tillägg (av Claude):**
+  - Alla siffror före "klunk" eller "minuspoäng" stoppas vid 4 i AW. Det gäller förvalda kort, utmaningskort man drar, minigames, kaoskort och spelarnas egna kort (t.ex. "Alla tar 10 klunkar" blir "Alla tar 4 klunkar").
+  - Vanliga kort ger redan som mest 3 klunkar per kort (B90).
+  - Fest och vanligt spel är oförändrade.
+  - Testerna kontrollerar att inget AW-kort har mer än 4.
+- **Var i koden:** `AW_MAX_SIPS` och `scaleSips()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
