@@ -12,6 +12,7 @@ import {
   applyAction,
   housekeeping,
   familyText,
+  usesPoints,
   GameError,
   isSoloCard,
   MAX_SAVED,
@@ -23,7 +24,7 @@ import {
   toPublic,
   type Ctx,
 } from '../src/lib/engine';
-import type { Action, CardRow, GameMode, GameState, Occasion } from '../src/lib/types';
+import type { Action, CardRow, GameMode, GameState, Occasion, Scoring } from '../src/lib/types';
 
 const files = Object.fromEntries(
   Object.entries(CONTENT_FILES).map(([key, file]) => [key, readFileSync(path.join('content', file), 'utf8')]),
@@ -50,12 +51,15 @@ for (const kind of ['vem', 'direkt', 'trivia', 'utmaning', 'minigame', 'bild']) 
   console.log(`  ${kind}: ${cards.filter((c) => c.kind === kind).length}`);
 }
 
-function play(seed: number, playerCount: number, mode: GameMode = 'classic', occasion: Occasion = 'fest') {
+function play(seed: number, playerCount: number, mode: GameMode = 'classic', occasion: Occasion = 'fest', scoring: Scoring = 'klunkar') {
   const rng = makeRng(seed);
   let now = 1000;
   const ids = Array.from({ length: playerCount }, (_, i) => `p${i}`);
-  let s: GameState = newGameState(newPlayer(ids[0], 'Värd', now), mode, occasion);
+  let s: GameState = newGameState(newPlayer(ids[0], 'Värd', now), mode, occasion, scoring);
   const family = occasion === 'familj' && mode === 'custom';
+  // Poäng (Familjespel, eller AW/Fest där värden valt poäng): inga klunkar och ingen spara-knapp.
+  const points = usesPoints(s);
+  if (mode === 'custom' && occasion !== 'familj') assert.equal(points, scoring === 'poang');
   for (const id of ids.slice(1)) s = addPlayer(s, `Spelare ${id}`, id, now).state;
   const active = new Set(ids);
   const ctx = (deck = false): Ctx => ({
@@ -158,10 +162,12 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       // Spelarnas egna kort kan handla om vad som helst, men klunkar och drickande skrivs om.
       const words = c.card.custom ? /klunk|drick/i : /klunk|drick|druck|alkohol|\bfyll(?:a|an|o)\b/i;
       assert.ok(!words.test(c.text), `dryckesord i familjespel: ${c.text}`);
+    } else if (points && ['utmaning', 'minigame', 'kaos'].includes(c.card.kind)) {
+      assert.ok(!/\d+\s+(?:extra\s+)?klunk/i.test(c.text), `klunkar i poängspel: ${c.text}`);
     }
     assert.ok(!/\bX\b|\bY\b|LAG1|LAG2/.test(c.text), `oersatt namn: ${c.text}`);
     assert.ok(s.players.find((p) => p.id === c.turnId), 'turen saknar spelare');
-    const choices = family ? (['drink', 'challenge'] as const) : (['drink', 'save', 'challenge'] as const);
+    const choices = points ? (['drink', 'challenge'] as const) : (['drink', 'save', 'challenge'] as const);
     const chooseAny = () => choices[Math.floor(rng() * choices.length)];
 
     if (c.phase === 'upload') {
@@ -296,6 +302,13 @@ console.log('Samma namn och försvunna spelare: OK');
 for (const occasion of ['fest', 'aw', 'familj'] as const) {
   for (let seed = 1; seed <= 60; seed++) play(seed, 3 + (seed % 13), 'custom', occasion);
 }
+// AW och Fest med poäng i stället för klunkar.
+for (const occasion of ['fest', 'aw'] as const) {
+  for (let seed = 1; seed <= 30; seed++) play(seed, 3 + (seed % 13), 'custom', occasion, 'poang');
+}
+assert.equal(newGameState(newPlayer('a', 'A', 0), 'custom', 'familj', 'klunkar').scoring, 'poang', 'familjespel har alltid poäng');
+assert.equal(newGameState(newPlayer('a', 'A', 0), 'custom', 'aw').scoring, 'klunkar', 'klunkar är förvalt');
+assert.ok(!usesPoints(newGameState(newPlayer('a', 'A', 0), 'classic', undefined, 'poang')), 'vanligt spel har alltid klunkar');
 // Utmaningskort i familjespel är också alkoholfria.
 for (const c of cards.filter((c) => c.occasion === 'familj')) {
   assert.ok(!/klunk|drick|druck|alkohol|\bfyll(?:a|an|o)\b/i.test(`${c.title ?? ''} ${c.text}`), `dryckesord i familj.txt: ${c.text}`);

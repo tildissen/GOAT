@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { api, saveCreds } from '@/lib/client';
-import type { Occasion } from '@/lib/types';
+import type { Occasion, Scoring } from '@/lib/types';
 import { Icon, Screen, type IconName } from './ui';
 
 /** Formuläret för både "skapa" (bara namn) och "joina" (kod + namn). */
@@ -23,6 +23,7 @@ export default function NameForm({
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [occasion, setOccasion] = useState<Occasion | null>(null);
+  const [scoring, setScoring] = useState<Scoring>('klunkar');
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -32,7 +33,7 @@ export default function NameForm({
     if (custom && !occasion) return setError('Välj tillfälle');
     setBusy(true);
     try {
-      const res = mode === 'create' ? await api.create(name, custom ? 'custom' : 'classic', occasion ?? undefined) : await api.join(code, name);
+      const res = mode === 'create' ? await api.create(name, custom ? 'custom' : 'classic', occasion ?? undefined, occasion === 'familj' ? 'poang' : scoring) : await api.join(code, name);
       saveCreds(res.code, { playerId: res.playerId, token: res.token });
       router.push(`/spel/${res.code}`);
     } catch (err) {
@@ -74,6 +75,26 @@ export default function NameForm({
                 </button>
               ))}
             </div>
+            {occasion && occasion !== 'familj' && (
+              <>
+                <p className="field-label">Spela om klunkar eller poäng?</p>
+                <div className="occasions scoring" role="radiogroup" aria-label="Klunkar eller poäng">
+                  {SCORINGS.map((o) => (
+                    <button
+                      key={o.key}
+                      type="button"
+                      role="radio"
+                      aria-checked={scoring === o.key}
+                      className={`occasion${scoring === o.key ? ' selected' : ''}`}
+                      onClick={() => setScoring(o.key)}
+                    >
+                      <strong>{o.label}</strong>
+                      <span>{o.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </>
         )}
         {mode === 'join' && (
@@ -122,4 +143,9 @@ const OCCASIONS: { key: Occasion; icon: IconName; label: string; desc: string }[
   { key: 'aw', icon: 'aw', label: 'AW', desc: 'Kollegor och vänner. Lugna frågor, inget pinsamt.' },
   { key: 'familj', icon: 'familj', label: 'Familjespel', desc: 'Alla åldrar och alkoholfritt – minuspoäng i stället för klunkar.' },
   { key: 'fest', icon: 'fest', label: 'Fest', desc: 'Allt är tillåtet. Blir vildare för varje del.' },
+];
+
+const SCORINGS: { key: Scoring; label: string; desc: string }[] = [
+  { key: 'klunkar', label: 'Klunkar', desc: 'Den som vägrar dricker. Klunkar går att spara.' },
+  { key: 'poang', label: 'Poäng', desc: 'Minuspoäng i stället för klunkar. Minst poäng vinner.' },
 ];

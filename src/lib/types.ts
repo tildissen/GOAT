@@ -1,6 +1,8 @@
 export type Category = 'casual' | 'party' | 'cheeky' | 'dirty' | 'framtid';
 /** Tillfälle i "Bygg eget spel". Fest använder de vanliga korten; AW och Familjespel har egna förvalda kort. */
 export type Occasion = 'fest' | 'aw' | 'familj';
+/** Klunkar eller (minus)poäng. */
+export type Scoring = 'klunkar' | 'poang';
 export type CardKind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild' | 'kaos';
 
 /** Ett kort som det ligger i databasen (tabellen cards). */
@@ -116,6 +118,8 @@ export interface GameState {
   mode?: GameMode;
   /** Bara i "Bygg eget spel". */
   occasion?: Occasion;
+  /** "Bygg eget spel" med AW eller Fest: klunkar (förvalt) eller poäng. Familjespel har alltid poäng. */
+  scoring?: Scoring;
   lastTurnId: string | null;
   seq: number;
   /** Senaste valen som gjorts, så att alla ser vad någon valde (inget fusk). */

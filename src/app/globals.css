@@ -774,3 +774,6 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
   80% { opacity: 1; }
   100% { opacity: 0.2; }
 }
+
+/* Klunkar eller poäng: två val bredvid varandra */
+.occasions.scoring { display: grid; grid-template-columns: 1fr 1fr; }

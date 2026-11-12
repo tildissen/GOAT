@@ -3,7 +3,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 import { buildCustomDeck, buildDeck } from './deck';
 import { addPlayer, applyAction, GameError, housekeeping, newGameState, newPlayer, cleanName, toPublic, type Ctx } from './engine';
 import { getStore, type GameRecord } from './store';
-import type { Action, GameMode, GameState, GameView, Occasion } from './types';
+import type { Action, GameMode, GameState, GameView, Occasion, Scoring } from './types';
 
 /** Så länge räknas en spelare som uppkopplad efter senaste kontakten. */
 const ACTIVE_MS = 25_000;
@@ -66,14 +66,14 @@ function authorize(record: GameRecord, playerId: string, token: string) {
   }
 }
 
-export async function createGame(rawName: string, mode: GameMode = 'classic', occasion?: Occasion) {
+export async function createGame(rawName: string, mode: GameMode = 'classic', occasion?: Occasion, scoring?: Scoring) {
   const store = getStore();
   const name = cleanName(rawName);
   store.cleanup(new Date(Date.now() - MAX_GAME_AGE_MS)).catch((err) => console.error('cleanup', err));
   const host = newPlayer(randomUUID(), name, Date.now());
   const token = newToken();
   for (let attempt = 0; attempt < 10; attempt++) {
-    const record = await store.createGame(newCode(), newGameState(host, mode, occasion), { [host.id]: token });
+    const record = await store.createGame(newCode(), newGameState(host, mode, occasion, scoring), { [host.id]: token });
     if (record) {
       await store.touch(record.id, host.id);
       return { code: record.code, playerId: host.id, token };

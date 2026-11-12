@@ -50,7 +50,7 @@ export default function Lobby({ state, view, isLeader, busy, act, code }: GamePr
       </div>
 
       <div className="sub-label">
-        {state.mode === 'custom' && `Bygg eget spel · ${OCCASION_LABEL[state.occasion ?? 'fest']} · `}
+        {state.mode === 'custom' && `Bygg eget spel · ${OCCASION_LABEL[state.occasion ?? 'fest']}${state.occasion !== 'familj' && state.scoring === 'poang' ? ' · Poäng' : ''} · `}
         {state.players.length} spelare · minst {MIN_PLAYERS}
       </div>
       <div className="players">

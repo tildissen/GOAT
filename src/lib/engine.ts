@@ -1,5 +1,5 @@
 import { CARDS_PER_PART, PARTS, shuffle, type Rng } from './deck';
-import type { Action, Current, CustomCard, CustomKind, DeckCard, GameMode, GameState, Occasion, Player, PublicState } from './types';
+import type { Action, Current, CustomCard, CustomKind, DeckCard, GameMode, GameState, Occasion, Scoring, Player, PublicState } from './types';
 
 export const MIN_PLAYERS = 3;
 export const MAX_PLAYERS = 15;
@@ -51,10 +51,10 @@ export function newPlayer(id: string, name: string, now: number): Player {
   };
 }
 
-export function newGameState(host: Player, mode: GameMode = 'classic', occasion?: Occasion): GameState {
+export function newGameState(host: Player, mode: GameMode = 'classic', occasion?: Occasion, scoring?: Scoring): GameState {
   return {
     mode,
-    ...(mode === 'custom' ? { occasion: occasion ?? 'fest' } : {}),
+    ...(mode === 'custom' ? { occasion: occasion ?? 'fest', scoring: occasion === 'familj' ? 'poang' : (scoring ?? 'klunkar') } : {}),
     status: 'lobby',
     hostId: host.id,
     players: [host],
@@ -113,9 +113,17 @@ export function scaleSips(text: string, part: number): string {
   });
 }
 
-/** Familjespel: alkoholfritt – man får minuspoäng i stället för att dricka. */
+/** Familjespel: alkoholfritt och för alla åldrar. */
 export function isFamily(state: Pick<GameState, 'mode' | 'occasion'>): boolean {
   return state.mode === 'custom' && state.occasion === 'familj';
+}
+
+/**
+ * Spelar man med poäng i stället för klunkar? Alltid i Familjespel, och i AW/Fest om värden valt poäng.
+ * Då blir klunkar minuspoäng, det går inte att spara och den med minst poäng vinner.
+ */
+export function usesPoints(state: Pick<GameState, 'mode' | 'occasion' | 'scoring'>): boolean {
+  return isFamily(state) || (state.mode === 'custom' && state.scoring === 'poang');
 }
 
 /** Skriver om dryckesord till minuspoäng, för kort som spelarna skrivit i ett familjespel. */
@@ -221,7 +229,8 @@ function deal(s: GameState, ctx: Ctx) {
   }
 
   // På utmaningar och minigames gäller antalet klunkar som står på kortet.
-  if (isFamily(s)) text = familyText(text);
+  // Med poäng blir klunkar minuspoäng. I AW/Fest bara på kort med siffror, så att t.ex. "Vem dricker mest?" står kvar.
+  if (isFamily(s) || (usesPoints(s) && hasNumbers)) text = familyText(text);
   const sipsOnCard =
     hasNumbers ? text.match(/(\d+)\s+(?:extra\s+)?(?:klunk|minuspoäng)/) : null;
 
@@ -311,7 +320,7 @@ function drawChallenge(s: GameState, ctx: Ctx): string {
   const pool = s.challengePool.filter((c) => c.level <= s.part);
   const card = pick(pool.length > 0 ? pool : s.challengePool, ctx.rng);
   const text = card ? scaleSips(card.text, s.part) : 'Gör en segerpose i 10 sekunder.';
-  return isFamily(s) ? familyText(text) : text;
+  return usesPoints(s) ? familyText(text) : text;
 }
 
 export function applyAction(input: GameState, playerId: string, action: Action, ctx: Ctx): GameState {
@@ -408,7 +417,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       assertNotPaused(s, ctx);
       if (!canChoose(s, c, me)) throw new GameError('Det här kortet är redan klart – kolla skärmen', 409);
       const solo = isSoloCard(c.card) && c.phase === 'play';
-      const family = isFamily(s);
+      const family = usesPoints(s);
       if (action.choice === 'answered') {
         if (c.card.kind !== 'direkt') throw new GameError('Ogiltigt val');
         logEvent(s, playerId, 'svarade på frågan');
@@ -416,7 +425,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
         me.drank += c.sips;
         logEvent(s, playerId, family ? `tog ${sipsWord(c.sips, true)}` : `drack ${sipsWord(c.sips, false)}`);
       } else if (action.choice === 'save') {
-        if (family) throw new GameError('Man kan inte spara i familjespel');
+        if (family) throw new GameError('Man kan inte spara när ni spelar om poäng');
         me.saved += c.sips;
         logEvent(s, playerId, `sparade ${sipsWord(c.sips, false)} (har ${me.saved} sparade)`);
       } else if (action.choice === 'challenge') {
@@ -470,7 +479,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       break;
     }
     case 'drink_saved': {
-      if (me.saved > 0) logEvent(s, playerId, isFamily(s) ? `tog sina ${me.saved} sparade` : `drack sina ${me.saved} sparade klunkar`);
+      if (me.saved > 0) logEvent(s, playerId, usesPoints(s) ? `tog sina ${me.saved} sparade` : `drack sina ${me.saved} sparade klunkar`);
       me.drank += me.saved;
       me.saved = 0;
       break;

@@ -486,3 +486,14 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B77. Kaoskort
 - **Tillägg (av Claude):** Ny korttyp "Kaos!" – oväntade händelser för alla ("Lägg alla mobiler i mitten. Den som rör sin först dricker 3 klunkar", "Alla byter plats med personen till vänster. NU!"). Svart kort med gul text som skakar till. Inga val, värden trycker Nästa. 19 vanliga kaoskort (de grova bara i del 4), 6 för AW och 6 alkoholfria för Familjespel. Lagt in i Supabase via connectorn (migreringen `allow_kaos_cards`, 31 nya kort, inga befintliga ändrade).
 - **Var i koden:** [`content/kaos.txt`](../../content/kaos.txt), `kaos|` i [`content/aw.txt`](../../content/aw.txt) och [`content/familj.txt`](../../content/familj.txt).
+
+### B78. Klunkar eller poäng i "Bygg eget spel"
+- **Beslut:** När man bygger ett eget spel med AW eller Fest väljer värden om spelet ska vara om **klunkar** eller **poäng**. Familjespel är som tidigare (alltid minuspoäng).
+- **Tillägg (av Claude):**
+  - Klunkar är förvalt.
+  - Valet visas under "Vilket tillfälle?" när AW eller Fest är valt, och syns i lobbyn ("Bygg eget spel · AW · Poäng").
+  - Poäng fungerar som i Familjespel: klunkar blir minuspoäng, det finns ingen spara-knapp (och därmed inget ERROR) och den med minst minuspoäng vinner.
+  - I AW och Fest skrivs bara siffrorna på utmaningar, minigames och kaoskort om ("tar 2 klunkar" → "får 2 minuspoäng"). Frågor som "Vem dricker mest?" står kvar.
+  - Spelreglerna får en poängversion.
+  - Vanligt spel har alltid klunkar.
+- **Var i koden:** `scoring` i `GameState` och `usesPoints()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `SCORINGS` i [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx).

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
-import { canPressNext, isFamily, isSoloCard, savedCap } from '@/lib/engine';
+import { canPressNext, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import Face from '../Face';
 import { Avatar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
@@ -45,7 +45,7 @@ function CardScreen({
   const theme = partTheme(game.state.part);
   return (
     <Screen bg={bg ?? theme.bg}>
-      <Hud me={game.me} part={game.state.part} index={game.state.cardIndex} total={game.state.cardsInPart} family={isFamily(game.state)} />
+      <Hud me={game.me} part={game.state.part} index={game.state.cardIndex} total={game.state.cardsInPart} family={usesPoints(game.state)} />
       <div className={`card ${card ?? theme.card}`}>{children}</div>
       {below && <div className="stack" style={{ marginTop: 18 }}>{below}</div>}
     </Screen>
@@ -140,7 +140,7 @@ function Direct(p: CardProps) {
         sips={p.cur.sips}
         act={p.act}
         busy={p.busy}
-        family={isFamily(p.state)}
+        family={usesPoints(p.state)}
         extra={
           <button className="btn yellow" disabled={p.busy} onClick={() => p.act({ type: 'choose', choice: 'answered' })}>
             Jag svarar!
@@ -193,10 +193,10 @@ function Trivia(p: CardProps) {
       </div>
       {!answered && (
         <p className="hint">
-          {isFamily(p.state) ? 'Fel svar: ta minuspoäng eller dra en utmaning' : 'Fel svar: drick, spara eller dra en utmaning'}
+          {usesPoints(p.state) ? 'Fel svar: ta minuspoäng eller dra en utmaning' : 'Fel svar: drick, spara eller dra en utmaning'}
         </p>
       )}
-      {answered && !right && <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={isFamily(p.state)} />}
+      {answered && !right && <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={usesPoints(p.state)} />}
     </CardScreen>
   );
 }
@@ -237,9 +237,9 @@ function Challenge(p: CardProps) {
         {cur.card.players === 2 && involved && <p className="body-text">Det gäller dig!</p>}
       </div>
       {mine ? (
-        <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" family={isFamily(p.state)} />
+        <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" family={usesPoints(p.state)} />
       ) : canSkip ? (
-        <Chosen cur={cur} meId={me.id} family={isFamily(p.state)} />
+        <Chosen cur={cur} meId={me.id} family={usesPoints(p.state)} />
       ) : null}
     </CardScreen>
   );
@@ -333,7 +333,7 @@ function ResultCard(p: CardProps) {
   if (photo && cur.photoSkipped) {
     headline = (
       <p className="card-text">
-        {owner} vägrade ladda upp en bild – och {isFamily(state) ? 'får minuspoäng' : 'får dricka'}!
+        {owner} vägrade ladda upp en bild – och {usesPoints(state) ? 'får minuspoäng' : 'får dricka'}!
       </p>
     );
   } else if (photo) {
@@ -344,8 +344,8 @@ function ResultCard(p: CardProps) {
           <span className="display mid name-font">{owner.toUpperCase()}</span>
         </div>
         <p className="heading">{allRight
-            ? `ägde bilden – alla gissade rätt, så ${owner} ${isFamily(state) ? 'får minuspoäng' : 'dricker'}!`
-            : `ägde bilden! Alla som gissade fel ${isFamily(state) ? 'får minuspoäng' : 'dricker'}.`}</p>
+            ? `ägde bilden – alla gissade rätt, så ${owner} ${usesPoints(state) ? 'får minuspoäng' : 'dricker'}!`
+            : `ägde bilden! Alla som gissade fel ${usesPoints(state) ? 'får minuspoäng' : 'dricker'}.`}</p>
       </>
     );
   } else {
@@ -358,7 +358,7 @@ function ResultCard(p: CardProps) {
         </div>
         <p className="heading">
           {everyoneTied
-            ? `fick lika många röster – alla ${isFamily(state) ? 'får minuspoäng' : 'dricker'}!`
+            ? `fick lika många röster – alla ${usesPoints(state) ? 'får minuspoäng' : 'dricker'}!`
             : cur.losers.length > 1
               ? 'fick lika många röster'
               : 'fick flest röstningar'}
@@ -397,14 +397,14 @@ function ResultCard(p: CardProps) {
         </div>
       )}
       {iLost && !cur.choices[me.id] ? (
-        <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={isFamily(state)} />
+        <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={usesPoints(state)} />
       ) : (
         <div className="votes-list">
           {cur.losers
             .filter((id) => cur.choices[id])
             .map((id) => (
               <div key={id}>
-                {nameOf(state, id)} {choiceText(cur.choices[id], cur.sips, isFamily(state))}
+                {nameOf(state, id)} {choiceText(cur.choices[id], cur.sips, usesPoints(state))}
               </div>
             ))}
         </div>
@@ -466,7 +466,7 @@ function PhotoUpload(p: CardProps) {
           {working ? 'Laddar upp…' : 'Ladda upp här!'}
         </button>
         <button className="link-btn" disabled={working || p.busy} onClick={() => p.act({ type: 'skip_photo' })}>
-          {isFamily(p.state) ? `Jag vägrar (och tar ${sipsText(cur.sips, true)})` : `Jag vägrar (och dricker ${sipsText(cur.sips)})`}
+          {usesPoints(p.state) ? `Jag vägrar (och tar ${sipsText(cur.sips, true)})` : `Jag vägrar (och dricker ${sipsText(cur.sips)})`}
         </button>
       </div>
     </CardScreen>

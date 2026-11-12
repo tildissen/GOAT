@@ -5,6 +5,7 @@ export async function POST(req: Request) {
   return handle(async () => {
     const body = await readJson(req);
     const occasion = body.occasion === 'aw' || body.occasion === 'familj' ? body.occasion : 'fest';
-    return createGame(str(body.name), body.mode === 'custom' ? 'custom' : 'classic', occasion);
+    const scoring = body.scoring === 'poang' ? 'poang' : 'klunkar';
+    return createGame(str(body.name), body.mode === 'custom' ? 'custom' : 'classic', occasion, scoring);
   });
 }

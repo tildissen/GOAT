@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { compressImage, loadLocal, saveLocal } from '@/lib/client';
-import { isFamily, MAX_OWN_CARDS, MIN_OWN_CARDS, MIN_PLAYERS, ownCardCount } from '@/lib/engine';
+import { isFamily, usesPoints, MAX_OWN_CARDS, MIN_OWN_CARDS, MIN_PLAYERS, ownCardCount } from '@/lib/engine';
 import type { CustomCard, CustomKind } from '@/lib/types';
 import Face from '../Face';
 import { Avatar, Screen } from '../ui';
@@ -77,10 +77,18 @@ function Regler({ state, onDone }: { state: GameProps['state']; onDone: () => vo
         SPELREGLER
       </h1>
       <div className="card green" style={{ padding: '24px 18px', gap: 16 }}>
-        {isFamily(state) ? (
+        {usesPoints(state) ? (
           <>
             <p className="body-text">
-              <strong>Välkommen</strong> till G.O.A.T. – familjeversionen!
+              {isFamily(state) ? (
+                <>
+                  <strong>Välkommen</strong> till G.O.A.T. – familjeversionen!
+                </>
+              ) : (
+                <>
+                  <strong>Välkommen</strong> till G.O.A.T. – i kväll spelar ni om poäng i stället för klunkar!
+                </>
+              )}
             </p>
             <p className="body-text">
               Spelet är uppdelat i {parts}, och för varje del blir utmaningarna lite svårare. Här styr nästa kort allt.

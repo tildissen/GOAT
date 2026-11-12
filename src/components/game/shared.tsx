@@ -1,7 +1,7 @@
 'use client';
 
 import type { Action, Choice, GameView, Player, PublicState } from '@/lib/types';
-import { isFamily } from '@/lib/engine';
+import { usesPoints } from '@/lib/engine';
 import { Avatar } from '../ui';
 
 export interface GameProps {
@@ -80,7 +80,7 @@ export function Board({ state, active, meId }: { state: PublicState; active: str
         <div key={p.id} className={`board-row${p.id === meId ? ' me' : ''}${active.includes(p.id) ? '' : ' offline'}`}>
           <Avatar player={p} />
           <span className="name">{p.name}</span>
-          {isFamily(state) ? (
+          {usesPoints(state) ? (
             <span className="stat">
               minuspoäng <strong>{p.drank}</strong>
             </span>
@@ -104,7 +104,7 @@ export function Board({ state, active, meId }: { state: PublicState; active: str
 export function Stats({ state }: { state: PublicState }) {
   const players = state.players.filter((p) => p.ready);
   if (players.length === 0) return null;
-  const family = isFamily(state);
+  const family = usesPoints(state);
   const leader = (key: 'drank' | 'votesReceived' | 'challenges') => {
     const best = [...players].sort((a, b) => b[key] - a[key])[0];
     return best && best[key] > 0 ? best.id : null;

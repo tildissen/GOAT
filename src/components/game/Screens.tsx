@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { isFamily, pausedPlayers, savedCap, sipsForPart } from '@/lib/engine';
+import { usesPoints, pausedPlayers, savedCap, sipsForPart } from '@/lib/engine';
 import Face from '../Face';
 import { Screen, type Color } from '../ui';
 import { nameOf, PART_WORDS, possessive, sipsText, Stats, type GameProps } from './shared';
@@ -235,7 +235,7 @@ export function PartIntro({ state }: GameProps) {
   if (count === null) return null;
   const last = state.part >= state.parts;
   const name = last && state.parts < 4 ? PART_NAMES[3] : PART_NAMES[Math.min(state.part, 4) - 1];
-  const family = isFamily(state);
+  const family = usesPoints(state);
   const sips = sipsForPart(state.part);
   return (
     <div className={`overlay part-intro part-${Math.min(state.part, 4)}`} onClick={() => setCount(null)} role="dialog" aria-label={`Del ${state.part} börjar`}>
