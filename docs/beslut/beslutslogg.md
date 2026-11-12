@@ -513,3 +513,16 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Startsidan: en rad under varje val. "Skapa ett spel: Färdiga kort, klara att köra", "Joina ett spel: Skriv koden du har fått", "Bygg eget spel: Ni skriver korten själva".
 - **Inte byggt än:** övriga fynd i genomgången (bannern som täcker toppytan, huvudknappen under kanten på små mobiler, nykter-texten i reglerna, tryckytor och textstorlek, bilder och integritet, lobbyn med många spelare, felmeddelandet vid upptaget namn). Tilda har inte sagt om de ska göras.
 - **Var i koden:** `Stats` och `ordinal` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `Finished` och `Ended` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), [`src/app/page.tsx`](../../src/app/page.tsx), `.podium`, `.choices` i [`src/app/globals.css`](../../src/app/globals.css).
+
+---
+
+## 2026-11-12 – Kontrast
+
+### B80. Kontrastgenomgång: kant nederst på textfälten och skugga på knapparna i korten
+- **Beslut:** Tilda bad Claude gå igenom kontrasten i spelet och valde sedan Claudes rekommendationer: skugga på knapparna i korten och en kant nederst på textfälten.
+- **Mätning (av Claude):** 368 textstilar på 77 skärmar (vanligt spel, Familjespel, AW med poäng, ERROR, banner, del-intro, slutskärm) klarar alla kontrastkraven (WCAG 2.1 AA). Det som var svagt var avgränsningen: textfält mot bakgrunden 1,2–1,6 : 1 och gula knappar på grönt eller cyan kort 1,1–1,2 : 1.
+- **Tillägg (av Claude):**
+  - Textfälten får en mörk kant nederst (insida, 5 px, ca 5 : 1 mot cyan) i stället för ingen kant alls. Det syns som en kant längs undersidan, inte som en ram runt hela fältet. Ersätter B74.
+  - Knapparna i korten har skuggan kvar. Den hade tagits bort inne i korten. Skuggan är svag och uppfyller inte 3 : 1, men ger knappen en kant mot kortet.
+- **Inte ändrat:** Fältets markering när man skriver är fortfarande bara en aningen mörkare grön. Bläddringsfokus med tangentbord syns på knappar och länkar (webbläsarens ram, 12–19 : 1).
+- **Var i koden:** `.input` och `.card .actions .btn` i [`src/app/globals.css`](../../src/app/globals.css).

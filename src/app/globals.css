@@ -199,7 +199,8 @@ a.btn.ink { color: var(--white); }
   margin: 0;
 }
 .card .actions { width: 100%; display: flex; flex-direction: column; gap: 12px; align-items: center; }
-.card .actions .btn { box-shadow: none; max-width: none; min-height: 54px; font-size: 19px; }
+/* Knapparna i korten behåller skuggan: gula knappar på grönt eller cyan kort skiljer sig annars bara i nyans (1,1–1,2:1). */
+.card .actions .btn { max-width: none; min-height: 54px; font-size: 19px; }
 
 @keyframes card-in {
   from { transform: translateY(18px) scale(0.98); opacity: 0; }
@@ -224,8 +225,10 @@ a.btn.ink { color: var(--white); }
   padding: 12px 26px;
   font-size: 22px;
   outline: none;
+  /* Mörk kant nederst så att fältet syns mot bakgrunden (ca 5:1). Ingen ram runt hela fältet. */
+  box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.65);
 }
-/* Ingen svart kant när man skriver. Fältet blir bara en aning mörkare grönt. */
+/* När man skriver blir fältet en aning mörkare grönt. */
 .input:focus-visible { background: #b3f55e; }
 .input.code { text-transform: uppercase; letter-spacing: 0.25em; font-weight: 600; }
 textarea.input { min-height: 96px; resize: none; font-size: 18px; line-height: 1.4; padding-top: 16px; }
