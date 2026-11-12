@@ -72,11 +72,12 @@ function StorEj({ onDone }: { onDone: () => void }) {
 type Rule = { title: string; text: string };
 
 /**
- * Spelreglerna – korta och olika för varje typ av spel (B87): en rad i lägets ton och tre punkter.
+ * Spelreglerna – korta och olika för varje typ av spel (B87): en rad i lägets ton och fyra punkter (B89: Läs högt).
  * Vanligt spel och Fest med klunkar, AW med klunkar, AW/Fest med poäng och Familjespel.
  */
 function rulesFor(state: GameProps['state']): { intro: string; rules: Rule[] } {
   const custom = state.mode === 'custom';
+  const aloud: Rule = { title: 'Läs högt', text: 'Läs ditt kort högt för alla – om det inte står något annat.' };
   const cards: Rule = {
     title: 'Ett kort i taget',
     text: custom
@@ -87,6 +88,7 @@ function rulesFor(state: GameProps['state']): { intro: string; rules: Rule[] } {
     return {
       intro: 'G.O.A.T. för hela familjen – utan alkohol.',
       rules: [
+        aloud,
         { ...cards, text: cards.text.replace('vildare', 'lite svårare') },
         { title: 'Vill du inte?', text: 'Ta minuspoäng – eller dra ett utmaningskort och gör det.' },
         { title: 'Minst vinner', text: 'Den med minst minuspoäng i slutet vinner.' },
@@ -97,6 +99,7 @@ function rulesFor(state: GameProps['state']): { intro: string; rules: Rule[] } {
     return {
       intro: state.occasion === 'aw' ? 'AW – i kväll spelar ni om poäng.' : 'I kväll spelar ni om poäng i stället för klunkar.',
       rules: [
+        aloud,
         cards,
         { title: 'Vill du inte?', text: 'Ta minuspoäng – eller dra ett utmaningskort och gör det.' },
         { title: 'Minst vinner', text: 'Den med minst minuspoäng i slutet vinner.' },
@@ -109,6 +112,7 @@ function rulesFor(state: GameProps['state']): { intro: string; rules: Rule[] } {
         ? 'AW-versionen: lugnare frågor, samma kaos i slutet.'
         : 'Börjar oskyldigt. Slutar i fullständigt kaos.',
     rules: [
+      aloud,
       cards,
       { title: 'Vill du inte?', text: 'Drick, spara – eller dra ett utmaningskort och gör det.' },
       { title: 'Spara klunkar', text: 'Max 5, sedan 4, 3 och 2. Fullt = ERROR och du dricker allt.' },

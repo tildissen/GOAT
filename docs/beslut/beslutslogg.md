@@ -507,7 +507,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   1. **ERROR är en del av det roliga.** "Jag vill spara"-knappen döljs inte i del 3–4, även om den leder rakt till ERROR. Inget ändras.
   2. **Inget val för alkoholfritt.** Ingen "Jag dricker alkoholfritt" läggs till. Inget ändras.
   3. **Slutskärmen visar bara topp 3 och din plats.**
-  4. **Startsidan förklarar de tre valen.**
+  4. **Startsidan förklarar de tre valen.** (**Ersatt av B88**)
 - **Tillägg (av Claude):**
   - Slutskärmen: topp 3 som förut. Är du med i topp 3 får din ruta en svart ram och märket "Du". Är du inte det kommer en streckad ruta längst ned, "Din plats – Du blev 4:e av 6", med dina klunkar eller minuspoäng. Lika resultat delar plats ("Du blev delad 3:e av 6"). Ordningstalen skrivs på svenska (1:a, 2:a, 3:e, 4:e, 11:e, 21:a).
   - Startsidan: en rad under varje val. "Skapa ett spel: Färdiga kort, klara att köra", "Joina ett spel: Skriv koden du har fått", "Bygg eget spel: Ni skriver korten själva".
@@ -608,3 +608,12 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - I "Bygg eget spel" säger punkt 1 "Era egna kort blandas in."
   - Borttaget: "Är du nykter? Tråkigt." och "Det här är ett dryckesspel, inte en sparbank". Det var också ett av fynden i UX-genomgången (B79).
 - **Var i koden:** `rulesFor()` och `Regler` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.rules` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B88. Inga små texter under knapparna på startsidan
+- **Beslut:** Tilda ville ta bort de små texterna under de tre knapparna på startsidan ("Färdiga kort, klara att köra", "Skriv koden du har fått" och "Ni skriver korten själva"). Ersätter punkt 4 i B79.
+- **Var i koden:** [`src/app/page.tsx`](../../src/app/page.tsx), `.choices` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B89. Spelreglerna: läs ditt kort högt
+- **Beslut:** Spelreglerna ska säga att man läser sitt kort högt, så länge det inte står något annat på kortet.
+- **Tillägg (av Claude):** Det är en ny första punkt, "Läs högt – Läs ditt kort högt för alla – om det inte står något annat.", i alla fem versionerna av reglerna. Reglerna har nu fyra punkter och får fortfarande plats på en iPhone SE. Ändrar B87.
+- **Var i koden:** `rulesFor()` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).

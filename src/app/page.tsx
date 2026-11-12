@@ -43,19 +43,16 @@ export default function Home() {
             <Link href="/skapa" className="btn ink" style={linkBtn}>
               Skapa ett spel
             </Link>
-            <p className="choice-hint">Färdiga kort, klara att köra</p>
           </div>
           <div className="choice">
             <Link href="/join" className="btn yellow" style={linkBtn}>
               Joina ett spel
             </Link>
-            <p className="choice-hint">Skriv koden du har fått</p>
           </div>
           <div className="choice">
             <Link href="/skapa?eget=1" className="btn coral" style={linkBtn}>
               Bygg eget spel
             </Link>
-            <p className="choice-hint">Ni skriver korten själva</p>
           </div>
         </div>
         <div className="chips" style={{ marginTop: 16 }}>
