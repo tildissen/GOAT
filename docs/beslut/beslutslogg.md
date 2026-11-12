@@ -579,3 +579,17 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Har spelarna skrivit fler än 28 kort blir delarna längre än 10 kort, eftersom alla egna kort alltid kommer med.
   - Spelreglerna säger "4 delar" även i eget spel.
 - **Var i koden:** `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts), `Regler` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+---
+
+## 2026-11-12 – Arbetssätt
+
+### B86. Egen gren och pull request, eller bara en session åt gången i beslutsloggen
+- **Beslut:** Tilda bestämde: "Alla jobbar i en egen gren och slår ihop via pull request, eller bara en session skriver i beslutsloggen åt gången."
+- **Varför:** Två sessioner skrev i loggen samtidigt och fick samma nummer (B71–B77 finns två gånger) och flera sammanslagningskonflikter i `docs/beslut/beslutslogg.md`.
+- **Tillägg (av Claude):**
+  - Regeln står nu i [`CLAUDE.md`](../../CLAUDE.md) under "Arbetssätt – obligatoriskt", så att framtida sessioner följer den.
+  - "Eller" tolkades som att de två sätten är jämbördiga: egen gren och pull request är normalfallet, och en ensam skrivare i loggen är ett alternativ. Jag skrev också in att man aldrig skriver direkt på `main`, vilket följer av första delen.
+  - Vid en konflikt i loggen behåller man det som redan ligger på `main` och numrerar om sina egna nya beslut (så har det gjorts hittills, senast B83 och B84).
+- **Inte rättat:** De gamla dubbletterna B71–B77 (ett set från 2026-11-05, ett från 2026-11-12) är kvar. Ska ett av dem numreras om behöver hänvisningarna rättas.
+- **Var:** [`CLAUDE.md`](../../CLAUDE.md).
