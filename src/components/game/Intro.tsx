@@ -24,10 +24,16 @@ export default function Intro(props: GameProps) {
   };
   const canAddCards = state.status === 'lobby' || state.status === 'intro';
   const finish = () => act({ type: 'ready' });
+  // Startade värden spelet medan man skrev egna kort? Då hoppar man in direkt (korten kan inte läggas till längre).
+  const late = step === 'egna' && !canAddCards;
+  useEffect(() => {
+    if (late) act({ type: 'ready' });
+  }, [late, act]);
 
   if (step === 'storej') return <StorEj onDone={() => go('regler')} />;
   if (step === 'regler') return <Regler state={state} onDone={() => go('selfie')} />;
   if (step === 'selfie') return <Selfie {...props} onDone={() => (canAddCards ? go('egna') : finish())} />;
+  if (late) return null;
   return <EgnaKort {...props} onDone={finish} />;
 }
 
@@ -257,6 +263,7 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
   const [text, setText] = useState('');
   const [title, setTitle] = useState('');
   const [targetId, setTargetId] = useState<string | null>(null);
+  const [added, setAdded] = useState(0);
   const baseType = CARD_TYPES.find((t) => t.key === typeKey)!;
   const type = isFamily(state)
     ? { ...baseType, ...FAMILY_TYPE_TEXT[typeKey], titleExample: baseType.titleExample && 'Frys!' }
@@ -281,6 +288,7 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
       setText('');
       setTitle('');
       setTargetId(null);
+      setAdded(added + 1);
     }
   }
 
@@ -364,6 +372,15 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
       <button className="btn yellow" style={{ marginTop: 12 }} disabled={busy || !canAdd || full} onClick={add}>
         {full ? `Max ${MAX_OWN_CARDS} kort` : 'Lägg till'}
       </button>
+      <p className="add-feedback" role="status" aria-live="polite">
+        {text.trim().length > 0 && text.trim().length < 3
+          ? 'Skriv minst 3 tecken'
+          : type.kind === 'minigame' && text.trim().length >= 3 && title.trim().length < 2
+            ? 'Ge minigamet ett namn också'
+            : added > 0 && text === ''
+              ? `✓ Kortet är tillagt – du har skrivit ${mine.length} kort`
+              : ''}
+      </p>
 
       {mine.length > 0 && (
         <div className="votes-list" style={{ marginTop: 18 }}>

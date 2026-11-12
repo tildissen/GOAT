@@ -119,9 +119,12 @@ export function Stats({ state }: { state: PublicState }) {
       {rows.map((r) => (
         <div key={r.label} className="board-row">
           <Avatar player={r.p} />
-          <span className="name">
-            {'icon' in r && r.icon && <Icon name={r.icon} size={22} className="inline-icon" />}
-            {r.label}: {r.p.name}
+          <span className="name stat-name">
+            <small>
+              {'icon' in r && r.icon && <Icon name={r.icon} size={18} className="inline-icon" />}
+              {r.label}
+            </small>
+            {r.p.name}
           </span>
           <span className="stat">{r.value(r.p)}</span>
         </div>

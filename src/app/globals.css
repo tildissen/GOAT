@@ -687,3 +687,13 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
   from { transform: scale(0.6) rotate(-6deg); opacity: 0; }
   to { transform: rotate(-2deg); opacity: 1; }
 }
+
+/* UX-genomgången: mindre bild vid röstning så att "Skicka in" syns */
+.photo.voting { max-height: 24dvh; }
+/* Många namn vid oavgjort radbryts i stället för att flöda ut */
+.code-box.loser-box { white-space: normal; overflow-wrap: anywhere; line-height: 1.1; padding: 16px; }
+/* Statistik: rubriken på en rad, namnet under – så att namnet aldrig kapas */
+.board-row .stat-name { white-space: normal; display: flex; flex-direction: column; line-height: 1.2; }
+.board-row .stat-name small { font-weight: 400; font-size: 13px; opacity: 0.75; display: inline-flex; align-items: center; gap: 4px; }
+/* Bekräftelse och tips på "Skriv dina kort" */
+.add-feedback { font-size: 15px; margin: 8px 0 0; text-align: center; min-height: 1.2em; }

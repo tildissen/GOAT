@@ -1,12 +1,12 @@
 import 'server-only';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { buildCustomDeck, buildDeck } from './deck';
-import { addPlayer, applyAction, GameError, newGameState, newPlayer, cleanName, toPublic, type Ctx } from './engine';
+import { addPlayer, applyAction, GameError, housekeeping, newGameState, newPlayer, cleanName, toPublic, type Ctx } from './engine';
 import { getStore, type GameRecord } from './store';
 import type { Action, GameMode, GameState, GameView, Occasion } from './types';
 
 /** Så länge räknas en spelare som uppkopplad efter senaste kontakten. */
-const ACTIVE_MS = 45_000;
+const ACTIVE_MS = 25_000;
 /** Gamla spel och deras bilder rensas efter så här lång tid. */
 const MAX_GAME_AGE_MS = 12 * 60 * 60 * 1000;
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -86,8 +86,8 @@ export async function joinGame(code: string, rawName: string) {
   let joined: { playerId: string; token: string } | null = null;
   await mutate(
     code,
-    (record) => {
-      const { state, player } = addPlayer(record.state, rawName, randomUUID(), Date.now());
+    (record, active) => {
+      const { state, player } = addPlayer(record.state, rawName, randomUUID(), Date.now(), active);
       const token = record.secrets[player.id] ?? newToken();
       joined = { playerId: player.id, token };
       return { state, secrets: { ...record.secrets, [player.id]: token } };
@@ -105,6 +105,18 @@ export async function getView(code: string, playerId: string | null, token: stri
   const isPlayer = Boolean(playerId && token && record.secrets[playerId] === token);
   if (isPlayer) await getStore().touch(record.id, playerId!);
   const active = await activeIds(record);
+  // Har någon försvunnit mitt i en röstning eller bilduppladdning går spelet vidare av sig själv.
+  if (isPlayer && housekeeping(record.state, { active, rng: Math.random, now: Date.now() })) {
+    try {
+      return await mutate(
+        code,
+        (fresh, freshActive) => ({ state: housekeeping(fresh.state, { active: freshActive, rng: Math.random, now: Date.now() }) ?? fresh.state }),
+        playerId,
+      );
+    } catch (err) {
+      console.error('housekeeping', err);
+    }
+  }
   return view(record, record.state, record.version, active, isPlayer ? playerId : null);
 }
 

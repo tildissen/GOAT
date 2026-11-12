@@ -74,10 +74,20 @@ export function cleanName(raw: string): string {
 }
 
 /** Lägger till en spelare, eller hittar den som redan heter så (för att kunna joina igen). */
-export function addPlayer(state: GameState, rawName: string, id: string, now: number) {
+/**
+ * Lägger till en spelare. Finns namnet redan och den spelaren är borta får man tillbaka sin
+ * plats (för den som tappat uppkopplingen). Är spelaren med just nu är namnet upptaget.
+ */
+export function addPlayer(state: GameState, rawName: string, id: string, now: number, active: Set<string> = new Set()) {
   const name = cleanName(rawName);
   if (state.status === 'ended') throw new GameError('Spelet är redan slut', 410);
   const existing = state.players.find((p) => p.name.toLowerCase() === name.toLowerCase());
+  if (existing && active.has(existing.id)) {
+    throw new GameError(
+      `${existing.name} är redan med i spelet. Lägg till en bokstav, t.ex. "${existing.name} B". Är det du som tappat uppkopplingen? Vänta en halv minut och försök igen.`,
+      409,
+    );
+  }
   if (existing) return { state, player: existing, rejoined: true };
   if (state.players.length >= MAX_PLAYERS) throw new GameError(`Spelet är fullt (max ${MAX_PLAYERS} spelare)`);
   const s = structuredClone(state);
@@ -271,7 +281,8 @@ function canChoose(s: GameState, cur: Current, player: Player): boolean {
   if (cur.card.kind === 'minigame') return false;
   // X och Y: bara de två som utmaningen gäller kan välja att hoppa över.
   if (cur.card.players === 2) return player.ready && cur.targetIds.includes(player.id);
-  return player.ready;
+  // Gruppkort och lagkort ("Den som har flest syskon delar ut …") är instruktioner till alla – inga val.
+  return false;
 }
 
 function drawChallenge(s: GameState, ctx: Ctx): string {
@@ -291,7 +302,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
     if (!isLeader(s, playerId, ctx)) throw new GameError('Bara den som skapade spelet kan göra det', 403);
   };
   const requireCurrent = (): Current => {
-    if (s.status !== 'playing' || !cur) throw new GameError('Inget kort spelas just nu', 409);
+    if (s.status !== 'playing' || !cur) throw new GameError('Kortet har redan bytts – kolla skärmen', 409);
     return cur;
   };
 
@@ -354,7 +365,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
     case 'vote': {
       const c = requireCurrent();
       assertNotPaused(s, ctx);
-      if (c.phase !== 'voting') throw new GameError('Röstningen är stängd', 409);
+      if (c.phase !== 'voting') throw new GameError('Röstningen är redan klar – kolla skärmen', 409);
       if (!me.ready) throw new GameError('Du är inte med i spelet än');
       if (c.card.kind === 'bild' && playerId === c.turnId) throw new GameError('Du kan inte rösta på din egen bild');
       if (!s.players.some((p) => p.id === action.targetId && p.ready)) throw new GameError('Okänd spelare');
@@ -373,7 +384,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
     case 'choose': {
       const c = requireCurrent();
       assertNotPaused(s, ctx);
-      if (!canChoose(s, c, me)) throw new GameError('Du kan inte välja just nu', 409);
+      if (!canChoose(s, c, me)) throw new GameError('Det här kortet är redan klart – kolla skärmen', 409);
       const solo = isSoloCard(c.card) && c.phase === 'play';
       if (action.choice === 'answered') {
         if (c.card.kind !== 'direkt') throw new GameError('Ogiltigt val');
@@ -473,6 +484,30 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
     }
   }
   return s;
+}
+
+/**
+ * Städar upp när någon försvunnit så att spelet inte står still: avgör röstningen när alla
+ * som är uppkopplade har röstat, och hoppar över "Vems är bilden?" om den hemliga
+ * uppladdaren har försvunnit. Returnerar null om inget behöver ändras.
+ */
+export function housekeeping(input: GameState, ctx: Ctx): GameState | null {
+  const cur = input.current;
+  if (input.status !== 'playing' || !cur) return null;
+  if (cur.phase === 'voting') {
+    const s = structuredClone(input);
+    const c = s.current!;
+    const everyoneVoted = Object.keys(c.votes).length > 0 && voters(s, c, ctx).every((p) => c.votes[p.id]);
+    if (!everyoneVoted) return null;
+    resolveVotes(s, c);
+    return s;
+  }
+  if (cur.phase === 'upload' && !ctx.active.has(cur.turnId) && pausedPlayers(input).length === 0) {
+    const s = structuredClone(input);
+    advance(s, ctx);
+    return s;
+  }
+  return null;
 }
 
 /** Tar bort sådant som inte ska synas för just den här spelaren. */

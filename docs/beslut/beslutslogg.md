@@ -369,7 +369,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - **Trivia:** bara den som svarar, och bara efter fel svar (inte "Jag svarar").
   - **Utmaning till en person:** bara den personen, plus "Klar!".
   - **X och Y:** bara de två.
-  - **Utmaning för alla och lag:** alla.
+  - **Utmaning för alla och lag:** alla. *(Ersatt av B72: inga val på gruppkort.)*
   - **Alla röstar / Vems är bilden?:** bara de som förlorade röstningen (flest röster, eller gissade fel).
   - **Vems är bilden? (uppladdning):** den hemliga uppladdaren kan välja "Jag vägrar (och dricker)".
   - **Minigames:** ingen (B68).
@@ -429,3 +429,28 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B77. "Vad ska vi kalla dig?" i stället för "Vad heter du?"
 - **Beslut:** Frågan över namnfältet heter "Vad ska vi kalla dig?" i alla versioner: Skapa, Joina och Bygg eget spel (AW, Familjespel och Fest).
 - **Var i koden:** [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx). Alla lägen använder samma formulär, så texten finns på ett ställe.
+
+---
+
+## 2026-11-12 – UX-genomgång med personas
+
+### B71. UX-genomgång och rättning av allt som var fel
+- **Beslut:** Tilda bad Claude utvärdera flödet genom att spela som olika personas, och sedan åtgärda allt som var fel.
+- **Tillägg (av Claude):** 13 personas i 3 scenarier (förfest, familjespel, AW) på 6 mobilstorlekar, med riktiga klick i webbläsaren. Rättat:
+  - **Röstningen stod still** när någon låste mobilen. Nu avgörs röstningen av sig själv när alla som är uppkopplade har röstat, och "Vems är bilden?" hoppas över om den hemliga uppladdaren försvinner. En spelare räknas som borta efter 25 sekunder (förut 45).
+  - **Räknaren** kunde visa "4 av 1 har röstat". Nu räknas alla som har röstat.
+  - **Samma namn:** en ny person som skrev ett namn som redan fanns tog över den spelarens plats. Nu är namnet upptaget så länge spelaren är uppkopplad ("Kalle är redan med i spelet. Lägg till en bokstav …"). Den som tappat uppkopplingen kan fortfarande komma tillbaka med sitt namn. Ändrar B22.
+  - **"Skicka in" syntes inte** vid "Vems är bilden?" – bilden är mindre under röstningen.
+  - **Fast i "Egna kort"** när värden startade spelet – nu hoppar man in direkt.
+  - **Namn flödade ut** vid oavgjort – de radbryts, och blir alla lika står det "alla dricker!".
+  - **Namnen kapades** på slutskärmen – rubriken står nu ovanför namnet.
+  - **Ingen bekräftelse** när ett eget kort lagts till – nu står det "✓ Kortet är tillagt – du har skrivit N kort", och "Skriv minst 3 tecken" när texten är för kort.
+  - **"1 gissning"** var otydligt – nu "1 gissade på Kalle".
+  - **Felmeddelanden** när man tryckte på ett kort som just bytts: "Kortet har redan bytts – kolla skärmen" i stället för "Du kan inte välja just nu".
+- **Inte ändrat:** att de som väntar inte ser frågan vid trivia och direkta frågor (Tildas beslut B4). Att man ibland måste scrolla på små mobiler (Spelregler, Egna kort, sista knappen på vissa kort). Att startsidan inte förklarar skillnaden mellan "Skapa ett spel" och "Bygg eget spel".
+- **Var i koden:** `housekeeping()` och `addPlayer()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `getView()` i [`src/lib/game-service.ts`](../../src/lib/game-service.ts), [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx).
+
+### B72. Inga val på gruppkort
+- **Beslut:** Knapparna "Vill du hoppa över? / Jag dricker / Jag vill spara / Dra ett utmaningskort" på gruppkort var fel (t.ex. "Den som har flest syskon *delar ut* 2 klunkar" – vad hoppar man över, och vem ska trycka?). Tilda bad Claude åtgärda allt som var fel.
+- **Tillägg (av Claude):** Gruppkort och lagkort fungerar nu som minigames: ingen har val, värden trycker Nästa. Kvar med val: solo-utmaningar (personen) och X och Y (de två). Ersätter den delen av B69.
+- **Var i koden:** `canChoose()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).

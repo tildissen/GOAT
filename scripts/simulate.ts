@@ -10,6 +10,7 @@ import { buildCustomDeck, buildDeck, CARDS_PER_PART, PARTS } from '../src/lib/de
 import {
   addPlayer,
   applyAction,
+  housekeeping,
   familyText,
   GameError,
   isSoloCard,
@@ -204,9 +205,9 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       } else {
         for (const id of ids) {
           if (s.current?.choices[id] || pausedPlayers(s).length > 0) continue;
-          // X och Y: bara de två kan välja.
-          if (c.card.players === 2 && !c.targetIds.includes(id)) {
-            assert.throws(() => act(id, { type: 'choose', choice: 'drink' }), GameError, 'fel spelare valde på X och Y');
+          // X och Y: bara de två kan välja. Gruppkort och lagkort: ingen.
+          if (c.card.players !== 2 || !c.targetIds.includes(id)) {
+            assert.throws(() => act(id, { type: 'choose', choice: 'drink' }), GameError, 'fel spelare valde på gruppkort');
           } else if (rng() < 0.3) {
             act(id, { type: 'choose', choice: chooseAny() });
           }
@@ -241,6 +242,34 @@ for (let seed = 1; seed <= 200; seed++) {
 }
 assert.deepEqual([...kinds].sort(), ['bild', 'direkt', 'minigame', 'trivia', 'utmaning', 'vem']);
 console.log('200 simulerade spel med 3–15 spelare: OK');
+
+// Samma namn: upptaget om den spelaren är med, annars får man tillbaka sin plats.
+{
+  let s = newGameState(newPlayer('a', 'Kalle', 1));
+  assert.throws(() => addPlayer(s, 'kalle', 'b', 2, new Set(['a'])), GameError, 'samma namn tog över en aktiv spelare');
+  const back = addPlayer(s, 'kalle', 'b', 2, new Set());
+  assert.equal(back.player.id, 'a');
+  assert.equal(back.rejoined, true);
+}
+// Röstningen avgörs av sig själv när den som inte röstat har försvunnit.
+{
+  const rng = makeRng(7);
+  const ids = ['a', 'b', 'c', 'd'];
+  let s: GameState = newGameState(newPlayer('a', 'A', 1));
+  for (const id of ids.slice(1)) s = addPlayer(s, id.toUpperCase(), id, 1).state;
+  const all = new Set(ids);
+  const ctx = (active: Set<string>, deck = false): Ctx => ({ active, rng, now: 1, deck: deck ? buildDeck(cards, [], rng) : undefined });
+  s = applyAction(s, 'a', { type: 'start_intro' }, ctx(all));
+  for (const id of ids) s = applyAction(s, id, { type: 'ready' }, ctx(all));
+  s = applyAction(s, 'a', { type: 'start_game' }, ctx(all, true));
+  for (let i = 0; i < 40 && s.current?.phase !== 'voting'; i++) s = applyAction(s, 'a', { type: 'next' }, ctx(all));
+  assert.equal(s.current?.phase, 'voting');
+  for (const id of ['a', 'b', 'c']) s = applyAction(s, id, { type: 'vote', targetId: 'b' }, ctx(all));
+  assert.equal(housekeeping(s, ctx(all)), null, 'avgjordes fast alla inte röstat');
+  const after = housekeeping(s, ctx(new Set(['a', 'b', 'c'])));
+  assert.equal(after?.current?.phase, 'result', 'röstningen avgjordes inte när d försvann');
+}
+console.log('Samma namn och försvunna spelare: OK');
 
 for (const occasion of ['fest', 'aw', 'familj'] as const) {
   for (let seed = 1; seed <= 60; seed++) play(seed, 3 + (seed % 13), 'custom', occasion);

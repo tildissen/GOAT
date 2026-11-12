@@ -205,9 +205,9 @@ function Challenge(p: CardProps) {
   const minigame = cur.card.kind === 'minigame';
   const solo = isSoloCard(cur.card);
   const involved = cur.targetIds.includes(me.id);
-  // Vem får välja dricka/spara/utmaningskort: personen på solo-kort, X och Y på X och Y-kort,
-  // alla på gruppkort och lagkort. Minigames har inga val.
-  const canSkip = !minigame && (solo || cur.card.players !== 2 || involved);
+  // Vem får välja dricka/spara/utmaningskort: personen på solo-kort och X och Y på X och Y-kort.
+  // Gruppkort, lagkort och minigames har inga val – värden trycker Nästa.
+  const canSkip = !minigame && (solo || (cur.card.players === 2 && involved));
   const mine = canSkip && (solo || !cur.choices[me.id]);
   return (
     <CardScreen
@@ -248,15 +248,18 @@ function VoteCard(p: CardProps) {
   const isOwner = photo && cur.turnId === me.id;
   const [selected, setSelected] = useState<string | null>(null);
   const myVote = cur.votes[me.id];
-  const voters = state.players.filter((pl) => pl.ready && p.view.active.includes(pl.id) && !(photo && pl.id === cur.turnId));
   const voted = Object.keys(cur.votes).length;
+  // Alla som är uppkopplade eller redan har röstat – så att det aldrig blir "4 av 1".
+  const voters = state.players.filter(
+    (pl) => pl.ready && !(photo && pl.id === cur.turnId) && (p.view.active.includes(pl.id) || pl.id in cur.votes),
+  );
 
   return (
     <CardScreen game={p}>
       <KindTag kind={photo ? 'bild' : 'vem'} />
       {photo ? (
         // eslint-disable-next-line @next/next/no-img-element
-        cur.photoUrl && <img className="photo" src={cur.photoUrl} alt="Den hemliga bilden" />
+        cur.photoUrl && <img className="photo voting" src={cur.photoUrl} alt="Den hemliga bilden" />
       ) : (
         <div className="card-q">
           <p className="card-text big">{cur.text}</p>
@@ -297,8 +300,8 @@ function VoteCard(p: CardProps) {
         </>
       )}
       <div className="dots" aria-label={`${voted} av ${voters.length} har röstat`}>
-        {voters.map((v, i) => (
-          <i key={v.id} className={i < voted ? 'on' : ''} />
+        {voters.map((v) => (
+          <i key={v.id} className={v.id in cur.votes ? 'on' : ''} />
         ))}
         <span>
           {voted} av {voters.length} har röstat
@@ -320,6 +323,7 @@ function ResultCard(p: CardProps) {
   const iLost = cur.losers.includes(me.id);
   const pending = cur.losers.filter((id) => !cur.choices[id] && p.view.active.includes(id));
   const loserNames = cur.losers.map((id) => nameOf(state, id));
+  const everyoneTied = !photo && cur.losers.length > 2 && cur.losers.length === Object.keys(cur.tally ?? {}).length;
 
   let headline: React.ReactNode;
   if (photo && cur.photoSkipped) {
@@ -343,10 +347,18 @@ function ResultCard(p: CardProps) {
   } else {
     headline = (
       <>
-        <div className="code-box" style={{ background: 'var(--green)', cursor: 'default' }}>
-          <span className="display big name-font">{loserNames.join(' & ').toUpperCase()}</span>
+        <div className="code-box loser-box" style={{ background: 'var(--green)', cursor: 'default' }}>
+          <span className={`display ${cur.losers.length > 2 ? 'small' : cur.losers.length > 1 ? 'mid' : 'big'} name-font`}>
+            {loserNames.join(' & ').toUpperCase()}
+          </span>
         </div>
-        <p className="heading">{cur.losers.length > 1 ? 'fick lika många röster' : 'fick flest röstningar'}</p>
+        <p className="heading">
+          {everyoneTied
+            ? `fick lika många röster – alla ${isFamily(state) ? 'får minuspoäng' : 'dricker'}!`
+            : cur.losers.length > 1
+              ? 'fick lika många röster'
+              : 'fick flest röstningar'}
+        </p>
       </>
     );
   }
@@ -367,7 +379,15 @@ function ResultCard(p: CardProps) {
             .sort(([, a], [, b]) => b - a)
             .map(([id, n]) => (
               <div key={id}>
-                <strong>{nameOf(state, id)}</strong> – {n} {photo ? (n === 1 ? 'gissning' : 'gissningar') : n === 1 ? 'röst' : 'röster'}
+                {photo ? (
+                  <>
+                    {n} gissade på <strong>{nameOf(state, id)}</strong>
+                  </>
+                ) : (
+                  <>
+                    <strong>{nameOf(state, id)}</strong> – {n} {n === 1 ? 'röst' : 'röster'}
+                  </>
+                )}
               </div>
             ))}
         </div>
