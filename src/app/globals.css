@@ -199,7 +199,8 @@ a.btn.ink { color: var(--white); }
   margin: 0;
 }
 .card .actions { width: 100%; display: flex; flex-direction: column; gap: 12px; align-items: center; }
-.card .actions .btn { box-shadow: none; max-width: none; min-height: 54px; font-size: 19px; }
+/* Knapparna i korten behåller skuggan: gula knappar på grönt eller cyan kort skiljer sig annars bara i nyans (1,1–1,2:1). */
+.card .actions .btn { max-width: none; min-height: 54px; font-size: 19px; }
 
 @keyframes card-in {
   from { transform: translateY(18px) scale(0.98); opacity: 0; }
@@ -224,8 +225,10 @@ a.btn.ink { color: var(--white); }
   padding: 12px 26px;
   font-size: 22px;
   outline: none;
+  /* Mörk kant nederst så att fältet syns mot bakgrunden (ca 5:1). Ingen ram runt hela fältet. */
+  box-shadow: inset 0 -5px 0 rgba(0, 0, 0, 0.65);
 }
-/* Ingen svart kant när man skriver. Fältet blir bara en aning mörkare grönt. */
+/* När man skriver blir fältet en aning mörkare grönt. */
 .input:focus-visible { background: #b3f55e; }
 .input.code { text-transform: uppercase; letter-spacing: 0.25em; font-weight: 600; }
 textarea.input { min-height: 96px; resize: none; font-size: 18px; line-height: 1.4; padding-top: 16px; }
@@ -777,3 +780,14 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 
 /* Klunkar eller poäng: två val bredvid varandra */
 .occasions.scoring { display: grid; grid-template-columns: 1fr 1fr; }
+
+/* Slutskärmen: din plats när du inte är med i topp 3 */
+.podium .podium-row.me { outline: 3px solid var(--black); outline-offset: -3px; }
+.podium .podium-row.mine { background: var(--white); border: 2px dashed var(--black); }
+.podium .place { font-weight: 700; font-size: 20px; min-width: 38px; text-align: center; line-height: 1; }
+.you-tag { font-style: normal; font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--black); color: var(--white); border-radius: 999px; padding: 2px 8px; margin-left: 8px; vertical-align: 2px; }
+
+/* Startsidan: en rad under varje val */
+.choices { display: flex; flex-direction: column; gap: 16px; width: 100%; align-items: center; margin-top: 28px; }
+.choice { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+.choice-hint { font-size: 15px; line-height: 1.3; text-align: center; margin: 0; }

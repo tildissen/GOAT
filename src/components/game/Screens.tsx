@@ -41,7 +41,7 @@ export function PartEnd({ state, isLeader, busy, act }: GameProps) {
 
 const confirmEnd = () => window.confirm('Avsluta spelet för alla? Alla bilder raderas.');
 
-export function Finished({ state, isLeader, busy, act }: GameProps) {
+export function Finished({ state, me, isLeader, busy, act }: GameProps) {
   return (
     <Screen bg="yellow">
       <div className="stack" style={{ marginTop: 48, gap: 20 }}>
@@ -49,7 +49,7 @@ export function Finished({ state, isLeader, busy, act }: GameProps) {
         <p className="tagline">wow, vilka GOATs</p>
       </div>
       <div style={{ width: '100%', margin: '32px 0' }}>
-        <Stats state={state} />
+        <Stats state={state} meId={me.id} />
       </div>
       <div className="grow" />
       {isLeader ? (
@@ -68,7 +68,7 @@ export function Finished({ state, isLeader, busy, act }: GameProps) {
   );
 }
 
-export function Ended({ state }: GameProps) {
+export function Ended({ state, me }: GameProps) {
   return (
     <Screen bg="coral">
       <div className="stack" style={{ marginTop: 56, gap: 40 }}>
@@ -76,7 +76,7 @@ export function Ended({ state }: GameProps) {
         <h1 className="logo huge">G.O.A.T</h1>
       </div>
       <div style={{ width: '100%', margin: '36px 0 20px' }}>
-        <Stats state={state} />
+        <Stats state={state} meId={me.id} />
       </div>
       <p className="body-text">Tack för ikväll! Alla bilder är raderade.</p>
       <div className="grow" style={{ minHeight: 24 }} />

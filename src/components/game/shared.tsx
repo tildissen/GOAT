@@ -101,7 +101,10 @@ export function Board({ state, active, meId }: { state: PublicState; active: str
  * Slutskärmens topp 3: en ruta per person, med det personen vann ("Fick flest röster" osv.) i rutan.
  * Vanligt spel: flest klunkar överst. Familjespel: minst minuspoäng överst (vinnaren).
  */
-export function Stats({ state }: { state: PublicState }) {
+/** 1:a, 2:a, 3:e, 4:e, 11:e, 12:e, 21:a … */
+export const ordinal = (n: number) => `${n}:${(n % 10 === 1 || n % 10 === 2) && n % 100 !== 11 && n % 100 !== 12 ? 'a' : 'e'}`;
+
+export function Stats({ state, meId }: { state: PublicState; meId: string }) {
   const players = state.players.filter((p) => p.ready);
   if (players.length === 0) return null;
   const family = usesPoints(state);
@@ -115,6 +118,12 @@ export function Stats({ state }: { state: PublicState }) {
     [leader('challenges'), 'Flest utmaningar'],
   ];
   const ranked = [...players].sort((a, b) => (family ? a.drank - b.drank : b.drank - a.drank)).slice(0, 3);
+  // Plats: lika resultat delar plats, så "5:e" betyder att fyra personer var bättre.
+  const better = (a: number, b: number) => (family ? a < b : a > b);
+  const me = players.find((p) => p.id === meId);
+  const myPlace = me ? 1 + players.filter((q) => better(q.drank, me.drank)).length : 0;
+  const myShared = me ? players.some((q) => q.id !== me.id && q.drank === me.drank) : false;
+  const meInTop = Boolean(me && ranked.some((p) => p.id === me.id));
   const medals = ['🥇', '🥈', '🥉'];
   return (
     <div className="board podium">
@@ -122,19 +131,38 @@ export function Stats({ state }: { state: PublicState }) {
         const won = awards.filter(([id]) => id === p.id).map(([, label]) => label);
         if (family && i === 0) won.unshift('Vinnare');
         return (
-          <div key={p.id} className={`board-row podium-row${i === 0 ? ' first' : ''}`}>
+          <div key={p.id} className={`board-row podium-row${i === 0 ? ' first' : ''}${p.id === meId ? ' me' : ''}`}>
             <span className="medal" aria-label={`Plats ${i + 1}`}>
               {medals[i]}
             </span>
             <Avatar player={p} />
             <span className="name stat-name">
-              {p.name}
+              <span>
+                {p.name}
+                {p.id === meId && <em className="you-tag">Du</em>}
+              </span>
               {won.length > 0 && <small>{won.join(' · ')}</small>}
             </span>
             <span className="stat">{sipsText(p.drank, family)}</span>
           </div>
         );
       })}
+      {me && !meInTop && (
+        <div className="board-row podium-row mine">
+          <span className="place" aria-hidden="true">
+            {ordinal(myPlace)}
+          </span>
+          <Avatar player={me} />
+          <span className="name stat-name">
+            Din plats
+            <small>
+              Du blev {myShared ? 'delad ' : ''}
+              {ordinal(myPlace)} av {players.length}
+            </small>
+          </span>
+          <span className="stat">{sipsText(me.drank, family)}</span>
+        </div>
+      )}
     </div>
   );
 }
