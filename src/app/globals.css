@@ -719,13 +719,15 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
   background: var(--black);
   color: var(--white);
   border-radius: 16px;
-  padding: 10px 16px;
+  padding: 7px 14px;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 14px;
+  line-height: 1.3;
   text-align: center;
   box-shadow: var(--shadow);
   animation: card-in 0.3s ease;
 }
+.event-banner .event-more { font-weight: 400; opacity: 0.75; }
 
 /* Slutskärmens topp 3 – en ruta per person */
 .podium .podium-row { padding: 12px 14px; }

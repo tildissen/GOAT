@@ -9,10 +9,13 @@ export const MAX_SAVED = 5;
 const SAVED_CAP = [5, 4, 3, 2];
 /** Klunkar per kort i del 1–4. Utmaningar och minigames: siffran på kortet plus (värdet − 1). */
 const SIPS_PER_PART = [1, 2, 4, 6];
+/** AW med kollegor stegrar lugnare (B90): 1, 2, 3, 3 per kort, och kortens siffror ökar som mest med 2. */
+const AW_SIPS_PER_PART = [1, 2, 3, 3];
 
 const partIndex = (part: number) => Math.min(Math.max(part, 1), SIPS_PER_PART.length) - 1;
 export const savedCap = (part: number) => SAVED_CAP[partIndex(part)];
-export const sipsForPart = (part: number) => SIPS_PER_PART[partIndex(part)];
+export const sipsForPart = (part: number, occasion?: Occasion) =>
+  (occasion === 'aw' ? AW_SIPS_PER_PART : SIPS_PER_PART)[partIndex(part)];
 export const MAX_NAME_LENGTH = 20;
 /** I "Bygg eget spel" måste alla skriva minst så här många kort, av vilken typ som helst (minigames räknas också). */
 export const MIN_OWN_CARDS = 3;
@@ -105,9 +108,9 @@ export function addPlayer(state: GameState, rawName: string, id: string, now: nu
 }
 
 /** Byter siffror före "klunk" så att det blir fler klunkar för varje del. */
-export function scaleSips(text: string, part: number): string {
+export function scaleSips(text: string, part: number, occasion?: Occasion): string {
   return text.replace(/(\d+)(\s+(?:extra\s+)?)(klunk(?:ar)?|minuspoäng)/g, (_, n: string, space: string, unit: string) => {
-    const sips = Number(n) + sipsForPart(part) - 1;
+    const sips = Number(n) + sipsForPart(part, occasion) - 1;
     if (unit === 'minuspoäng') return `${sips}${space}minuspoäng`;
     return `${sips}${space}${sips === 1 ? 'klunk' : 'klunkar'}`;
   });
@@ -231,7 +234,7 @@ function deal(s: GameState, ctx: Ctx) {
   }
 
   const hasNumbers = card.kind === 'utmaning' || card.kind === 'minigame' || card.kind === 'kaos';
-  let text = hasNumbers ? scaleSips(card.text, s.part) : card.text;
+  let text = hasNumbers ? scaleSips(card.text, s.part, s.occasion) : card.text;
   text = text.replace(/\bX\b/g, nameOf(targetIds[0])).replace(/\bY\b/g, nameOf(targetIds[1] ?? targetIds[0]));
   if (teams) {
     text = text
@@ -253,7 +256,7 @@ function deal(s: GameState, ctx: Ctx) {
     turnId: turn.id,
     targetIds,
     teams,
-    sips: sipsOnCard ? Number(sipsOnCard[1]) : sipsForPart(s.part),
+    sips: sipsOnCard ? Number(sipsOnCard[1]) : sipsForPart(s.part, s.occasion),
     phase: card.kind === 'vem' ? 'voting' : card.kind === 'bild' ? 'upload' : 'play',
     votes: {},
     losers: [],
@@ -345,7 +348,7 @@ function canChoose(s: GameState, cur: Current, player: Player): boolean {
 function drawChallenge(s: GameState, ctx: Ctx): string {
   const pool = s.challengePool.filter((c) => c.level <= s.part);
   const card = pick(pool.length > 0 ? pool : s.challengePool, ctx.rng);
-  const text = card ? scaleSips(card.text, s.part) : 'Gör en segerpose i 10 sekunder.';
+  const text = card ? scaleSips(card.text, s.part, s.occasion) : 'Gör en segerpose i 10 sekunder.';
   return usesPoints(s) ? familyText(text) : text;
 }
 

@@ -13,6 +13,7 @@ import {
   housekeeping,
   familyText,
   usesPoints,
+  sipsForPart,
   canTake,
   GameError,
   isSoloCard,
@@ -45,6 +46,10 @@ assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 1), 'Den som bli
 assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 3), 'Den som blinkar först tar 5 klunkar.');
 assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 4), 'Den som blinkar först tar 7 klunkar.');
 assert.equal(scaleSips('tar 1 extra klunk.', 2), 'tar 2 extra klunkar.');
+// AW stegrar lugnare: som mest +2.
+assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 4, 'aw'), 'Den som blinkar först tar 4 klunkar.');
+assert.equal(sipsForPart(4, 'aw'), 3);
+assert.equal(sipsForPart(4, 'fest'), 6);
 assert.equal(scaleSips('ett nummer mellan 1–5 samtidigt', 3), 'ett nummer mellan 1–5 samtidigt');
 
 console.log(`Kort: ${cards.length} st`);
