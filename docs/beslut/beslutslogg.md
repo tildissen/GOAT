@@ -23,7 +23,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ## 2026-10-27 – Intervju: hur spelet fungerar
 
-### B4. Alla spelar på sin egen mobil
+### B4. Alla spelar på sin egen mobil (**Ersatt av B82**)
 - **Beslut:** När man spelar visas kortet bara **hos den vars tur det är**. De andra ser vems tur det är.
 - **Alternativ:** samma kort hos alla samtidigt · bara värdens mobil visar kortet.
 - **Var i koden:** [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
@@ -290,7 +290,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ### B54. Alla spelare måste skriva minst 3 kort
 - **Beslut:** I "Bygg eget spel" är det obligatoriskt för alla spelare att skriva minst 3 frågor, påståenden eller utmaningar.
-- **Tillägg (av Claude):** Man kan inte gå vidare (och servern godkänner inte "redo") förrän man skrivit 3. Max 10 kort per person. Egna minigames räknas inte till de 3. Den som joinar efter att spelet startat slipper skriva.
+- **Tillägg (av Claude):** Man kan inte gå vidare (och servern godkänner inte "redo") förrän man skrivit 3. Max 10 kort per person. Egna minigames räknas inte till de 3 (**ersatt av B81**: nu räknas de). Den som joinar efter att spelet startat slipper skriva.
 - **Var i koden:** `MIN_OWN_CARDS`, `ownCardCount()` och `ready` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `EgnaKort` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
 
 ### B55. Trivia förvald, minigames förvalda plus frivilliga egna
@@ -527,7 +527,33 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Inte ändrat:** Fältets markering när man skriver är fortfarande bara en aningen mörkare grön. Bläddringsfokus med tangentbord syns på knappar och länkar (webbläsarens ram, 12–19 : 1).
 - **Var i koden:** `.input` och `.card .actions .btn` i [`src/app/globals.css`](../../src/app/globals.css).
 
-### B81. "Jag vägrar" är en knapp, och straffet tas direkt
+---
+
+## 2026-11-12 – Egna kort
+
+### B81. Alla korttyper räknas mot de 3 egna korten
+- **Beslut:** Man ska kunna gå vidare när man skrivit tre kort, oavsett typ. Det ska till exempel gå att skriva tre kort av samma kategori.
+- **Varför:** Tilda hade skrivit tre kort (Vem i rummet?, Direkt fråga och ett minigame) men knappen var fortfarande grå, eftersom minigames inte räknades.
+- **Tillägg (av Claude):**
+  - Egna minigames räknas nu också mot kravet. Det ändrar Claudes eget tillägg i B54 ("Egna minigames räknas inte till de 3").
+  - Typen heter nu bara "Minigame", inte "Minigame (frivilligt)".
+- **Var i koden:** `ownCardCount()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `CARD_TYPES` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B82. Alla ser kortet, utom "Vems är bilden?"
+- **Beslut:** Man ska se vilket kort de andra får, så länge det inte är ett "Vems är bilden?"-kort. Ersätter B4 ("kortet visas bara hos den vars tur det är").
+- **Tillägg (av Claude):**
+  - När det är någon annans tur på en direkt fråga, en trivia eller en utmaning till en person ser de andra samma kort med namnet, men utan knappar.
+  - På trivia ser de svarsalternativen. När frågan är besvarad ser de vad som var rätt och fel.
+  - Under kortet står vad personen valde, t.ex. "Tuva drack 2 klunkar" eller "Tilda svarade rätt!".
+  - Ställningen visas under kortet som förut.
+  - Bildkorten är fortfarande hemliga.
+- **Var i koden:** `Waiting` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+---
+
+## 2026-11-12 – Bildkort
+
+### B83. "Jag vägrar" är en knapp, och straffet tas direkt
 - **Beslut:** "Jag vägrar (och dricker/tar X)" på "Vems är bilden?" ska vara en knapp, inte en länk. När man trycker på den ska spelaren inte få frågan om att dricka eller ta minuspoäng en gång till.
 - **Beslut:** Knappen ska se ut som alla andra knappar (gul, `btn yellow`). Claude provade först en sekundärknapp med ram, men Tilda ville inte ha den.
 - **Tillägg (av Claude):** Vägran drar straffet direkt (klunkar eller minuspoäng, en gång) och resultatkortet visar bara att personen vägrade och drack. Tidigare fick spelaren valen "Jag dricker / Jag vill spara / Dra ett utmaningskort" ovanpå, trots att knappen redan sagt vad vägran kostade. Ändrar den delen av B14.

@@ -75,14 +75,13 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
   act(ids[0], { type: 'start_intro' });
   let ownCards = 0;
   if (mode === 'custom') {
-    // Alla måste skriva minst 3 kort; minigames räknas inte.
+    // Alla måste skriva minst 3 kort, av vilken typ som helst.
     const kinds: Action[] = [
       { type: 'add_custom', kind: 'vem', text: 'Vem skulle överleva längst i en zombieapokalyps?' },
       { type: 'add_custom', kind: 'direkt', text: 'Vad är det pinsammaste du gjort på fyllan?' },
       { type: 'add_custom', kind: 'utmaning', players: 1, text: 'Härma någon i rummet tills någon gissar vem.' },
       { type: 'add_custom', kind: 'utmaning', players: 0, text: 'Alla som har på sig svart tar 2 klunkar.' },
     ];
-    act(ids[0], { type: 'add_custom', kind: 'minigame', title: 'Tyst minut', text: 'Ingen får prata. Den som pratar tar 2 klunkar.' });
     assert.throws(() => act(ids[0], { type: 'add_custom', kind: 'minigame', text: 'Utan namn' }), GameError, 'minigame utan namn');
     for (const id of ids) {
       const extra = Math.floor(rng() * 4);
@@ -97,6 +96,8 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
     act(ids[1], { type: 'add_custom', kind: 'direkt', text: 'Vad tycker du om sälj?', targetId: ids[2] });
     act(ids[2], { type: 'add_custom', kind: 'utmaning', players: 1, text: 'Härma mig!', targetId: ids[0] });
     ownCards += 2;
+    // Ett eget minigame räknas också mot kravet.
+    act(ids[0], { type: 'add_custom', kind: 'minigame', title: 'Tyst minut', text: 'Ingen får prata. Den som pratar tar 2 klunkar.' });
   } else {
     act(ids[1], { type: 'add_custom', kind: 'vem', text: 'Vem är egentligen värst på det här spelet?' });
     act(ids[2], { type: 'add_custom', kind: 'utmaning', text: 'Alla som har på sig något rött tar 2 klunkar.' });
