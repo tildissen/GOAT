@@ -74,6 +74,8 @@ export interface Current {
   photoUrl?: string | null;
   photoSkipped?: boolean;
   triviaPick?: number | null;
+  /** Gruppkort, minigames och kaoskort: hur många gånger varje spelare har fått kortets klunkar/minuspoäng. */
+  taken?: Record<string, number>;
 }
 
 export interface Overlay {
@@ -158,6 +160,8 @@ export type Action =
   | { type: 'close_vote' }
   | { type: 'choose'; choice: Choice }
   | { type: 'trivia_answer'; index: number }
+  | { type: 'take'; targetId: string }
+  | { type: 'untake'; targetId: string }
   | { type: 'dismiss_overlay' }
   | { type: 'drink_saved' }
   | { type: 'upload_photo'; url: string }

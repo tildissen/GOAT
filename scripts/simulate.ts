@@ -13,6 +13,7 @@ import {
   housekeeping,
   familyText,
   usesPoints,
+  canTake,
   GameError,
   isSoloCard,
   MAX_SAVED,
@@ -198,7 +199,12 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       if (s.current?.seq === c.seq && pausedPlayers(s).length === 0) {
         // Gruppkort: bara värden går vidare.
         assert.throws(() => act(ids[1], { type: 'next' }), GameError, 'icke-värd fick trycka nästa på gruppkort');
+        // Förlorare som inte valt något får klunkarna/minuspoängen ändå när kortet går vidare.
+        const skipped = s.current!.losers.filter((id) => !s.current!.choices[id]);
+        const before = new Map(skipped.map((id) => [id, s.players.find((pl) => pl.id === id)!.drank]));
+        const sips = s.current!.sips;
         act(ids[0], { type: 'next' });
+        for (const id of skipped) assert.equal(s.players.find((pl) => pl.id === id)!.drank, before.get(id)! + sips, 'förlorare slapp dricka');
       }
     } else if (c.card.kind === 'trivia') {
       act(c.turnId, { type: 'trivia_answer', index: Math.floor(rng() * 4) });
@@ -214,6 +220,19 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       if (c.card.kind === 'minigame') {
         // Minigames har inga val – bara Nästa/Hoppa över.
         if (pausedPlayers(s).length === 0) assert.throws(() => act(ids[0], { type: 'choose', choice: 'drink' }), GameError, 'val på minigame');
+      }
+      // Gruppkort, minigames och kaoskort: den som fick klunkar/minuspoäng trycker själv, och det räknas.
+      if (canTake(c, s.players.find((pl) => pl.id === ids[1])!) && rng() < 0.7) {
+        const before = s.players.find((pl) => pl.id === ids[1])!.drank;
+        act(ids[0], { type: 'take', targetId: ids[1] });
+        act(ids[2], { type: 'take', targetId: ids[1] });
+        act(ids[1], { type: 'untake', targetId: ids[1] });
+        assert.equal(s.players.find((pl) => pl.id === ids[1])!.drank, before + c.sips, 'poängen räknades fel');
+        assert.equal(s.current!.taken![ids[1]], 1);
+        assert.throws(() => act(ids[0], { type: 'untake', targetId: ids[2] }), GameError, 'tog bort poäng som inte fanns');
+      }
+      if (c.card.kind === 'minigame') {
+        // (inga val)
       } else {
         for (const id of ids) {
           if (s.current?.choices[id] || pausedPlayers(s).length > 0) continue;
