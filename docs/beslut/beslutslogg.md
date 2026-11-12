@@ -497,3 +497,19 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Spelreglerna får en poängversion.
   - Vanligt spel har alltid klunkar.
 - **Var i koden:** `scoring` i `GameState` och `usesPoints()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `SCORINGS` i [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx).
+
+---
+
+## 2026-11-12 – Beslut efter UX-genomgången med sex personas
+
+### B79. ERROR är en del av det roliga, slutskärmen visar topp 3 och din plats, startsidan förklarar valen
+- **Beslut:** Efter Claudes UX-genomgång (sex personas, nio fynd) svarade Tilda på fyra frågor:
+  1. **ERROR är en del av det roliga.** "Jag vill spara"-knappen döljs inte i del 3–4, även om den leder rakt till ERROR. Inget ändras.
+  2. **Inget val för alkoholfritt.** Ingen "Jag dricker alkoholfritt" läggs till. Inget ändras.
+  3. **Slutskärmen visar bara topp 3 och din plats.**
+  4. **Startsidan förklarar de tre valen.**
+- **Tillägg (av Claude):**
+  - Slutskärmen: topp 3 som förut. Är du med i topp 3 får din ruta en svart ram och märket "Du". Är du inte det kommer en streckad ruta längst ned, "Din plats – Du blev 4:e av 6", med dina klunkar eller minuspoäng. Lika resultat delar plats ("Du blev delad 3:e av 6"). Ordningstalen skrivs på svenska (1:a, 2:a, 3:e, 4:e, 11:e, 21:a).
+  - Startsidan: en rad under varje val. "Skapa ett spel: Färdiga kort, klara att köra", "Joina ett spel: Skriv koden du har fått", "Bygg eget spel: Ni skriver korten själva".
+- **Inte byggt än:** övriga fynd i genomgången (bannern som täcker toppytan, huvudknappen under kanten på små mobiler, nykter-texten i reglerna, tryckytor och textstorlek, bilder och integritet, lobbyn med många spelare, felmeddelandet vid upptaget namn). Tilda har inte sagt om de ska göras.
+- **Var i koden:** `Stats` och `ordinal` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `Finished` och `Ended` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), [`src/app/page.tsx`](../../src/app/page.tsx), `.podium`, `.choices` i [`src/app/globals.css`](../../src/app/globals.css).
