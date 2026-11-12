@@ -526,3 +526,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Knapparna i korten har skuggan kvar. Den hade tagits bort inne i korten. Skuggan är svag och uppfyller inte 3 : 1, men ger knappen en kant mot kortet.
 - **Inte ändrat:** Fältets markering när man skriver är fortfarande bara en aningen mörkare grön. Bläddringsfokus med tangentbord syns på knappar och länkar (webbläsarens ram, 12–19 : 1).
 - **Var i koden:** `.input` och `.card .actions .btn` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B81. "Jag vägrar" är en knapp, och straffet tas direkt
+- **Beslut:** "Jag vägrar (och dricker/tar X)" på "Vems är bilden?" ska vara en knapp, inte en länk. När man trycker på den ska spelaren inte få frågan om att dricka eller ta minuspoäng en gång till.
+- **Tillägg (av Claude):** Knappen är en sekundärknapp med tunn svart ram och ingen fyllning (`btn outline`), så att den gula huvudknappen "Ladda upp här!" fortfarande sticker ut. Vägran drar straffet direkt (klunkar eller minuspoäng, en gång) och resultatkortet visar bara att personen vägrade och drack. Tidigare fick spelaren valen "Jag dricker / Jag vill spara / Dra ett utmaningskort" ovanpå, trots att knappen redan sagt vad vägran kostade. Ändrar den delen av B14.
+- **Var i koden:** `skip_photo` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `PhotoUpload` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `.btn.outline` i [`src/app/globals.css`](../../src/app/globals.css).
