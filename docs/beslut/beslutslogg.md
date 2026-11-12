@@ -558,3 +558,14 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Gäller både klunkar och poäng.
 - **Inte byggt:** regler som gäller flera kort ("Ny regel! … de kommande 5 korten") kan bara registreras på kortet där regeln kom.
 - **Var i koden:** `canTake()`, `autoDrink()` och åtgärderna `take`/`untake` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `TakeButtons` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `.take-*` i [`src/app/globals.css`](../../src/app/globals.css).
+
+---
+
+## 2026-11-12 – Bildkort
+
+### B84. "Jag vägrar" är en knapp, och valen kommer efteråt
+- **Beslut:** "Jag vägrar" på "Vems är bilden?" ska vara en knapp i samma gula stil som alla andra knappar, inte en länk.
+- **Beslut:** När man trycker på den ska man få upp valen: dricka eller ta minuspoäng, spara och dra ett utmaningskort (som på andra kort). Tilda ville först att straffet inte skulle upprepas efteråt, och förtydligade sedan att valen ska komma upp.
+- **Tillägg (av Claude):** Claude tolkade första önskemålet som att straffet skulle tas direkt och byggde det, men det ersattes av detta. Knappen heter nu bara "Jag vägrar". Texten "(och dricker 1 klunk)" togs bort ur knappen, eftersom valen kommer efteråt och texten annars nämnde straffet två gånger. Resultatkortet och valen är oförändrade.
+- **Obs (av Claude):** Om spelaren inte väljer något efter "Jag vägrar" får hen klunkarna automatiskt när någon trycker Nästa, enligt B83.
+- **Var i koden:** `PhotoUpload` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
