@@ -791,8 +791,3 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .choices { display: flex; flex-direction: column; gap: 16px; width: 100%; align-items: center; margin-top: 28px; }
 .choice { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
 .choice-hint { font-size: 15px; line-height: 1.3; text-align: center; margin: 0; }
-
-/* Sekundärknapp: tunn ram och ingen fyllning, så att huvudvalet (den gula knappen) fortfarande sticker ut. */
-.btn.outline { background: transparent; border: 2px solid var(--black); color: var(--black); box-shadow: none; }
-.card .actions .btn.outline { font-size: 16px; min-height: 50px; }
-.btn.outline:disabled { background: transparent; border-color: rgba(0, 0, 0, 0.35); }
