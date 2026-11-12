@@ -10,6 +10,12 @@ Varje gång Tilda tar ett beslut om spelet (innehåll, regler, design, teknik, h
 - Ändras ett tidigare beslut: skriv ett nytt beslut och markera det gamla med **Ersatt av Bxx**. Stryk aldrig gamla beslut.
 - Skilj på vad Tilda bestämde och vad Claude lade till själv (skriv det som **Tillägg (av Claude)**).
 
+## Arbetssätt – obligatoriskt
+Flera sessioner kan arbeta i repot samtidigt. För att de inte ska krocka, särskilt i beslutsloggen:
+- **Egen gren:** Jobba alltid i en egen gren och slå ihop via pull request. Skriv aldrig direkt på `main`.
+- **Beslutsloggen:** Antingen skrivs den i din egen gren och slås ihop via pull request, eller så skriver bara en session åt gången i loggen. Hämta senaste `main` innan du väljer nummer.
+- **Konflikt i loggen:** Behåll det som redan ligger på `main`, numrera om dina egna nya beslut efter dem och rätta hänvisningarna.
+
 ## Projektet
 - Next.js (App Router) på Vercel, Supabase för databas, realtid och bilder. Se [README.md](README.md).
 - All spellogik finns i `src/lib/engine.ts`. Kör `npm test` (simulerar 200 spel) och `npm run typecheck` efter ändringar.
