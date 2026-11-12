@@ -460,17 +460,8 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
         c.photoUrl = action.url;
         c.phase = 'voting';
       } else {
-        // Knappen säger redan vad vägran kostar, så straffet tas direkt och spelaren får inget nytt val efteråt.
         c.photoSkipped = true;
-        me.drank += c.sips;
-        c.choices[playerId] = 'drink';
-        logEvent(
-          s,
-          playerId,
-          usesPoints(s)
-            ? `vägrade ladda upp en bild och tog ${sipsWord(c.sips, true)}`
-            : `vägrade ladda upp en bild och drack ${sipsWord(c.sips, false)}`,
-        );
+        logEvent(s, playerId, 'vägrade ladda upp en bild');
         c.losers = [playerId];
         c.phase = 'result';
       }

@@ -466,7 +466,7 @@ function PhotoUpload(p: CardProps) {
           {working ? 'Laddar upp…' : 'Ladda upp här!'}
         </button>
         <button className="btn yellow" disabled={working || p.busy} onClick={() => p.act({ type: 'skip_photo' })}>
-          {usesPoints(p.state) ? `Jag vägrar (och tar ${sipsText(cur.sips, true)})` : `Jag vägrar (och dricker ${sipsText(cur.sips)})`}
+          Jag vägrar
         </button>
       </div>
     </CardScreen>

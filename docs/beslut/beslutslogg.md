@@ -553,8 +553,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ## 2026-11-12 – Bildkort
 
-### B83. "Jag vägrar" är en knapp, och straffet tas direkt
-- **Beslut:** "Jag vägrar (och dricker/tar X)" på "Vems är bilden?" ska vara en knapp, inte en länk. När man trycker på den ska spelaren inte få frågan om att dricka eller ta minuspoäng en gång till.
-- **Beslut:** Knappen ska se ut som alla andra knappar (gul, `btn yellow`). Claude provade först en sekundärknapp med ram, men Tilda ville inte ha den.
-- **Tillägg (av Claude):** Vägran drar straffet direkt (klunkar eller minuspoäng, en gång) och resultatkortet visar bara att personen vägrade och drack. Tidigare fick spelaren valen "Jag dricker / Jag vill spara / Dra ett utmaningskort" ovanpå, trots att knappen redan sagt vad vägran kostade. Ändrar den delen av B14.
-- **Var i koden:** `skip_photo` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `PhotoUpload` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+### B83. "Jag vägrar" är en knapp, och valen kommer efteråt
+- **Beslut:** "Jag vägrar" på "Vems är bilden?" ska vara en knapp i samma gula stil som alla andra knappar, inte en länk.
+- **Beslut:** När man trycker på den ska man få upp valen: dricka eller ta minuspoäng, spara och dra ett utmaningskort (som på andra kort). Tilda ville först att straffet inte skulle upprepas efteråt, och förtydligade sedan att valen ska komma upp.
+- **Tillägg (av Claude):** Claude tolkade första önskemålet som att straffet skulle tas direkt och byggde det, men det ersattes av detta. Knappen heter nu bara "Jag vägrar". Texten "(och dricker 1 klunk)" togs bort ur knappen, eftersom valen kommer efteråt och texten annars nämnde straffet två gånger. Resultatkortet och valen är oförändrade.
+- **Var i koden:** `PhotoUpload` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
