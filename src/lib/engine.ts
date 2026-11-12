@@ -14,7 +14,7 @@ const partIndex = (part: number) => Math.min(Math.max(part, 1), SIPS_PER_PART.le
 export const savedCap = (part: number) => SAVED_CAP[partIndex(part)];
 export const sipsForPart = (part: number) => SIPS_PER_PART[partIndex(part)];
 export const MAX_NAME_LENGTH = 20;
-/** I "Bygg eget spel" måste alla skriva minst så här många kort (minigames räknas inte). */
+/** I "Bygg eget spel" måste alla skriva minst så här många kort, av vilken typ som helst (minigames räknas också). */
 export const MIN_OWN_CARDS = 3;
 export const MAX_OWN_CARDS = 10;
 
@@ -72,7 +72,7 @@ export function newGameState(host: Player, mode: GameMode = 'classic', occasion?
 
 /** Antal kort spelaren skrivit som räknas mot kravet i "Bygg eget spel". */
 export function ownCardCount(state: GameState | PublicState, playerId: string): number {
-  return state.customCards.filter((c) => c.by === playerId && c.kind !== 'minigame').length;
+  return state.customCards.filter((c) => c.by === playerId).length;
 }
 
 export function cleanName(raw: string): string {

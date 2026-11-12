@@ -229,8 +229,8 @@ const CARD_TYPES: {
   {
     key: 'minigame',
     kind: 'minigame',
-    label: 'Minigame (frivilligt)',
-    desc: 'En lek eller regel som alla gör tillsammans. Ge den ett namn och förklara reglerna. Räknas inte till dina kort.',
+    label: 'Minigame',
+    desc: 'En lek eller regel som alla gör tillsammans. Ge den ett namn och förklara reglerna.',
     example: 'Ingen får prata förrän nästa kort. Den som pratar dricker 2 klunkar.',
     titleExample: 'Tyst minut',
   },
@@ -255,7 +255,7 @@ const FAMILY_TYPE_TEXT: Partial<Record<CardTypeKey, { desc: string; example: str
     example: 'Alla som har randiga strumpor får 2 minuspoäng.',
   },
   minigame: {
-    desc: 'En lek eller regel som alla gör tillsammans. Ge den ett namn och förklara reglerna. Räknas inte till dina kort.',
+    desc: 'En lek eller regel som alla gör tillsammans. Ge den ett namn och förklara reglerna.',
     example: 'Alla står stilla som statyer i 20 sekunder. Den som rör sig först får 2 minuspoäng.',
   },
 };

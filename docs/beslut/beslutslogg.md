@@ -290,7 +290,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ### B54. Alla spelare måste skriva minst 3 kort
 - **Beslut:** I "Bygg eget spel" är det obligatoriskt för alla spelare att skriva minst 3 frågor, påståenden eller utmaningar.
-- **Tillägg (av Claude):** Man kan inte gå vidare (och servern godkänner inte "redo") förrän man skrivit 3. Max 10 kort per person. Egna minigames räknas inte till de 3. Den som joinar efter att spelet startat slipper skriva.
+- **Tillägg (av Claude):** Man kan inte gå vidare (och servern godkänner inte "redo") förrän man skrivit 3. Max 10 kort per person. Egna minigames räknas inte till de 3 (**ersatt av B81**: nu räknas de). Den som joinar efter att spelet startat slipper skriva.
 - **Var i koden:** `MIN_OWN_CARDS`, `ownCardCount()` och `ready` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `EgnaKort` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
 
 ### B55. Trivia förvald, minigames förvalda plus frivilliga egna
@@ -526,3 +526,15 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Knapparna i korten har skuggan kvar. Den hade tagits bort inne i korten. Skuggan är svag och uppfyller inte 3 : 1, men ger knappen en kant mot kortet.
 - **Inte ändrat:** Fältets markering när man skriver är fortfarande bara en aningen mörkare grön. Bläddringsfokus med tangentbord syns på knappar och länkar (webbläsarens ram, 12–19 : 1).
 - **Var i koden:** `.input` och `.card .actions .btn` i [`src/app/globals.css`](../../src/app/globals.css).
+
+---
+
+## 2026-11-12 – Egna kort
+
+### B81. Alla korttyper räknas mot de 3 egna korten
+- **Beslut:** Man ska kunna gå vidare när man skrivit tre kort, oavsett typ. Det ska till exempel gå att skriva tre kort av samma kategori.
+- **Varför:** Tilda hade skrivit tre kort (Vem i rummet?, Direkt fråga och ett minigame) men knappen var fortfarande grå, eftersom minigames inte räknades.
+- **Tillägg (av Claude):**
+  - Egna minigames räknas nu också mot kravet. Det ändrar Claudes eget tillägg i B54 ("Egna minigames räknas inte till de 3").
+  - Typen heter nu bara "Minigame", inte "Minigame (frivilligt)".
+- **Var i koden:** `ownCardCount()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `CARD_TYPES` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
