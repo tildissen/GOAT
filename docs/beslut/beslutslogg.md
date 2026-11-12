@@ -593,3 +593,18 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Innan en pull request öppnas hämtar man senaste `main`, lägger sin gren ovanpå och kör testerna.
   - Har någon annan tagit samma beslutsnummer byter man till nästa lediga.
 - **Var i koden:** [`CLAUDE.md`](../../CLAUDE.md).
+## 2026-11-12 – Spelreglerna
+
+### B87. Kortare spelregler med en egen version för varje typ av spel
+- **Beslut:** Tilda ville se över spelreglerna för alla typer av spel. De var cirka 130 ord, nästan likadana i alla lägen, och många läste dem inte.
+- **Tillägg (av Claude):**
+  - Reglerna är nu en kort rad i lägets ton och tre numrerade punkter med en fetstilt rubrik var.
+  - Det blir cirka 40–45 ord, och allt får plats på en liten mobil (iPhone SE) utan att man scrollar.
+  - Det finns fem versioner:
+    - **Vanligt spel och Fest med klunkar:** "Börjar oskyldigt. Slutar i fullständigt kaos." 1. Ett kort i taget (4 delar, vildare för varje del). 2. Vill du inte? (drick, spara eller dra ett utmaningskort). 3. Spara klunkar (max 5, sedan 4, 3 och 2, fullt = ERROR).
+    - **AW med klunkar:** samma punkter, men introt "AW-versionen: lugnare frågor, samma kaos i slutet."
+    - **AW och Fest med poäng:** "I kväll spelar ni om poäng" (AW: "AW – i kväll spelar ni om poäng."). Punkt 2 blir minuspoäng eller utmaningskort, och punkt 3 blir "Minst vinner".
+    - **Familjespel:** "G.O.A.T. för hela familjen – utan alkohol." "Lite svårare" i stället för "vildare", plus minuspoäng och Minst vinner.
+  - I "Bygg eget spel" säger punkt 1 "Era egna kort blandas in."
+  - Borttaget: "Är du nykter? Tråkigt." och "Det här är ett dryckesspel, inte en sparbank". Det var också ett av fynden i UX-genomgången (B79).
+- **Var i koden:** `rulesFor()` och `Regler` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.rules` i [`src/app/globals.css`](../../src/app/globals.css).

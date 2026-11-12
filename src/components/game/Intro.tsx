@@ -69,62 +69,73 @@ function StorEj({ onDone }: { onDone: () => void }) {
   );
 }
 
+type Rule = { title: string; text: string };
+
+/**
+ * Spelreglerna – korta och olika för varje typ av spel (B87): en rad i lägets ton och tre punkter.
+ * Vanligt spel och Fest med klunkar, AW med klunkar, AW/Fest med poäng och Familjespel.
+ */
+function rulesFor(state: GameProps['state']): { intro: string; rules: Rule[] } {
+  const custom = state.mode === 'custom';
+  const cards: Rule = {
+    title: 'Ett kort i taget',
+    text: custom
+      ? 'Era egna kort blandas in. 4 delar, vildare för varje del.'
+      : 'Frågor, utmaningar och minigames. 4 delar, vildare för varje del.',
+  };
+  if (isFamily(state)) {
+    return {
+      intro: 'G.O.A.T. för hela familjen – utan alkohol.',
+      rules: [
+        { ...cards, text: cards.text.replace('vildare', 'lite svårare') },
+        { title: 'Vill du inte?', text: 'Ta minuspoäng – eller dra ett utmaningskort och gör det.' },
+        { title: 'Minst vinner', text: 'Den med minst minuspoäng i slutet vinner.' },
+      ],
+    };
+  }
+  if (usesPoints(state)) {
+    return {
+      intro: state.occasion === 'aw' ? 'AW – i kväll spelar ni om poäng.' : 'I kväll spelar ni om poäng i stället för klunkar.',
+      rules: [
+        cards,
+        { title: 'Vill du inte?', text: 'Ta minuspoäng – eller dra ett utmaningskort och gör det.' },
+        { title: 'Minst vinner', text: 'Den med minst minuspoäng i slutet vinner.' },
+      ],
+    };
+  }
+  return {
+    intro:
+      state.occasion === 'aw' && custom
+        ? 'AW-versionen: lugnare frågor, samma kaos i slutet.'
+        : 'Börjar oskyldigt. Slutar i fullständigt kaos.',
+    rules: [
+      cards,
+      { title: 'Vill du inte?', text: 'Drick, spara – eller dra ett utmaningskort och gör det.' },
+      { title: 'Spara klunkar', text: 'Max 5, sedan 4, 3 och 2. Fullt = ERROR och du dricker allt.' },
+    ],
+  };
+}
+
 function Regler({ state, onDone }: { state: GameProps['state']; onDone: () => void }) {
-  const parts = '4 delar';
+  const { intro, rules } = rulesFor(state);
   return (
     <Screen bg="coral">
       <h1 className="display big" style={{ marginTop: 12, marginBottom: 16 }}>
         SPELREGLER
       </h1>
       <div className="card green" style={{ padding: '24px 18px', gap: 16 }}>
-        {usesPoints(state) ? (
-          <>
-            <p className="body-text">
-              {isFamily(state) ? (
-                <>
-                  <strong>Välkommen</strong> till G.O.A.T. – familjeversionen!
-                </>
-              ) : (
-                <>
-                  <strong>Välkommen</strong> till G.O.A.T. – i kväll spelar ni om poäng i stället för klunkar!
-                </>
-              )}
-            </p>
-            <p className="body-text">
-              Spelet är uppdelat i {parts}, och för varje del blir utmaningarna lite svårare. Här styr nästa kort allt.
-              Det kan vara en fråga, ett spel eller en utmaning – och ingen vet vad som väntar.
-            </p>
-            <p className="body-text">
-              <strong>Vill du inte svara?</strong> Då tar du minuspoäng – eller drar ett utmaningskort. Men då måste du
-              också göra utmaningen. Inga ursäkter, inga ”jag gör det sen”.
-            </p>
-            <p className="body-text">
-              Den som har <strong>minst minuspoäng</strong> när spelet är slut vinner.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="body-text">
-              <strong>Välkommen</strong> till spelet som börjar oskyldigt… och slutar i fullständigt <em>kaos</em>.
-            </p>
-            <p className="body-text">
-              Spelet är uppdelat i {parts}, och för varje del blir frågorna sjukare, minigamesen mer kaotiska och tempot
-              så högt att du börjar ifrågasätta dina livsval.
-            </p>
-            <p className="body-text">
-              Här styr nästa kort allt. Det kan vara en fråga, ett spel eller en utmaning – och nej, ingen vet vad som
-              väntar.
-            </p>
-            <p className="body-text">
-              <strong>Är du nykter?</strong> Tråkigt. Men lugn, du kan alltid dra ett utmaningskort i stället för att
-              dricka. Men då måste du också göra utmaningen. Inga ursäkter, inga kompromisser, inga ”jag gör det sen”.
-            </p>
-            <p className="body-text">
-              Du får <strong>spara</strong> klunkar – men taket sjunker för varje del: 5, 4, 3 och sist bara 2. Når du
-              taket pausas spelet tills du druckit dem. Det här är ett dryckesspel, inte en sparbank.
-            </p>
-          </>
-        )}
+        <p className="body-text rules-intro">{intro}</p>
+        <ol className="rules">
+          {rules.map((r, i) => (
+            <li key={r.title}>
+              <span className="rule-num">{i + 1}</span>
+              <div>
+                <strong>{r.title}</strong>
+                <p>{r.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
         <button className="btn ink" onClick={onDone} style={{ marginTop: 8 }}>
           Nästa
         </button>
