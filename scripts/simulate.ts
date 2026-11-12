@@ -48,6 +48,9 @@ assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 4), 'Den som bli
 assert.equal(scaleSips('tar 1 extra klunk.', 2), 'tar 2 extra klunkar.');
 // AW stegrar lugnare: som mest +2.
 assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 4, 'aw'), 'Den som blinkar först tar 4 klunkar.');
+// AW: max 4 klunkar på ett kort, även egna kort med stora siffror.
+assert.equal(scaleSips('Hen delar ut 3 klunkar.', 4, 'aw'), 'Hen delar ut 4 klunkar.');
+assert.equal(scaleSips('Alla tar 10 klunkar.', 1, 'aw'), 'Alla tar 4 klunkar.');
 assert.equal(sipsForPart(4, 'aw'), 3);
 assert.equal(sipsForPart(4, 'fest'), 6);
 assert.equal(scaleSips('ett nummer mellan 1–5 samtidigt', 3), 'ett nummer mellan 1–5 samtidigt');
@@ -163,6 +166,10 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
     }
     const c = s.current!;
     seen.add(c.card.kind);
+    if (mode === 'custom' && occasion === 'aw') {
+      assert.ok(c.sips <= 4, `för många klunkar i AW: ${c.sips}`);
+      for (const m of c.text.matchAll(/(\d+)\s+(?:extra\s+)?(?:klunk|minuspoäng)/g)) assert.ok(Number(m[1]) <= 4, `för många klunkar i AW: ${c.text}`);
+    }
     if (c.card.targetId) assert.equal(c.turnId, c.card.targetId, `riktat kort hamnade fel: ${c.text}`);
     if (family) {
       // Familjespel: aldrig något om att dricka, och man kan inte spara.

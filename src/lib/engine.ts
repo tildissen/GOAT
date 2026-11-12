@@ -11,6 +11,8 @@ const SAVED_CAP = [5, 4, 3, 2];
 const SIPS_PER_PART = [1, 2, 4, 6];
 /** AW med kollegor stegrar lugnare (B90): 1, 2, 3, 3 per kort, och kortens siffror ökar som mest med 2. */
 const AW_SIPS_PER_PART = [1, 2, 3, 3];
+/** AW: aldrig mer än så här många klunkar på ett kort, inte heller på spelarnas egna kort (B93). */
+export const AW_MAX_SIPS = 4;
 
 const partIndex = (part: number) => Math.min(Math.max(part, 1), SIPS_PER_PART.length) - 1;
 export const savedCap = (part: number) => SAVED_CAP[partIndex(part)];
@@ -110,7 +112,8 @@ export function addPlayer(state: GameState, rawName: string, id: string, now: nu
 /** Byter siffror före "klunk" så att det blir fler klunkar för varje del. */
 export function scaleSips(text: string, part: number, occasion?: Occasion): string {
   return text.replace(/(\d+)(\s+(?:extra\s+)?)(klunk(?:ar)?|minuspoäng)/g, (_, n: string, space: string, unit: string) => {
-    const sips = Number(n) + sipsForPart(part, occasion) - 1;
+    const scaled = Number(n) + sipsForPart(part, occasion) - 1;
+    const sips = occasion === 'aw' ? Math.min(scaled, AW_MAX_SIPS) : scaled;
     if (unit === 'minuspoäng') return `${sips}${space}minuspoäng`;
     return `${sips}${space}${sips === 1 ? 'klunk' : 'klunkar'}`;
   });

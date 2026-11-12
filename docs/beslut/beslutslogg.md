@@ -622,7 +622,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ## 2026-11-12 – Inför AW med kollegor
 
-### B90. AW stegrar lugnare
+### B90. AW stegrar lugnare (**Max antal klunkar ändrat av B93**)
 - **Beslut:** I AW ska det inte bli lika mycket att dricka mot slutet. Det gäller AW-versionen i "Bygg eget spel". Fest och vanligt spel är som förut.
 - **Alternativ:** samma stegring i alla lägen · spela AW med poäng i stället.
 - **Varför:** I ett testspel med fem kollegor drack den som drack mest 71 klunkar, och korten i del 4 sa 6–7 klunkar.
@@ -652,3 +652,12 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Utmaningen "Visa den senaste skärmdumpen du tog" → "Visa din favoritbild från i somras och berätta om den."
   - De fyra korten är uppdaterade direkt i Supabase via connectorn (bara de fyra raderna ändrades). Familjespel och vanligt spel är inte ändrade.
 - **Var i koden:** [`content/aw.txt`](../../content/aw.txt), [`supabase/seed.sql`](../../supabase/seed.sql).
+
+### B93. Max 4 klunkar på ett kort i AW
+- **Beslut:** I AW ska det vara som mest 4 klunkar på ett kort.
+- **Tillägg (av Claude):**
+  - Alla siffror före "klunk" eller "minuspoäng" stoppas vid 4 i AW. Det gäller förvalda kort, utmaningskort man drar, minigames, kaoskort och spelarnas egna kort (t.ex. "Alla tar 10 klunkar" blir "Alla tar 4 klunkar").
+  - Vanliga kort ger redan som mest 3 klunkar per kort (B90).
+  - Fest och vanligt spel är oförändrade.
+  - Testerna kontrollerar att inget AW-kort har mer än 4.
+- **Var i koden:** `AW_MAX_SIPS` och `scaleSips()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
