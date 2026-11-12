@@ -787,10 +787,9 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .podium .place { font-weight: 700; font-size: 20px; min-width: 38px; text-align: center; line-height: 1; }
 .you-tag { font-style: normal; font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--black); color: var(--white); border-radius: 999px; padding: 2px 8px; margin-left: 8px; vertical-align: 2px; }
 
-/* Startsidan: en rad under varje val */
+/* Startsidan: de tre valen */
 .choices { display: flex; flex-direction: column; gap: 16px; width: 100%; align-items: center; margin-top: 28px; }
 .choice { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
-.choice-hint { font-size: 15px; line-height: 1.3; text-align: center; margin: 0; }
 
 /* Vem fick klunkarna/minuspoängen? (gruppkort, minigames, kaoskort) */
 .take-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
