@@ -23,7 +23,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 
 ## 2026-10-27 – Intervju: hur spelet fungerar
 
-### B4. Alla spelar på sin egen mobil
+### B4. Alla spelar på sin egen mobil (**Ersatt av B82**)
 - **Beslut:** När man spelar visas kortet bara **hos den vars tur det är**. De andra ser vems tur det är.
 - **Alternativ:** samma kort hos alla samtidigt · bara värdens mobil visar kortet.
 - **Var i koden:** [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
@@ -538,3 +538,13 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Egna minigames räknas nu också mot kravet. Det ändrar Claudes eget tillägg i B54 ("Egna minigames räknas inte till de 3").
   - Typen heter nu bara "Minigame", inte "Minigame (frivilligt)".
 - **Var i koden:** `ownCardCount()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `CARD_TYPES` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B82. Alla ser kortet, utom "Vems är bilden?"
+- **Beslut:** Man ska se vilket kort de andra får, så länge det inte är ett "Vems är bilden?"-kort. Ersätter B4 ("kortet visas bara hos den vars tur det är").
+- **Tillägg (av Claude):**
+  - När det är någon annans tur på en direkt fråga, en trivia eller en utmaning till en person ser de andra samma kort med namnet, men utan knappar.
+  - På trivia ser de svarsalternativen. När frågan är besvarad ser de vad som var rätt och fel.
+  - Under kortet står vad personen valde, t.ex. "Tuva drack 2 klunkar" eller "Tilda svarade rätt!".
+  - Ställningen visas under kortet som förut.
+  - Bildkorten är fortfarande hemliga.
+- **Var i koden:** `Waiting` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).

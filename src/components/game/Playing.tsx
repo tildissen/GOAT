@@ -5,7 +5,7 @@ import { compressImage } from '@/lib/client';
 import { canPressNext, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import Face from '../Face';
-import { Avatar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
+import { KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
 import { Board, ChoiceButtons, choiceText, nameOf, possessive, sipsText, type GameProps } from './shared';
 
 /** Visar kortet som spelas just nu – olika beroende på korttyp och vems tur det är. */
@@ -474,22 +474,69 @@ function PhotoUpload(p: CardProps) {
 }
 
 /* ---------- Någon annans tur ---------- */
-const DOING: Record<string, string> = {
-  direkt: 'svarar på en fråga',
-  trivia: 'kör trivia',
-  utmaning: 'gör en utmaning',
-};
-
+/**
+ * De andra ser samma kort som den vars tur det är (frågan, trivian med svarsalternativ eller utmaningen)
+ * och vad hen valde – men kan inte svara själva. Bara "Vems är bilden?" hålls hemligt.
+ */
 function Waiting(p: CardProps) {
   const { cur, state } = p;
-  const player = state.players.find((pl) => pl.id === cur.turnId);
+  const name = nameOf(state, cur.turnId);
+  const kind = cur.card.kind;
+  const options = cur.card.options ?? [];
+  const picked = cur.triviaPick;
+  const choice = cur.choices[cur.turnId];
+  const family = usesPoints(state);
   return (
-    <CardScreen game={p}>
-      {player && <Avatar player={player} big />}
-      <h2 className="display big name-font">{possessive(nameOf(state, cur.turnId))} tur</h2>
-      <p className="body-text">{nameOf(state, cur.turnId)} {DOING[cur.card.kind] ?? 'spelar'}…</p>
-      <Board state={state} active={p.view.active} meId={p.me.id} />
-      {!p.view.active.includes(cur.turnId) && <NextButton {...p} label="Hoppa över" />}
+    <CardScreen
+      game={p}
+      bg={kind === 'utmaning' ? 'coral' : undefined}
+      card={kind === 'utmaning' ? 'green' : undefined}
+      below={
+        <>
+          {!p.view.active.includes(cur.turnId) && <NextButton {...p} label="Hoppa över" />}
+          <Board state={state} active={p.view.active} meId={p.me.id} />
+        </>
+      }
+    >
+      <div className="card-top">
+        <KindTag kind={kind === 'trivia' ? 'trivia' : kind === 'direkt' ? 'direkt' : 'utmaning'} />
+        <span className="chip">{possessive(name)} tur</span>
+      </div>
+      <p className="heading name-font name-big">{name}</p>
+      <div className="card-body">
+        <p className={`card-text${kind === 'utmaning' ? '' : ' big'}`}>{cur.text}</p>
+      </div>
+      {kind === 'trivia' && (
+        <div className="options">
+          {options.map((opt, i) => {
+            const cls =
+              picked != null && cur.card.answerIndex != null
+                ? i === cur.card.answerIndex
+                  ? ' right'
+                  : i === picked
+                    ? ' wrong'
+                    : ''
+                : '';
+            return (
+              <div key={i} className={`option${cls}`} aria-disabled="true">
+                <span className="letter">{'ABCD'[i]}</span>
+                <span>{opt}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <p className="body-text">
+        {choice
+          ? choice === 'answered'
+            ? kind === 'trivia'
+              ? `${name} svarade rätt!`
+              : `${name} svarar ✓`
+            : `${name} ${choiceText(choice, cur.sips, family)}`
+          : kind === 'trivia' && picked != null
+            ? `${name} svarade fel – väljer nu…`
+            : `${name} ${kind === 'trivia' ? 'funderar' : kind === 'direkt' ? 'ska svara' : 'ska göra utmaningen'}…`}
+      </p>
     </CardScreen>
   );
 }
