@@ -730,3 +730,47 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .podium .medal { font-size: 26px; line-height: 1; }
 .podium .stat-name { font-size: 19px; font-weight: 700; }
 .podium .stat-name small { font-size: 13px; font-weight: 400; opacity: 0.8; }
+
+/* ⚡ Kaoskort (del 3–4): svart kort som skakar till när det dyker upp */
+.card.kaos {
+  background: var(--black);
+  color: var(--white);
+  animation: card-in 0.35s ease, kaos-shake 0.6s ease 0.35s 2;
+}
+.card.kaos .kind { background: var(--yellow); color: var(--black); }
+.card.kaos .card-text { color: var(--white); }
+.kaos-title { color: var(--yellow); }
+@keyframes kaos-shake {
+  0%, 100% { transform: none; }
+  20% { transform: translateX(-8px) rotate(-1.5deg); }
+  40% { transform: translateX(7px) rotate(1.5deg); }
+  60% { transform: translateX(-5px) rotate(-1deg); }
+  80% { transform: translateX(4px) rotate(0.5deg); }
+}
+
+/* Introskärm när en ny del börjar – vildare för varje del */
+.overlay.part-intro { z-index: 58; background: var(--cyan); color: var(--black); cursor: pointer; }
+.overlay.part-intro.part-2 { background: var(--yellow); }
+.overlay.part-intro.part-3 { background: var(--coral); }
+.overlay.part-intro.part-4 { background: var(--black); color: var(--yellow); }
+.part-intro-inner { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.part-intro-label { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; }
+.part-intro-name {
+  margin: 0;
+  font-family: var(--font-knewave), var(--font-glacial), sans-serif;
+  font-size: clamp(36px, 11vw, 72px);
+  line-height: 1.05;
+  max-width: calc(100vw - 32px);
+  overflow-wrap: anywhere;
+  transform: rotate(-4deg);
+}
+.part-intro.part-3 .part-intro-name { animation: kaos-shake 0.5s ease infinite; }
+.part-intro.part-4 .part-intro-name { animation: kaos-shake 0.35s ease infinite; text-shadow: 4px 4px 0 var(--coral); }
+.part-intro-count { margin: 18px 0; font-size: 110px; font-weight: 700; line-height: 1; animation: count-pop 1.1s ease; }
+.part-intro-info { margin: 0; font-size: 17px; font-weight: 700; opacity: 0.85; }
+@keyframes count-pop {
+  0% { transform: scale(1.8); opacity: 0; }
+  25% { transform: scale(1); opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0.2; }
+}

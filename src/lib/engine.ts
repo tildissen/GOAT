@@ -3,8 +3,16 @@ import type { Action, Current, CustomCard, CustomKind, DeckCard, GameMode, GameS
 
 export const MIN_PLAYERS = 3;
 export const MAX_PLAYERS = 15;
-/** Når man så här många sparade klunkar (eller fler) pausas spelet tills man druckit. */
+/** Når man så här många sparade klunkar (eller fler) pausas spelet tills man druckit. Gäller del 1. */
 export const MAX_SAVED = 5;
+/** Taket för sparade klunkar sjunker för varje del: 5, 4, 3, 2. */
+const SAVED_CAP = [5, 4, 3, 2];
+/** Klunkar per kort i del 1–4. Utmaningar och minigames: siffran på kortet plus (värdet − 1). */
+const SIPS_PER_PART = [1, 2, 4, 6];
+
+const partIndex = (part: number) => Math.min(Math.max(part, 1), SIPS_PER_PART.length) - 1;
+export const savedCap = (part: number) => SAVED_CAP[partIndex(part)];
+export const sipsForPart = (part: number) => SIPS_PER_PART[partIndex(part)];
 export const MAX_NAME_LENGTH = 20;
 /** I "Bygg eget spel" måste alla skriva minst så här många kort (minigames räknas inte). */
 export const MIN_OWN_CARDS = 3;
@@ -99,7 +107,7 @@ export function addPlayer(state: GameState, rawName: string, id: string, now: nu
 /** Byter siffror före "klunk" så att det blir fler klunkar för varje del. */
 export function scaleSips(text: string, part: number): string {
   return text.replace(/(\d+)(\s+(?:extra\s+)?)(klunk(?:ar)?|minuspoäng)/g, (_, n: string, space: string, unit: string) => {
-    const sips = Number(n) + part - 1;
+    const sips = Number(n) + sipsForPart(part) - 1;
     if (unit === 'minuspoäng') return `${sips}${space}minuspoäng`;
     return `${sips}${space}${sips === 1 ? 'klunk' : 'klunkar'}`;
   });
@@ -137,7 +145,7 @@ export function isSoloCard(card: DeckCard): boolean {
 }
 
 export function pausedPlayers(state: GameState | PublicState): Player[] {
-  return state.players.filter((p) => p.saved >= MAX_SAVED);
+  return state.players.filter((p) => p.saved >= savedCap(state.part));
 }
 
 function pick<T>(items: T[], rng: Rng): T {
@@ -203,7 +211,8 @@ function deal(s: GameState, ctx: Ctx) {
     targetIds = everyone;
   }
 
-  let text = card.kind === 'utmaning' || card.kind === 'minigame' ? scaleSips(card.text, s.part) : card.text;
+  const hasNumbers = card.kind === 'utmaning' || card.kind === 'minigame' || card.kind === 'kaos';
+  let text = hasNumbers ? scaleSips(card.text, s.part) : card.text;
   text = text.replace(/\bX\b/g, nameOf(targetIds[0])).replace(/\bY\b/g, nameOf(targetIds[1] ?? targetIds[0]));
   if (teams) {
     text = text
@@ -214,7 +223,7 @@ function deal(s: GameState, ctx: Ctx) {
   // På utmaningar och minigames gäller antalet klunkar som står på kortet.
   if (isFamily(s)) text = familyText(text);
   const sipsOnCard =
-    card.kind === 'utmaning' || card.kind === 'minigame' ? text.match(/(\d+)\s+(?:extra\s+)?(?:klunk|minuspoäng)/) : null;
+    hasNumbers ? text.match(/(\d+)\s+(?:extra\s+)?(?:klunk|minuspoäng)/) : null;
 
   s.seq += 1;
   s.current = {
@@ -224,7 +233,7 @@ function deal(s: GameState, ctx: Ctx) {
     turnId: turn.id,
     targetIds,
     teams,
-    sips: sipsOnCard ? Number(sipsOnCard[1]) : s.part,
+    sips: sipsOnCard ? Number(sipsOnCard[1]) : sipsForPart(s.part),
     phase: card.kind === 'vem' ? 'voting' : card.kind === 'bild' ? 'upload' : 'play',
     votes: {},
     losers: [],

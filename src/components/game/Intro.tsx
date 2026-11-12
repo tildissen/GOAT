@@ -112,8 +112,8 @@ function Regler({ state, onDone }: { state: GameProps['state']; onDone: () => vo
               dricka. Men då måste du också göra utmaningen. Inga ursäkter, inga kompromisser, inga ”jag gör det sen”.
             </p>
             <p className="body-text">
-              Du får <strong>spara</strong> klunkar – men så fort du har 5 sparade pausas spelet tills du druckit
-              dem. Det här är ett dryckesspel, inte en sparbank.
+              Du får <strong>spara</strong> klunkar – men taket sjunker för varje del: 5, 4, 3 och sist bara 2. Når du
+              taket pausas spelet tills du druckit dem. Det här är ett dryckesspel, inte en sparbank.
             </p>
           </>
         )}

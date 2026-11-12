@@ -7,6 +7,7 @@
 #   alla|utmaning              – utmaning för hela gruppen
 #   minigame|namn|beskrivning
 #   bild|uppmaning             – Vems är bilden?
+#   kaos|händelse              – kaoskort i de sista delarna (alla, värden trycker Nästa)
 # Antal minuspoäng i utmaningar och minigames ökar automatiskt per del.
 
 vem|Vem skulle klara sig längst utan mobil?
@@ -117,6 +118,13 @@ minigame|Viskleken|Personen till höger viskar en fråga i ditt öra. Du säger 
 minigame|Nej-förbud|Ny regel! Ingen får säga "nej" de kommande 5 korten. Den som gör det får 2 minuspoäng.
 minigame|Frågemästaren|Ny regel! Den vars tur det är blir frågemästare de kommande 5 korten. Den som svarar på en fråga från frågemästaren får 1 minuspoäng.
 minigame|Jag har aldrig|Alla håller upp tre fingrar. Säg i tur och ordning något du aldrig har gjort. De som har gjort det fäller ett finger. Den som först har noll fingrar kvar får 3 minuspoäng.
+
+kaos|Alla byter plats med personen till vänster. NU!
+kaos|Tystnad! Den som säger något först får 3 minuspoäng.
+kaos|Alla reser sig upp. Den som sätter sig sist får 3 minuspoäng.
+kaos|Alla gör sin bästa djurimitation samtidigt i 10 sekunder!
+kaos|Byt namn med personen till vänster resten av delen. Säger någon fel namn får hen 2 minuspoäng.
+kaos|Alla som skrattar de kommande 10 sekunderna får 2 minuspoäng.
 
 bild|Ladda upp den sötaste djurbilden du har i mobilen.
 bild|Ladda upp den senaste bilden du tog på mat.

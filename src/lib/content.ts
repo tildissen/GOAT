@@ -26,6 +26,7 @@ export interface ContentFiles {
   bild: string;
   aw: string;
   familj: string;
+  kaos: string;
 }
 
 export const CONTENT_FILES: Record<keyof ContentFiles, string> = {
@@ -37,6 +38,7 @@ export const CONTENT_FILES: Record<keyof ContentFiles, string> = {
   bild: 'vems-ar-bilden.txt',
   aw: 'aw.txt',
   familj: 'familj.txt',
+  kaos: 'kaos.txt',
 };
 
 /** Tolkar en fil med förvalda kort för ett tillfälle (aw.txt, familj.txt). */
@@ -56,6 +58,8 @@ function parseOccasion(source: string, occasion: Occasion, file: string): Omit<C
         return { kind: 'minigame', title: rest[0], text: rest[1], players: 0, occasion };
       case 'bild':
         return { kind: 'bild', text: rest[0], players: 1, occasion };
+      case 'kaos':
+        return { kind: 'kaos', text: rest[0], players: 0, occasion };
       default:
         throw new Error(`Okänd korttyp "${type}" i ${file}`);
     }
@@ -92,6 +96,9 @@ export function parseContent(files: ContentFiles): Omit<CardRow, 'id'>[] {
   }
   for (const [cat, text] of lines(files.bild)) {
     cards.push({ kind: 'bild', category: category(cat, 'bild'), text, players: 1 });
+  }
+  for (const [cat, text] of lines(files.kaos)) {
+    cards.push({ kind: 'kaos', category: category(cat, 'kaos'), text, players: 0 });
   }
   cards.push(...parseOccasion(files.aw, 'aw', CONTENT_FILES.aw), ...parseOccasion(files.familj, 'familj', CONTENT_FILES.familj));
   return cards;

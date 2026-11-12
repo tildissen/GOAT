@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { MAX_SAVED, pausedPlayers } from '@/lib/engine';
+import { isFamily, pausedPlayers, savedCap, sipsForPart } from '@/lib/engine';
 import Face from '../Face';
 import { Screen, type Color } from '../ui';
 import { nameOf, PART_WORDS, possessive, sipsText, Stats, type GameProps } from './shared';
@@ -147,7 +147,7 @@ export function ChallengeOverlay({ state, me, busy, act }: GameProps) {
 }
 
 /** Tryck på "Sparade klunkar" för att dricka dem när du vill. */
-export function SavedSheet({ me, busy, act }: GameProps) {
+export function SavedSheet({ state, me, busy, act }: GameProps) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const show = () => setOpen(true);
@@ -160,7 +160,7 @@ export function SavedSheet({ me, busy, act }: GameProps) {
       <div className="panel white" onClick={(e) => e.stopPropagation()}>
         <h2 className="heading">Du har {sipsText(me.saved)} sparade</h2>
         <p className="body-text">
-          Så fort du har {MAX_SAVED} sparade pausas spelet tills du druckit dem.
+          I den här delen pausas spelet så fort du har {savedCap(state.part)} sparade, tills du druckit dem.
         </p>
         {me.saved > 0 && (
           <button
@@ -211,6 +211,46 @@ export function EventBanner({ state, me }: GameProps) {
       {shown.map((e) => (
         <div key={e.id}>{e.text}</div>
       ))}
+    </div>
+  );
+}
+
+const PART_NAMES = ['Uppvärmning', 'Nu kör vi', 'Kaos', 'Totalt kaos'];
+
+/** Skräll-skärm när en ny del börjar: delens namn, nedräkning 3-2-1 och hur vilt det blir. */
+export function PartIntro({ state }: GameProps) {
+  const cur = state.current;
+  const startOfPart = state.status === 'playing' && state.cardIndex === 0 && cur ? cur.seq : null;
+  const shownFor = useRef<number | null>(null);
+  const [count, setCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (startOfPart === null || shownFor.current === startOfPart) return;
+    shownFor.current = startOfPart;
+    setCount(3);
+    const timers = [1, 2, 3].map((i) => setTimeout(() => setCount(i === 3 ? null : 3 - i), i * 1100));
+    return () => timers.forEach(clearTimeout);
+  }, [startOfPart]);
+
+  if (count === null) return null;
+  const last = state.part >= state.parts;
+  const name = last && state.parts < 4 ? PART_NAMES[3] : PART_NAMES[Math.min(state.part, 4) - 1];
+  const family = isFamily(state);
+  const sips = sipsForPart(state.part);
+  return (
+    <div className={`overlay part-intro part-${Math.min(state.part, 4)}`} onClick={() => setCount(null)} role="dialog" aria-label={`Del ${state.part} börjar`}>
+      <div className="part-intro-inner">
+        <p className="part-intro-label">Del {state.part}</p>
+        <h2 className="part-intro-name">{name.toUpperCase()}</h2>
+        <p className="part-intro-count" key={count}>
+          {count}
+        </p>
+        <p className="part-intro-info">
+          {family
+            ? `${sips} minuspoäng per kort`
+            : `${sips} ${sips === 1 ? 'klunk' : 'klunkar'} per kort · max ${savedCap(state.part)} sparade`}
+        </p>
+      </div>
     </div>
   );
 }

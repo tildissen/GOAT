@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
-import { canPressNext, isFamily, isSoloCard, MAX_SAVED } from '@/lib/engine';
+import { canPressNext, isFamily, isSoloCard, savedCap } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import Face from '../Face';
 import { Avatar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
@@ -37,7 +37,8 @@ function CardScreen({
   game: GameProps;
   /** Utan bg/card används delens egna färger. Utmaningar och minigames anger sina egna. */
   bg?: Color;
-  card?: Color;
+  /** 'kaos' = kaoskortens svarta, skakande kort. */
+  card?: Color | 'kaos';
   children: React.ReactNode;
   below?: React.ReactNode;
 }) {
@@ -51,7 +52,7 @@ function CardScreen({
   );
 }
 
-/** Toppytan: sparade klunkar (max 5, sedan ERROR) och hur långt det är kvar i delen. */
+/** Toppytan: sparade klunkar (taket sjunker per del: 5, 4, 3, 2 – sedan ERROR) och hur långt det är kvar i delen. */
 export function Hud({
   me,
   part,
@@ -66,7 +67,8 @@ export function Hud({
   /** Familjespel: inga sparade klunkar, bara dina minuspoäng. */
   family?: boolean;
 }) {
-  const filled = Math.min(me.saved, MAX_SAVED);
+  const cap = savedCap(part);
+  const filled = Math.min(me.saved, cap);
   return (
     <div className="hud">
       {family ? (
@@ -77,16 +79,16 @@ export function Hud({
       <button
         className="hud-block"
         onClick={() => window.dispatchEvent(new Event('goat:saved'))}
-        aria-label={`Sparade klunkar: ${me.saved} av ${MAX_SAVED}. Tryck för att dricka dem.`}
+        aria-label={`Sparade klunkar: ${me.saved} av ${cap}. Tryck för att dricka dem.`}
       >
         <span className="hud-label">
-          Sparade {me.saved}/{MAX_SAVED}
+          Sparade {me.saved}/{cap}
         </span>
         <span className="pips" aria-hidden="true">
-          {Array.from({ length: MAX_SAVED }, (_, i) => (
+          {Array.from({ length: cap }, (_, i) => (
             <i key={i} className={i < filled ? 'on' : ''} />
           ))}
-          {me.saved > MAX_SAVED && <span className="more">+{me.saved - MAX_SAVED}</span>}
+          {me.saved > cap && <span className="more">+{me.saved - cap}</span>}
         </span>
       </button>
       )}
@@ -203,6 +205,7 @@ function Trivia(p: CardProps) {
 function Challenge(p: CardProps) {
   const { cur, me } = p;
   const minigame = cur.card.kind === 'minigame';
+  const kaos = cur.card.kind === 'kaos';
   const solo = isSoloCard(cur.card);
   const involved = cur.targetIds.includes(me.id);
   // Vem får välja dricka/spara/utmaningskort: personen på solo-kort och X och Y på X och Y-kort.
@@ -212,12 +215,13 @@ function Challenge(p: CardProps) {
   return (
     <CardScreen
       game={p}
-      bg={minigame ? 'cyan' : 'coral'}
-      card={minigame ? 'coral' : 'green'}
+      bg={kaos ? 'yellow' : minigame ? 'cyan' : 'coral'}
+      card={kaos ? 'kaos' : minigame ? 'coral' : 'green'}
       below={<NextButton {...p} label={solo ? 'Klar!' : 'Nästa'} />}
     >
-      <KindTag kind={minigame ? 'minigame' : 'utmaning'} />
+      <KindTag kind={kaos ? 'kaos' : minigame ? 'minigame' : 'utmaning'} />
       {minigame && cur.card.title && <h2 className="minigame-title">{cur.card.title}</h2>}
+      {kaos && <h2 className="minigame-title kaos-title">KAOS!</h2>}
       {solo && <p className="heading name-font name-big">{me.name}</p>}
       <div className="card-body">
         <p className="card-text">{cur.text}</p>

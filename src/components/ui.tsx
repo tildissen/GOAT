@@ -45,6 +45,8 @@ export function Toast({ message }: { message: string | null }) {
 
 /** Ikoner i samma lösa, handritade streckstil som G.O.A.T.-ikonen: runda ändar, inga fyllningar och lite sneda linjer. */
 const ICONS = {
+  // Kaoskort: en spretig explosion i samma handritade stil.
+  kaos: '<path d="M24 4L28 16L40 9L33 21L45 25L33 29L39 41L27 34L22 45L19 33L7 38L14 27L3 22L15 19L10 7L21 14Z"/><circle cx="24" cy="25" r="3" fill="currentColor"/>',
   vem:
     '<path d="M17 9C23 8 26 14 24 19C22 24 14 24 12 19C10 14 12 10 17 9Z"/><path d="M5 41C5 31 12 27 18 27C24 27 29 31 29 41"/><path d="M35 14C39 13 42 17 40 21C38 25 32 24 31 20C30 17 32 14 35 14Z"/><path d="M31 35C33 31 38 30 43 32C44 35 44 38 44 40"/>',
   direkt:
@@ -68,7 +70,7 @@ const ICONS = {
 } as const;
 
 export type IconName = keyof typeof ICONS;
-export type Kind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild';
+export type Kind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild' | 'kaos';
 
 export function Icon({ name, size = 24, className }: { name: IconName; size?: number; className?: string }) {
   return (
@@ -95,6 +97,7 @@ const KIND_LABEL: Record<Kind, string> = {
   utmaning: 'Utmaning',
   minigame: 'Minigame',
   bild: 'Vems är bilden?',
+  kaos: 'Kaos!',
 };
 
 /** Svart tagg överst på kortet: ikon och korttyp. */

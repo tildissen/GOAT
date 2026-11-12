@@ -7,6 +7,7 @@
 #   alla|utmaning              – utmaning för hela gruppen
 #   minigame|namn|beskrivning
 #   bild|uppmaning             – Vems är bilden?
+#   kaos|händelse              – kaoskort i de sista delarna (alla, värden trycker Nästa)
 # Antal klunkar i utmaningar och minigames ökar automatiskt per del.
 
 vem|Vem svarar på mejl klockan 23?
@@ -113,6 +114,13 @@ minigame|Gissa låten|Den vars tur det är nynnar på en låt. Den som gissar r�
 minigame|Inga namn|Ny regel! Ingen får säga någons namn de kommande 5 korten. Den som gör det tar 2 klunkar.
 minigame|Frågemästaren|Ny regel! Den vars tur det är blir frågemästare de kommande 5 korten. Den som svarar på en fråga från frågemästaren tar 1 klunk.
 minigame|Skål!|Ny regel! Varje gång någon säger "jobb" de kommande 5 korten ska alla skåla. Den som missar tar 1 klunk.
+
+kaos|Alla byter plats med personen till vänster. NU!
+kaos|Lägg alla mobiler i mitten av bordet. Den som rör sin först tar 3 klunkar.
+kaos|Alla skålar för veckans hjälte och tar 2 klunkar!
+kaos|Tystnad! Den som säger något först tar 3 klunkar.
+kaos|Alla reser sig upp. Den som sätter sig sist tar 3 klunkar.
+kaos|Byt namn med personen till vänster resten av delen. Säger någon fel namn tar hen 2 klunkar.
 
 bild|Ladda upp den senaste bilden du tog på mat.
 bild|Ladda upp den senaste skärmdumpen du tog.

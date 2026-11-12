@@ -5,7 +5,7 @@
 -- Alla kort i spelet. Redigera dem i Table Editor → cards.
 create table if not exists public.cards (
   id bigint generated always as identity primary key,
-  kind text not null check (kind in ('vem', 'direkt', 'trivia', 'utmaning', 'minigame', 'bild')),
+  kind text not null check (kind in ('vem', 'direkt', 'trivia', 'utmaning', 'minigame', 'bild', 'kaos')),
   text text not null,
   -- Namn på minigame
   title text,
@@ -46,6 +46,11 @@ create table if not exists public.presence (
 
 -- För databaser som skapades innan tillfällen fanns. Gör ingenting om kolumnen redan finns.
 alter table public.cards add column if not exists occasion text check (occasion in ('aw', 'familj'));
+
+-- Kaoskort (del 3–4) lades till senare: uppdatera tillåtna korttyper.
+alter table public.cards drop constraint if exists cards_kind_check;
+alter table public.cards add constraint cards_kind_check
+  check (kind in ('vem', 'direkt', 'trivia', 'utmaning', 'minigame', 'bild', 'kaos'));
 
 create index if not exists games_created_at_idx on public.games (created_at);
 

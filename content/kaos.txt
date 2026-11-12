@@ -1,0 +1,23 @@
+# Kaoskort – oväntade händelser som avbryter spelet i del 3 och 4. Visas hos alla, värden trycker Nästa.
+# Format: kategori|text
+# Kategori styr tidigaste del: party/cheeky = del 3+, dirty = del 4.
+# Antal klunkar i texten ökar automatiskt per del.
+party|Alla byter plats med personen till vänster. NU!
+party|Lägg alla mobiler i mitten av bordet. Den som rör sin först dricker 3 klunkar.
+party|Alla som skrattar de kommande 10 sekunderna dricker 2 klunkar.
+party|Värden väljer en person som får dela ut 5 klunkar hur hen vill.
+party|Alla skålar för G.O.A.T. och dricker 2 klunkar!
+party|Byt namn med personen till vänster resten av delen. Säger någon fel namn dricker hen 2 klunkar.
+party|Pekleken: på tre pekar alla på den som är fullast. Den med flest fingrar på sig dricker 3 klunkar.
+party|Tystnad! Den som säger något först dricker 3 klunkar.
+party|Alla reser sig upp. Den som sätter sig sist dricker 3 klunkar.
+party|Vattenfall – NU! Alla börjar dricka samtidigt. Ingen får sluta förrän värden slutar.
+party|Alla regler från minigames gäller inte längre. Kaos råder!
+party|Den som har kortast namn bestämmer en ny regel som gäller resten av spelet.
+cheeky|Alla som har hånglat med någon i det här rummet dricker 3 klunkar.
+cheeky|Alla som har ett ex kvar i kontaktlistan dricker 2 klunkar.
+cheeky|Den som senast skickade ett flirtigt sms delar ut 4 klunkar.
+cheeky|Byt plats så att ingen sitter bredvid någon den kom hit med.
+dirty|Alla som har haft sex den här veckan dricker 3 klunkar.
+dirty|Alla visar den senaste bilden i kamerarullen. Den som vägrar dricker 5 klunkar.
+dirty|Gruppen röstar fram den mest pinsamma appen på någons hemskärm. Ägaren dricker 3 klunkar.

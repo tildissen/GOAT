@@ -1,7 +1,7 @@
 export type Category = 'casual' | 'party' | 'cheeky' | 'dirty' | 'framtid';
 /** Tillfälle i "Bygg eget spel". Fest använder de vanliga korten; AW och Familjespel har egna förvalda kort. */
 export type Occasion = 'fest' | 'aw' | 'familj';
-export type CardKind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild';
+export type CardKind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild' | 'kaos';
 
 /** Ett kort som det ligger i databasen (tabellen cards). */
 export interface CardRow {

@@ -40,7 +40,8 @@ function makeRng(seed: number) {
 }
 
 assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 1), 'Den som blinkar först tar 2 klunkar.');
-assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 4), 'Den som blinkar först tar 5 klunkar.');
+assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 3), 'Den som blinkar först tar 5 klunkar.');
+assert.equal(scaleSips('Den som blinkar först tar 2 klunkar.', 4), 'Den som blinkar först tar 7 klunkar.');
 assert.equal(scaleSips('tar 1 extra klunk.', 2), 'tar 2 extra klunkar.');
 assert.equal(scaleSips('ett nummer mellan 1–5 samtidigt', 3), 'ett nummer mellan 1–5 samtidigt');
 
@@ -116,6 +117,10 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
     assert.equal(s.deck.length, PARTS);
     s.deck.forEach((part) => assert.equal(part.length, CARDS_PER_PART));
     assert.equal(all.filter((c) => c.custom).length, 2, 'egna kort saknas');
+    // Vildare för varje del: kaoskort bara i del 3–4, ingen trivia i del 3–4.
+    const count = (i: number, kind: string) => s.deck[i].filter((c) => c.kind === kind && !c.custom).length;
+    assert.deepEqual([0, 1, 2, 3].map((i) => count(i, 'kaos')), [0, 0, 1, 2], 'kaoskort i fel del');
+    assert.equal(count(2, 'trivia') + count(3, 'trivia'), 0, 'trivia i del 3–4');
   }
   s.deck.forEach((part, i) => {
     for (const c of part) assert.ok(mode === 'custom' || c.level <= i + 1, `för grovt kort i del ${i + 1}: ${c.text}`);
@@ -219,7 +224,7 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
         act(ids[0], { type: 'next' });
       }
     }
-    for (const p of s.players) assert.ok(p.saved <= MAX_SAVED + 6, 'för många sparade klunkar');
+    for (const p of s.players) assert.ok(p.saved <= MAX_SAVED + 12, 'för många sparade klunkar');
   }
 
   // Turerna ska vara jämnt fördelade.
@@ -240,7 +245,7 @@ const kinds = new Set<string>();
 for (let seed = 1; seed <= 200; seed++) {
   for (const k of play(seed, 3 + (seed % 13))) kinds.add(k);
 }
-assert.deepEqual([...kinds].sort(), ['bild', 'direkt', 'minigame', 'trivia', 'utmaning', 'vem']);
+assert.deepEqual([...kinds].sort(), ['bild', 'direkt', 'kaos', 'minigame', 'trivia', 'utmaning', 'vem']);
 console.log('200 simulerade spel med 3–15 spelare: OK');
 
 // Samma namn: upptaget om den spelaren är med, annars får man tillbaka sin plats.
@@ -275,6 +280,15 @@ console.log('200 simulerade spel med 3–15 spelare: OK');
   for (const [saved, paused] of [[4, false], [5, true], [6, true], [8, true]] as const) {
     s.players[0].saved = saved;
     assert.equal(pausedPlayers(s).length === 1, paused, `fel paus vid ${saved} sparade`);
+  }
+}
+// Taket för sparade klunkar sjunker per del: 5, 4, 3, 2.
+{
+  const s = newGameState(newPlayer('a', 'A', 1));
+  s.players[0].saved = 3;
+  for (const [part, paused] of [[1, false], [2, false], [3, true], [4, true]] as const) {
+    s.part = part;
+    assert.equal(pausedPlayers(s).length === 1, paused, `fel tak i del ${part}`);
   }
 }
 console.log('Samma namn och försvunna spelare: OK');

@@ -473,3 +473,16 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Slutskärmen visar bara topp 3, och varje person har bara en ruta.
 - **Tillägg (av Claude):** 🥇🥈🥉 med flest klunkar överst (i familjespel: minst minuspoäng överst = vinnaren). Det personen vunnit ("Drack mest · Fick flest röster · Flest utmaningar") står i personens ruta i stället för som egna rader. Ersätter priserna och listan från B19/B41.
 - **Var i koden:** `Stats` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx).
+
+### B76. Mer kaos för varje del
+- **Beslut:** Tilda tyckte att man inte märker skillnad mellan delarna. Hon valde: kaoskort i del 3–4, fler klunkar och hårdare regler, en introskärm för varje del, och vildare kortmix i de sista delarna. Valdes bort: nedräkning för att svara och visuellt galnare kort.
+- **Tillägg (av Claude):**
+  - **Klunkar per kort:** 1, 2, 4, 6 (förut 1, 2, 3, 4). Siffror i utmaningar, minigames och kaoskort ökar med 0, 1, 3, 5 ("2 klunkar" blir 2, 3, 5, 7). Ersätter B6 och B28.
+  - **Tak för sparade klunkar:** 5, 4, 3, 2 – når man taket kommer ERROR. Ändrar B73.
+  - **Kortmix (10 per del):** del 1: 3 vem, 1 bild, 2 direkt, 2 trivia, 1 utmaning, 1 minigame. Del 2: 3, 1, 2, 1, 2, 1. Del 3: 2 vem, 1 bild, 2 direkt, 3 utmaningar (X och Y och lag först), 1 minigame, 1 kaos. Del 4: 2 vem, 1 direkt, 3 utmaningar, 2 minigames, 2 kaos. Ersätter B67:s mix. I "Bygg eget spel" får de sista delarna ett kaoskort i stället för trivia.
+  - **Introskärm** när en del börjar: "Del 1 · Uppvärmning", "Del 2 · Nu kör vi", "Del 3 · Kaos", "Del 4 · Totalt kaos" (sista delen heter alltid Totalt kaos), nedräkning 3-2-1 och "4 klunkar per kort · max 3 sparade". Rubriken skakar i del 3–4. Tryck för att hoppa över.
+- **Var i koden:** `SIPS_PER_PART`, `SAVED_CAP` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `PART_MIX` i [`src/lib/deck.ts`](../../src/lib/deck.ts), `PartIntro` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+
+### B77. Kaoskort
+- **Tillägg (av Claude):** Ny korttyp "Kaos!" – oväntade händelser för alla ("Lägg alla mobiler i mitten. Den som rör sin först dricker 3 klunkar", "Alla byter plats med personen till vänster. NU!"). Svart kort med gul text som skakar till. Inga val, värden trycker Nästa. 19 vanliga kaoskort (de grova bara i del 4), 6 för AW och 6 alkoholfria för Familjespel. Lagt in i Supabase via connectorn (migreringen `allow_kaos_cards`, 31 nya kort, inga befintliga ändrade).
+- **Var i koden:** [`content/kaos.txt`](../../content/kaos.txt), `kaos|` i [`content/aw.txt`](../../content/aw.txt) och [`content/familj.txt`](../../content/familj.txt).
