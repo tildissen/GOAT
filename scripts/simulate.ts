@@ -269,6 +269,14 @@ console.log('200 simulerade spel med 3–15 spelare: OK');
   const after = housekeeping(s, ctx(new Set(['a', 'b', 'c'])));
   assert.equal(after?.current?.phase, 'result', 'röstningen avgjordes inte när d försvann');
 }
+// ERROR så fort man har 5 sparade (5/5, 6/5, 8/5 …), inte först vid 6.
+{
+  const s = newGameState(newPlayer('a', 'A', 1));
+  for (const [saved, paused] of [[4, false], [5, true], [6, true], [8, true]] as const) {
+    s.players[0].saved = saved;
+    assert.equal(pausedPlayers(s).length === 1, paused, `fel paus vid ${saved} sparade`);
+  }
+}
 console.log('Samma namn och försvunna spelare: OK');
 
 for (const occasion of ['fest', 'aw', 'familj'] as const) {

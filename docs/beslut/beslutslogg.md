@@ -454,3 +454,22 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Knapparna "Vill du hoppa över? / Jag dricker / Jag vill spara / Dra ett utmaningskort" på gruppkort var fel (t.ex. "Den som har flest syskon *delar ut* 2 klunkar" – vad hoppar man över, och vem ska trycka?). Tilda bad Claude åtgärda allt som var fel.
 - **Tillägg (av Claude):** Gruppkort och lagkort fungerar nu som minigames: ingen har val, värden trycker Nästa. Kvar med val: solo-utmaningar (personen) och X och Y (de två). Ersätter den delen av B69.
 - **Var i koden:** `canChoose()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `Challenge` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+---
+
+## 2026-11-12 – Fler justeringar
+
+### B73. ERROR så fort man har 5 sparade klunkar
+- **Beslut:** ERROR-skärmen kommer så fort man når 5/5 sparade klunkar. Blir det 6/5 eller 8/5 i ett enda sparande kommer den också direkt. Ersätter B8:s "fler än 5".
+- **Tillägg (av Claude):** Spelreglerna och rutan "Sparade klunkar" säger nu "så fort du har 5 sparade pausas spelet tills du druckit dem".
+- **Var i koden:** `pausedPlayers()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
+
+### B74. Alla ser vad någon valde
+- **Beslut:** Väljer någon "Jag dricker" (eller något annat) ska alla andra se det, så att man inte kan fuska.
+- **Tillägg (av Claude):** En svart banner högst upp hos alla andra i 6 sekunder, t.ex. "Moa drack 2 klunkar", "Moa sparade 2 klunkar (har 4 sparade)", "Moa drog ett utmaningskort: ”…”", "Moa svarade på frågan", "Moa svarade rätt på trivian! 🧠", "Moa drack sina 5 sparade klunkar". Gäller alla kort och val. I familjespel: "tog 2 minuspoäng". Den som valde ser ingen banner om sig själv.
+- **Var i koden:** `logEvent()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `EventBanner` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+
+### B75. Slutskärmen visar topp 3, en ruta per person
+- **Beslut:** Slutskärmen visar bara topp 3, och varje person har bara en ruta.
+- **Tillägg (av Claude):** 🥇🥈🥉 med flest klunkar överst (i familjespel: minst minuspoäng överst = vinnaren). Det personen vunnit ("Drack mest · Fick flest röster · Flest utmaningar") står i personens ruta i stället för som egna rader. Ersätter priserna och listan från B19/B41.
+- **Var i koden:** `Stats` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx).

@@ -2,7 +2,7 @@
 
 import type { Action, Choice, GameView, Player, PublicState } from '@/lib/types';
 import { isFamily } from '@/lib/engine';
-import { Avatar, Icon, type IconName } from '../ui';
+import { Avatar } from '../ui';
 
 export interface GameProps {
   view: GameView;
@@ -97,48 +97,44 @@ export function Board({ state, active, meId }: { state: PublicState; active: str
   );
 }
 
+/**
+ * Slutskärmens topp 3: en ruta per person, med det personen vann ("Fick flest röster" osv.) i rutan.
+ * Vanligt spel: flest klunkar överst. Familjespel: minst minuspoäng överst (vinnaren).
+ */
 export function Stats({ state }: { state: PublicState }) {
   const players = state.players.filter((p) => p.ready);
   if (players.length === 0) return null;
-  const top = (key: 'drank' | 'votesReceived' | 'challenges' | 'saved') =>
-    [...players].sort((a, b) => b[key] - a[key])[0];
   const family = isFamily(state);
-  const fewest = [...players].sort((a, b) => a.drank - b.drank)[0];
-  const rows = [
-    ...(family
-      ? [
-          { label: 'Vinnare', icon: 'trofe' as IconName, p: fewest, value: (p: Player) => sipsText(p.drank, true), always: true },
-          { label: 'Flest minuspoäng', p: top('drank'), value: (p: Player) => sipsText(p.drank, true) },
-        ]
-      : [{ label: 'Drack mest', p: top('drank'), value: (p: Player) => sipsText(p.drank) }]),
-    { label: 'Fick flest röster', p: top('votesReceived'), value: (p: Player) => `${p.votesReceived} röster` },
-    { label: 'Flest utmaningar', p: top('challenges'), value: (p: Player) => `${p.challenges} st` },
-  ].filter((r) => r.p && ('always' in r || !r.value(r.p).startsWith('0 ')));
+  const leader = (key: 'drank' | 'votesReceived' | 'challenges') => {
+    const best = [...players].sort((a, b) => b[key] - a[key])[0];
+    return best && best[key] > 0 ? best.id : null;
+  };
+  const awards: [string | null, string][] = [
+    [leader('drank'), family ? 'Flest minuspoäng' : 'Drack mest'],
+    [leader('votesReceived'), 'Fick flest röster'],
+    [leader('challenges'), 'Flest utmaningar'],
+  ];
+  const ranked = [...players].sort((a, b) => (family ? a.drank - b.drank : b.drank - a.drank)).slice(0, 3);
+  const medals = ['🥇', '🥈', '🥉'];
   return (
-    <div className="board">
-      {rows.map((r) => (
-        <div key={r.label} className="board-row">
-          <Avatar player={r.p} />
-          <span className="name stat-name">
-            <small>
-              {'icon' in r && r.icon && <Icon name={r.icon} size={18} className="inline-icon" />}
-              {r.label}
-            </small>
-            {r.p.name}
-          </span>
-          <span className="stat">{r.value(r.p)}</span>
-        </div>
-      ))}
-      {[...players]
-        .sort((a, b) => (family ? a.drank - b.drank : b.drank - a.drank))
-        .map((p) => (
-          <div key={p.id} className="board-row" style={{ fontSize: 16, padding: '4px 14px' }}>
-            <span className="name" style={{ fontWeight: 400 }}>
+    <div className="board podium">
+      {ranked.map((p, i) => {
+        const won = awards.filter(([id]) => id === p.id).map(([, label]) => label);
+        if (family && i === 0) won.unshift('Vinnare');
+        return (
+          <div key={p.id} className={`board-row podium-row${i === 0 ? ' first' : ''}`}>
+            <span className="medal" aria-label={`Plats ${i + 1}`}>
+              {medals[i]}
+            </span>
+            <Avatar player={p} />
+            <span className="name stat-name">
               {p.name}
+              {won.length > 0 && <small>{won.join(' · ')}</small>}
             </span>
             <span className="stat">{sipsText(p.drank, family)}</span>
           </div>
-        ))}
+        );
+      })}
     </div>
   );
 }

@@ -10,7 +10,7 @@ import { Screen, Spinner, Toast } from '../ui';
 import Intro, { ReadyWait } from './Intro';
 import Lobby from './Lobby';
 import Playing from './Playing';
-import { ChallengeOverlay, Ended, Finished, PartEnd, PauseOverlay, SavedSheet } from './Screens';
+import { ChallengeOverlay, Ended, EventBanner, Finished, PartEnd, PauseOverlay, SavedSheet } from './Screens';
 import type { GameProps } from './shared';
 
 export default function GameClient({ code }: { code: string }) {
@@ -99,6 +99,7 @@ function Game({ code, creds }: { code: string; creds: Creds }) {
   return (
     <>
       {screen}
+      {inGame && <EventBanner {...props} />}
       {inGame && <PauseOverlay {...props} />}
       {inGame && <ChallengeOverlay {...props} />}
       {inGame && <SavedSheet {...props} />}

@@ -3,7 +3,7 @@ import type { Action, Current, CustomCard, CustomKind, DeckCard, GameMode, GameS
 
 export const MIN_PLAYERS = 3;
 export const MAX_PLAYERS = 15;
-/** Fler sparade klunkar än så här pausar spelet. */
+/** Når man så här många sparade klunkar (eller fler) pausas spelet tills man druckit. */
 export const MAX_SAVED = 5;
 export const MAX_NAME_LENGTH = 20;
 /** I "Bygg eget spel" måste alla skriva minst så här många kort (minigames räknas inte). */
@@ -119,12 +119,25 @@ export function familyText(text: string): string {
     .replace(/\bdricker\b/gi, 'får minuspoäng');
 }
 
+const MAX_EVENTS = 8;
+
+/** Sparar vad någon valde så att alla andra kan se det. */
+function logEvent(s: GameState, actorId: string, text: string) {
+  const events = s.events ?? [];
+  const id = (events[events.length - 1]?.id ?? 0) + 1;
+  s.events = [...events, { id, actorId, text }].slice(-MAX_EVENTS);
+}
+
+function sipsWord(n: number, family: boolean): string {
+  return family ? `${n} minuspoäng` : `${n} ${n === 1 ? 'klunk' : 'klunkar'}`;
+}
+
 export function isSoloCard(card: DeckCard): boolean {
   return card.kind === 'direkt' || card.kind === 'trivia' || (card.kind === 'utmaning' && card.players === 1);
 }
 
 export function pausedPlayers(state: GameState | PublicState): Player[] {
-  return state.players.filter((p) => p.saved > MAX_SAVED);
+  return state.players.filter((p) => p.saved >= MAX_SAVED);
 }
 
 function pick<T>(items: T[], rng: Rng): T {
@@ -386,15 +399,21 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       assertNotPaused(s, ctx);
       if (!canChoose(s, c, me)) throw new GameError('Det här kortet är redan klart – kolla skärmen', 409);
       const solo = isSoloCard(c.card) && c.phase === 'play';
+      const family = isFamily(s);
       if (action.choice === 'answered') {
         if (c.card.kind !== 'direkt') throw new GameError('Ogiltigt val');
+        logEvent(s, playerId, 'svarade på frågan');
       } else if (action.choice === 'drink') {
         me.drank += c.sips;
+        logEvent(s, playerId, family ? `tog ${sipsWord(c.sips, true)}` : `drack ${sipsWord(c.sips, false)}`);
       } else if (action.choice === 'save') {
-        if (isFamily(s)) throw new GameError('Man kan inte spara i familjespel');
+        if (family) throw new GameError('Man kan inte spara i familjespel');
         me.saved += c.sips;
+        logEvent(s, playerId, `sparade ${sipsWord(c.sips, false)} (har ${me.saved} sparade)`);
       } else if (action.choice === 'challenge') {
-        s.overlays[playerId] = { text: drawChallenge(s, ctx), advancesCard: solo };
+        const text = drawChallenge(s, ctx);
+        s.overlays[playerId] = { text, advancesCard: solo };
+        logEvent(s, playerId, `drog ett utmaningskort: ”${text}”`);
       } else {
         throw new GameError('Ogiltigt val');
       }
@@ -410,6 +429,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       if (!c.card.options || action.index < 0 || action.index >= c.card.options.length) throw new GameError('Ogiltigt svar');
       c.triviaPick = action.index;
       if (action.index === c.card.answerIndex) c.choices[playerId] = 'answered';
+      logEvent(s, playerId, action.index === c.card.answerIndex ? 'svarade rätt på trivian! 🧠' : 'svarade fel på trivian');
       break;
     }
     case 'upload_photo':
@@ -423,6 +443,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
         c.phase = 'voting';
       } else {
         c.photoSkipped = true;
+        logEvent(s, playerId, 'vägrade ladda upp en bild');
         c.losers = [playerId];
         c.phase = 'result';
       }
@@ -440,6 +461,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       break;
     }
     case 'drink_saved': {
+      if (me.saved > 0) logEvent(s, playerId, isFamily(s) ? `tog sina ${me.saved} sparade` : `drack sina ${me.saved} sparade klunkar`);
       me.drank += me.saved;
       me.saved = 0;
       break;

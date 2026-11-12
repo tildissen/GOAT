@@ -118,6 +118,15 @@ export interface GameState {
   occasion?: Occasion;
   lastTurnId: string | null;
   seq: number;
+  /** Senaste valen som gjorts, så att alla ser vad någon valde (inget fusk). */
+  events?: GameEvent[];
+}
+
+export interface GameEvent {
+  id: number;
+  actorId: string;
+  /** T.ex. "drack 2 klunkar" – namnet sätts framför i appen. */
+  text: string;
 }
 
 /** Det klienterna får se: framtida kort skickas aldrig ut. */

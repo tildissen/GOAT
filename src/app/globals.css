@@ -697,3 +697,36 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .board-row .stat-name small { font-weight: 400; font-size: 13px; opacity: 0.75; display: inline-flex; align-items: center; gap: 4px; }
 /* Bekräftelse och tips på "Skriv dina kort" */
 .add-feedback { font-size: 15px; margin: 8px 0 0; text-align: center; min-height: 1.2em; }
+
+/* Vad någon valde – syns för alla andra i några sekunder */
+.event-banner {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top));
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 420px;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+.event-banner > div {
+  background: var(--black);
+  color: var(--white);
+  border-radius: 16px;
+  padding: 10px 16px;
+  font-weight: 700;
+  font-size: 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  animation: card-in 0.3s ease;
+}
+
+/* Slutskärmens topp 3 – en ruta per person */
+.podium .podium-row { padding: 12px 14px; }
+.podium .podium-row.first { background: var(--white); }
+.podium .medal { font-size: 26px; line-height: 1; }
+.podium .stat-name { font-size: 19px; font-weight: 700; }
+.podium .stat-name small { font-size: 13px; font-weight: 400; opacity: 0.8; }

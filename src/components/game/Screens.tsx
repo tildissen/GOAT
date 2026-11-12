@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MAX_SAVED, pausedPlayers } from '@/lib/engine';
 import Face from '../Face';
 import { Screen, type Color } from '../ui';
@@ -160,7 +160,7 @@ export function SavedSheet({ me, busy, act }: GameProps) {
       <div className="panel white" onClick={(e) => e.stopPropagation()}>
         <h2 className="heading">Du har {sipsText(me.saved)} sparade</h2>
         <p className="body-text">
-          Max {MAX_SAVED} får sparas. Har du fler pausas spelet tills du druckit ikapp.
+          Så fort du har {MAX_SAVED} sparade pausas spelet tills du druckit dem.
         </p>
         {me.saved > 0 && (
           <button
@@ -177,6 +177,40 @@ export function SavedSheet({ me, busy, act }: GameProps) {
           Stäng
         </button>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Visar för alla andra vad någon valde – "Moa drack 2 klunkar" – så att ingen kan fuska.
+ * Gamla händelser visas inte när man öppnar appen, bara de som sker medan man tittar.
+ */
+export function EventBanner({ state, me }: GameProps) {
+  const events = state.events ?? [];
+  const latest = events[events.length - 1]?.id ?? 0;
+  const seen = useRef<number | null>(null);
+  const [shown, setShown] = useState<{ id: number; text: string }[]>([]);
+
+  useEffect(() => {
+    if (seen.current === null) {
+      seen.current = latest;
+      return;
+    }
+    const fresh = events.filter((e) => e.id > (seen.current ?? 0) && e.actorId !== me.id);
+    seen.current = Math.max(seen.current, latest);
+    if (fresh.length === 0) return;
+    const items = fresh.map((e) => ({ id: e.id, text: `${nameOf(state, e.actorId)} ${e.text}` }));
+    setShown((cur) => [...cur, ...items].slice(-3));
+    const t = setTimeout(() => setShown((cur) => cur.filter((x) => !items.some((i) => i.id === x.id))), 6000);
+    return () => clearTimeout(t);
+  }, [latest]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (shown.length === 0) return null;
+  return (
+    <div className="event-banner" role="status" aria-live="polite">
+      {shown.map((e) => (
+        <div key={e.id}>{e.text}</div>
+      ))}
     </div>
   );
 }
