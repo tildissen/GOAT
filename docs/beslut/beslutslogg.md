@@ -302,7 +302,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Tillägg (av Claude):** Spelarna väljer typ för varje kort: **Vem i rummet?**, **Direkt fråga**, **Utmaning till en person**, **Utmaning för alla** och **Minigame (frivilligt)**, med beskrivning och exempel för den valda typen. Minigames har ett namnfält. Samma typer går nu också att välja under "Egna kort" i vanliga spel (frivilligt där).
 - **Var i koden:** `CARD_TYPES` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
 
-### B57. Längden styrs av hur många kort som skrivs
+### B57. Längden styrs av hur många kort som skrivs (**Ersatt av B85**)
 - **Tillägg (av Claude):** Ungefär 12 egna kort per del, 1–4 delar. Varje del får trivia (ungefär en per tre egna kort), en "Vems är bilden?" och ett minigame. Klunkarna ökar per del och trivian blir svårare per del, som i vanliga spel. Utmaningskorten man drar är de förvalda solo-utmaningarna.
 - **Var i koden:** `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts).
 
@@ -326,7 +326,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Kategorileken (bilmärken, länder osv.) ska finnas i alla minigames. Vanliga minigames som passar, t.ex. Viskleken och Tumregeln, ska också finnas i AW och Familjespel.
 - **Tillägg (av Claude):** AW får alla vanliga minigames plus 10 egna (AW-versionen vinner om namnet finns i båda). Familjespel har 14 alkoholfria minigames, bland andra Kategorier, Viskleken, Tumregeln, Nej-förbud, Frågemästaren och Jag har aldrig med minuspoäng. Minigames som går ut på att dricka (Vattenfall, Thunder, Vänsterhanden) är inte med i Familjespel.
 
-### B62. Förvalda kort fyller på när spelarna skrivit få
+### B62. Förvalda kort fyller på när spelarna skrivit få (**Antalet delar ersatt av B85**)
 - **Tillägg (av Claude):** Varje del fylls upp till 12 frågor och utmaningar med förvalda kort för tillfället, så att spelet blir lagom långt även om alla bara skriver 3 kort. Spelet har minst 2 och högst 4 delar. Ersätter delvis B57 (som bara använde spelarnas egna kort).
 - **Var i koden:** `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts).
 
@@ -569,3 +569,13 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Tillägg (av Claude):** Claude tolkade första önskemålet som att straffet skulle tas direkt och byggde det, men det ersattes av detta. Knappen heter nu bara "Jag vägrar". Texten "(och dricker 1 klunk)" togs bort ur knappen, eftersom valen kommer efteråt och texten annars nämnde straffet två gånger. Resultatkortet och valen är oförändrade.
 - **Obs (av Claude):** Om spelaren inte väljer något efter "Jag vägrar" får hen klunkarna automatiskt när någon trycker Nästa, enligt B83.
 - **Var i koden:** `PhotoUpload` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B85. Alltid 4 delar i alla typer av spel
+- **Beslut:** Alla spel har 4 delar: vanliga spel och "Bygg eget spel" med AW, Familjespel och Fest. Ersätter B57 och antalet delar i B62.
+- **Varför:** I "Bygg eget spel" berodde antalet delar på hur många egna kort som skrivits (7 per del, minst 2 delar). Skrev få personer bara 3 kort var blev det 2 delar, så kaoset i del 3–4 kom aldrig.
+- **Tillägg (av Claude):**
+  - De egna korten sprids över alla fyra delarna. Resten av varje del fylls med förvalda kort för tillfället, upp till 10 kort.
+  - Del 1–4 blir vildare som i vanliga spel: trivia i del 1–2, kaoskort i del 3–4, och klunkarna och sparataket ändras per del.
+  - Har spelarna skrivit fler än 28 kort blir delarna längre än 10 kort, eftersom alla egna kort alltid kommer med.
+  - Spelreglerna säger "4 delar" även i eget spel.
+- **Var i koden:** `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts), `Regler` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).

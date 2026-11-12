@@ -70,7 +70,7 @@ function StorEj({ onDone }: { onDone: () => void }) {
 }
 
 function Regler({ state, onDone }: { state: GameProps['state']; onDone: () => void }) {
-  const parts = state.mode === 'custom' ? 'flera delar' : '4 delar';
+  const parts = '4 delar';
   return (
     <Screen bg="coral">
       <h1 className="display big" style={{ marginTop: 12, marginBottom: 16 }}>

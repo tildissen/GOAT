@@ -111,8 +111,8 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
   const all = s.deck.flat();
   assert.equal(new Set(all.map((c) => c.id)).size, all.length, 'dubbletter i kortleken');
   if (mode === 'custom') {
-    // Alla egna kort och det egna minigamet är med, 1–4 delar, trivia blandas in.
-    assert.ok(s.deck.length >= 2 && s.deck.length <= PARTS);
+    // Alla egna kort och det egna minigamet är med, alltid 4 delar, trivia blandas in.
+    assert.equal(s.deck.length, PARTS, 'eget spel ska ha 4 delar');
     // 10 kort per del, om inte spelarna skrivit så många kort att de inte får plats.
     if (ownCards <= PARTS * 7) s.deck.forEach((part) => assert.ok(part.length <= CARDS_PER_PART, `för lång del: ${part.length}`));
     assert.equal(all.filter((c) => c.custom).length, ownCards + 1, 'egna kort saknas');

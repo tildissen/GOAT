@@ -61,8 +61,8 @@ export const OWN_CARDS_PER_PART = 7;
  * varje del upp till 7 frågor och utmaningar med förvalda kort för tillfället
  * (AW och Familjespel har egna kort, Fest använder de vanliga och blir vildare
  * per del). Sedan ett minigame (spelarnas egna först), ett triviakort (i de sista
- * delarna ett kaoskort) och en "Vems är bilden?" – så länge delen har färre än 10 kort. 2–4 delar beroende
- * på hur många kort som skrivits; har väldigt många skrivit blir delarna
+ * delarna ett kaoskort) och en "Vems är bilden?" – så länge delen har färre än 10 kort. Alltid 4 delar,
+ * som i vanliga spel. Har väldigt många skrivit blir delarna
  * längre, eftersom alla egna kort alltid kommer med.
  */
 export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rng, occasion: Occasion = 'fest') {
@@ -78,7 +78,8 @@ export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rn
     customs.filter((c) => c.kind === 'minigame'),
     rng,
   ).map(customToDeckCard);
-  const parts = Math.min(PARTS, Math.max(2, Math.ceil(own.length / OWN_CARDS_PER_PART)));
+  // Alltid 4 delar, som i vanliga spel (B84).
+  const parts = PARTS;
 
   const used = new Set<string>();
   const takeOne = (pool: CardRow[]): CardRow | undefined => {
@@ -105,7 +106,7 @@ export function buildCustomDeck(cards: CardRow[], customs: CustomCard[], rng: Rn
 
   deck.forEach((part, i) => {
     // Hur långt in i spelet delen ligger, 0–3, styr trivians svårighet och hur vilda Fest-korten blir.
-    const tier = parts === 1 ? 1 : Math.round((i * 3) / (parts - 1));
+    const tier = i;
     const allowed = (c: CardRow) => levelOf(c) <= tier + 1;
     const extra: (CardRow | undefined)[] = [];
 
