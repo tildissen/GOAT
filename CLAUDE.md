@@ -10,6 +10,13 @@ Varje gång Tilda tar ett beslut om spelet (innehåll, regler, design, teknik, h
 - Ändras ett tidigare beslut: skriv ett nytt beslut och markera det gamla med **Ersatt av Bxx**. Stryk aldrig gamla beslut.
 - Skilj på vad Tilda bestämde och vad Claude lade till själv (skriv det som **Tillägg (av Claude)**).
 
+## Arbetssätt: egen gren och pull request
+Flera personer och Claude-sessioner jobbar i repot samtidigt. Därför (B86):
+
+- Pusha aldrig direkt till `main`. Varje ändring görs i en egen gren och slås ihop via en pull request.
+- Innan du öppnar en pull request: hämta senaste `main`, lägg din gren ovanpå den och kör `npm test` och `npm run typecheck`.
+- Beslutsloggen: bara en session skriver i den åt gången. Har någon annan tagit samma nummer när du lägger dig ovanpå `main`, byter du till nästa lediga nummer (och rättar "Ersatt av"-hänvisningarna).
+
 ## Projektet
 - Next.js (App Router) på Vercel, Supabase för databas, realtid och bilder. Se [README.md](README.md).
 - All spellogik finns i `src/lib/engine.ts`. Kör `npm test` (simulerar 200 spel) och `npm run typecheck` efter ändringar.

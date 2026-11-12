@@ -579,3 +579,17 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Har spelarna skrivit fler än 28 kort blir delarna längre än 10 kort, eftersom alla egna kort alltid kommer med.
   - Spelreglerna säger "4 delar" även i eget spel.
 - **Var i koden:** `buildCustomDeck()` i [`src/lib/deck.ts`](../../src/lib/deck.ts), `Regler` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+---
+
+## 2026-11-12 – Arbetssätt
+
+### B86. Alla jobbar i en egen gren och slår ihop via pull request
+- **Beslut:** Ny regel: alla jobbar i en egen gren och slår ihop via pull request, eller så skriver bara en session i beslutsloggen åt gången.
+- **Varför:** Två sessioner pushade till `main` samtidigt och tog samma beslutsnummer två gånger (B79 och B84).
+- **Tillägg (av Claude):**
+  - Regeln står i CLAUDE.md, så att alla Claude-sessioner följer den.
+  - Ingen pushar direkt till `main` längre.
+  - Innan en pull request öppnas hämtar man senaste `main`, lägger sin gren ovanpå och kör testerna.
+  - Har någon annan tagit samma beslutsnummer byter man till nästa lediga.
+- **Var i koden:** [`CLAUDE.md`](../../CLAUDE.md).
