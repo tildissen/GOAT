@@ -549,7 +549,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Bildkorten är fortfarande hemliga.
 - **Var i koden:** `Waiting` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
 
-### B83. Klunkar och minuspoäng räknas även när ingen väljer något
+### B83. Klunkar och minuspoäng räknas även när ingen väljer något (**Vem som får dela ut ersatt av B95**)
 - **Beslut:** Tilda märkte att kort som säger att någon får minuspoäng (t.ex. "Den som har lägst batteri i mobilen får 2 minuspoäng") aldrig räknades, eftersom ingen aktivt valde något. På sådana kort ska man välja vem som får poängen.
 - **Tillägg (av Claude):**
   - **Gruppkort, lagkort, minigames och kaoskort:** under kortet står "Vem fick 2 minuspoäng?" (eller "Vem fick dricka 2 klunkar?") med alla spelare. Tryck på namnet för att ge personen kortets klunkar eller minuspoäng. Man kan trycka flera gånger, t.ex. i ett minigame, och "−" tar bort en gång.
@@ -661,3 +661,56 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Fest och vanligt spel är oförändrade.
   - Testerna kontrollerar att inget AW-kort har mer än 4.
 - **Var i koden:** `AW_MAX_SIPS` och `scaleSips()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
+
+---
+
+## 2026-11-24 – Efter första riktiga spelet (sju spelare, AW med poäng)
+
+### B94. Spelledare på minigames, kaoskort och gruppkort
+- **Beslut:** Minigames och utmaningar för alla ska riktas till en person, t.ex. "Sabina! Byt namn med personen till vänster". Är det lekar där alla är med ska någon vara spelledare, så att det blir struktur.
+- **Tillägg (av Claude):**
+  - Den som drog kortet blir spelledare. Kortet visar "Spelledare Sabina!", eller "Spelledare Du!" hos den som är spelledare.
+  - Spelledaren läser kortet och leder leken.
+  - Spelledaren kan också trycka Nästa, inte bara värden.
+  - Gäller minigames, kaoskort, utmaningar för alla och lagkort.
+- **Var i koden:** `isLeaderCard()` och `canPressNext()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `Challenge` och `NextButton` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B95. Bara spelledaren och värden delar ut klunkar och poäng
+- **Beslut:** Bara spelledaren och värden får dela ut klunkar eller poäng på kort där flera kan få dem. Ersätter "vem som helst kan trycka" i B83.
+- **Varför:** När alla kunde ge alla poäng blev det kaos.
+- **Alternativ:** bara värden · alla, som förut.
+- **Tillägg (av Claude):**
+  - Alla andra ser vem som fått något ("PH +4 · Sabbe +2") och kan inte trycka. Servern stoppar också försök.
+  - Är värden borta längre än 25 sekunder kan vem som helst dela ut, så att spelet inte fastnar.
+- **Var i koden:** `canGive()`, `canTake()` och `isTakeCard()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `GiveList` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx).
+
+### B96. Regelkoll när delen är slut
+- **Beslut:** Regler som gäller en stund ("byt namn resten av delen", "de kommande 5 korten") räknas i en regelkoll när delen är slut, inte direkt på kortet.
+- **Varför:** Det blev konstigt när kortet sa "resten av delen" men man skulle dela ut poäng direkt, och det var oklart hur länge regeln gällde.
+- **Alternativ:** poäng direkt, men regeln syns · ta bort sådana kort.
+- **Tillägg (av Claude):**
+  - Kortet säger "Regeln gäller resten av delen" (eller "de kommande korten") och att den räknas i regelkollen.
+  - Så länge regeln gäller syns den under toppytan, t.ex. "Frågemästaren · 5 kort till" eller "Kaos · resten av delen".
+  - När delen är slut finns rutan "Regelkoll" på "Del ett är klar!" (och på slutskärmen efter del 4). Där trycker spelledaren för regeln eller värden på vilka som bröt den ("Vem bröt regeln?"), med "−" för att ångra.
+  - Reglerna försvinner när nästa del börjar.
+- **Var i koden:** `ActiveRule` i [`src/lib/types.ts`](../../src/lib/types.ts), `isLastingRule()`, `deal()` och åtgärderna `rule_take`/`rule_untake` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `RuleCheck` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `ActiveRules` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B97. "Dricker" står kvar i AW och Fest med poäng
+- **Tillägg (av Claude):** I AW och Fest med poäng skrevs "Den som dricker med höger" om till "Den som får minuspoäng med höger" (Vänsterhanden). Nu byts bara siffror med klunkar ut mot poäng. Ordet "dricker" står kvar, eftersom man fortfarande dricker där. Familjespel skriver om allt som förut.
+- **Var i koden:** `familyText()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
+
+### B98. ERROR syns hos alla, och prickarna för röster fylls på i ordning
+- **Beslut:** ERROR syntes inte på allas skärmar, och prickarna för röster fylldes inte i ordning. Båda ska rättas.
+- **Tillägg (av Claude):**
+  - **ERROR:** det fanns två orsaker.
+    - Utmaningskortet låg i samma lager och kunde täcka ERROR. Nu ligger ERROR alltid överst.
+    - Drack personen direkt hann ERROR försvinna innan de andras mobiler hämtade läget. Nu sparas ERROR som en händelse, och alla ser ERROR i minst 4 sekunder ("OVVE SPARADE FÖR MÅNGA KLUNKAR – OCH HAR DRUCKIT DEM!").
+    - Sjunker sparataket vid ny del och någon då har för många, får också det en ERROR-händelse.
+  - **Prickarna:** varje prick hörde till en bestämd spelare, så fyllda och tomma blandades. Nu kommer de fyllda först.
+- **Var i koden:** `PauseOverlay` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `logEvent()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `VoteCard` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `.overlay.solid-error` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B99. Ställningslistan: ledaren överst och kortare med många spelare
+- **Tillägg (av Claude):**
+  - Med poäng leder den som har minst, så den personen står nu överst. Tidigare stod flest minuspoäng överst.
+  - Med fler än 5 spelare blir raderna lägre, så att sidan inte behöver scrolla lika mycket. När den scrollade hamnade toppytan under mobilens klocka.
+- **Var i koden:** `Board` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `.board.compact` i [`src/app/globals.css`](../../src/app/globals.css).

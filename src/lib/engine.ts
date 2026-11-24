@@ -133,21 +133,24 @@ export function usesPoints(state: Pick<GameState, 'mode' | 'occasion' | 'scoring
 }
 
 /** Skriver om dryckesord till minuspoäng, för kort som spelarna skrivit i ett familjespel. */
-export function familyText(text: string): string {
-  return text
+export function familyText(text: string, alcoholFree = true): string {
+  const t = text
     .replace(/\b(dricker|tar)\s+(\d+)\s+(?:extra\s+)?klunk(?:ar)?/gi, 'får $2 minuspoäng')
     .replace(/\bdrick\s+(\d+)\s+(?:extra\s+)?klunk(?:ar)?/gi, 'ta $1 minuspoäng')
-    .replace(/(\d+)\s+(?:extra\s+)?klunk(?:ar)?/gi, '$1 minuspoäng')
-    .replace(/\bdricker\b/gi, 'får minuspoäng');
+    .replace(/(\d+)\s+(?:extra\s+)?klunk(?:ar)?/gi, '$1 minuspoäng');
+  // I AW/Fest med poäng dricker man fortfarande – "Den som dricker med höger" ska stå kvar (B97).
+  return alcoholFree ? t.replace(/\bdricker\b/gi, 'får minuspoäng') : t;
 }
 
 const MAX_EVENTS = 8;
 
+const nameOfId = (s: GameState, id: string) => s.players.find((p) => p.id === id)?.name ?? '?';
+
 /** Sparar vad någon valde så att alla andra kan se det. */
-function logEvent(s: GameState, actorId: string, text: string) {
+function logEvent(s: GameState, actorId: string, text: string, kind?: 'error') {
   const events = s.events ?? [];
   const id = (events[events.length - 1]?.id ?? 0) + 1;
-  s.events = [...events, { id, actorId, text }].slice(-MAX_EVENTS);
+  s.events = [...events, { id, actorId, text, ...(kind ? { kind } : {}) }].slice(-MAX_EVENTS);
 }
 
 function sipsWord(n: number, family: boolean): string {
@@ -163,10 +166,28 @@ export function isSoloCard(card: DeckCard): boolean {
  * ("Den som har lägst batteri får 2 minuspoäng", minigames, kaoskort). Där trycker man på den eller de
  * som fick klunkarna/poängen – annars räknas de aldrig. Vem som helst kan trycka, alla ser vem som gav vem.
  */
-export function canTake(cur: Current, player: Pick<Player, 'ready'>): boolean {
-  if (!player.ready || cur.phase !== 'play') return false;
-  if (cur.card.kind === 'minigame' || cur.card.kind === 'kaos') return true;
-  return cur.card.kind === 'utmaning' && (cur.card.players === 0 || cur.card.players === 3);
+export function isLeaderCard(card: DeckCard): boolean {
+  if (card.kind === 'minigame' || card.kind === 'kaos') return true;
+  return card.kind === 'utmaning' && (card.players === 0 || card.players === 3);
+}
+
+/** Regel som gäller flera kort ("resten av delen", "de kommande 5 korten") – räknas i regelkollen i stället för direkt. */
+export function isLastingRule(card: DeckCard, text: string): boolean {
+  return isLeaderCard(card) && /resten av (?:den här )?delen|de kommande \d+ korten/i.test(text);
+}
+
+/** Bara spelledaren (den som drog kortet) och värden delar ut – värdens roll tas över av vem som helst om värden är borta (B95). */
+export function canGive(s: GameState | PublicState, byId: string, playerId: string, ctx: Pick<Ctx, 'active'>): boolean {
+  return playerId === byId || playerId === s.hostId || !ctx.active.has(s.hostId);
+}
+
+/** Kort där man delar ut klunkar/poäng direkt: gruppkort, minigames och kaoskort som inte är regler som gäller en stund. */
+export function isTakeCard(cur: Current): boolean {
+  return cur.phase === 'play' && isLeaderCard(cur.card) && !isLastingRule(cur.card, cur.text);
+}
+
+export function canTake(s: GameState | PublicState, cur: Current, playerId: string, ctx: Pick<Ctx, 'active'>): boolean {
+  return isTakeCard(cur) && canGive(s, cur.turnId, playerId, ctx);
 }
 
 export function pausedPlayers(state: GameState | PublicState): Player[] {
@@ -193,6 +214,8 @@ function isLeader(s: GameState, playerId: string, ctx: Ctx): boolean {
  */
 export function canPressNext(s: GameState | PublicState, cur: Current, playerId: string, ctx: Pick<Ctx, 'active'>): boolean {
   const leader = playerId === s.hostId || !ctx.active.has(s.hostId);
+  // Spelledaren (den som drog minigamet, kaoskortet eller gruppkortet) kan också gå vidare.
+  if (isLeaderCard(cur.card) && cur.phase === 'play') return leader || playerId === cur.turnId;
   if (!isSoloCard(cur.card)) return leader;
   return leader || playerId === cur.turnId || !ctx.active.has(cur.turnId);
 }
@@ -247,7 +270,7 @@ function deal(s: GameState, ctx: Ctx) {
 
   // På utmaningar och minigames gäller antalet klunkar som står på kortet.
   // Med poäng blir klunkar minuspoäng. I AW/Fest bara på kort med siffror, så att t.ex. "Vem dricker mest?" står kvar.
-  if (isFamily(s) || (usesPoints(s) && hasNumbers)) text = familyText(text);
+  if (isFamily(s) || (usesPoints(s) && hasNumbers)) text = familyText(text, isFamily(s));
   const sipsOnCard =
     hasNumbers ? text.match(/(\d+)\s+(?:extra\s+)?(?:klunk|minuspoäng)/) : null;
 
@@ -267,6 +290,22 @@ function deal(s: GameState, ctx: Ctx) {
     photoUrl: null,
     triviaPick: null,
   };
+  if (isLastingRule(card, text)) {
+    const coming = text.match(/de kommande (\d+) korten/i);
+    s.rules = [
+      ...(s.rules ?? []),
+      {
+        id: `r${s.seq}`,
+        ...(card.title ? { title: card.title } : {}),
+        text,
+        byId: turn.id,
+        sips: s.current.sips,
+        part: s.part,
+        untilCard: coming ? s.cardIndex + Number(coming[1]) : null,
+        taken: {},
+      },
+    ];
+  }
   turn.turns += 1;
   s.lastTurnId = turn.id;
 }
@@ -352,7 +391,7 @@ function drawChallenge(s: GameState, ctx: Ctx): string {
   const pool = s.challengePool.filter((c) => c.level <= s.part);
   const card = pick(pool.length > 0 ? pool : s.challengePool, ctx.rng);
   const text = card ? scaleSips(card.text, s.part, s.occasion) : 'Gör en segerpose i 10 sekunder.';
-  return usesPoints(s) ? familyText(text) : text;
+  return usesPoints(s) ? familyText(text, isFamily(s)) : text;
 }
 
 export function applyAction(input: GameState, playerId: string, action: Action, ctx: Ctx): GameState {
@@ -460,6 +499,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
         if (family) throw new GameError('Man kan inte spara när ni spelar om poäng');
         me.saved += c.sips;
         logEvent(s, playerId, `sparade ${sipsWord(c.sips, false)} (har ${me.saved} sparade)`);
+        if (me.saved >= savedCap(s.part)) logEvent(s, playerId, `fick ERROR med ${me.saved} sparade klunkar!`, 'error');
       } else if (action.choice === 'challenge') {
         const text = drawChallenge(s, ctx);
         s.overlays[playerId] = { text, advancesCard: solo };
@@ -519,7 +559,8 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
     case 'take':
     case 'untake': {
       const c = requireCurrent();
-      if (!canTake(c, me)) throw new GameError('Det här kortet är redan klart – kolla skärmen', 409);
+      if (!isTakeCard(c)) throw new GameError('Det här kortet är redan klart – kolla skärmen', 409);
+      if (!canTake(s, c, playerId, ctx)) throw new GameError(`Bara ${nameOfId(s, c.turnId)} (spelledare) och värden delar ut`, 403);
       const target = s.players.find((pl) => pl.id === action.targetId);
       if (!target) throw new GameError('Spelaren finns inte', 404);
       const taken = (c.taken ??= {});
@@ -538,6 +579,27 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       }
       break;
     }
+    case 'rule_take':
+    case 'rule_untake': {
+      const rule = (s.rules ?? []).find((r) => r.id === action.ruleId);
+      if (!rule) throw new GameError('Regeln finns inte längre', 409);
+      if (!canGive(s, rule.byId, playerId, ctx)) throw new GameError(`Bara ${nameOfId(s, rule.byId)} (spelledare) och värden delar ut`, 403);
+      const target = s.players.find((pl) => pl.id === action.targetId);
+      if (!target) throw new GameError('Spelaren finns inte', 404);
+      const what = sipsWord(rule.sips, usesPoints(s));
+      const label = rule.title ?? 'regeln';
+      if (action.type === 'rule_take') {
+        rule.taken[target.id] = (rule.taken[target.id] ?? 0) + 1;
+        target.drank += rule.sips;
+        logEvent(s, playerId, `gav ${target.name} ${what} (${label})`);
+      } else {
+        if (!rule.taken[target.id]) throw new GameError(`${target.name} har inte fått några för den regeln`, 409);
+        rule.taken[target.id] -= 1;
+        target.drank = Math.max(0, target.drank - rule.sips);
+        logEvent(s, playerId, `tog bort ${what} från ${target.name} (${label})`);
+      }
+      break;
+    }
     case 'next': {
       const c = requireCurrent();
       if (!canPressNext(s, c, playerId, ctx)) {
@@ -552,9 +614,13 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       requireLeader();
       if (s.status !== 'partEnd') throw new GameError('Delen är inte slut än', 409);
       assertNotPaused(s, ctx);
+      s.rules = (s.rules ?? []).filter((r) => r.part > s.part);
+      const before = new Set(pausedPlayers(s).map((p) => p.id));
       s.part += 1;
       s.cardIndex = 0;
       s.status = 'playing';
+      // Taket sjunker i nya delen – den som nu har för många sparade får ERROR.
+      for (const p of pausedPlayers(s)) if (!before.has(p.id)) logEvent(s, p.id, `fick ERROR med ${p.saved} sparade klunkar!`, 'error');
       deal(s, ctx);
       break;
     }
@@ -571,6 +637,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       for (const p of s.players) {
         Object.assign(p, { saved: 0, drank: 0, votesReceived: 0, challenges: 0, turns: 0 });
       }
+      s.rules = [];
       startPlaying(s, ctx);
       break;
     }

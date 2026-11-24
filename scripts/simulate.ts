@@ -14,7 +14,9 @@ import {
   familyText,
   usesPoints,
   sipsForPart,
-  canTake,
+  isTakeCard,
+  isLeaderCard,
+  isLastingRule,
   GameError,
   isSoloCard,
   MAX_SAVED,
@@ -59,6 +61,9 @@ console.log(`Kort: ${cards.length} st`);
 for (const kind of ['vem', 'direkt', 'trivia', 'utmaning', 'minigame', 'bild']) {
   console.log(`  ${kind}: ${cards.filter((c) => c.kind === kind).length}`);
 }
+
+let rulesChecked = 0;
+let errorsLogged = 0;
 
 function play(seed: number, playerCount: number, mode: GameMode = 'classic', occasion: Occasion = 'fest', scoring: Scoring = 'klunkar') {
   const rng = makeRng(seed);
@@ -151,12 +156,25 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
     // Den som har för många sparade klunkar måste dricka först.
     const paused = pausedPlayers(s);
     if (paused.length > 0) {
+      // ERROR loggas som händelse, så att alla ser den även om personen dricker direkt.
+      if ((s.events ?? []).some((e) => e.kind === 'error' && paused.some((p) => p.id === e.actorId))) errorsLogged++;
       assert.throws(() => act(paused[0].id, { type: s.status === 'partEnd' ? 'continue' : 'next' }), GameError);
       act(paused[0].id, { type: 'drink_saved' });
       continue;
     }
     if (s.status === 'partEnd') {
+      // Regelkoll: spelledaren delar ut för de regler som gällt i delen, ingen annan (utom värden).
+      for (const rule of (s.rules ?? []).filter((r) => r.part === s.part)) {
+        const before = s.players.find((pl) => pl.id === ids[1])!.drank;
+        act(rule.byId, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] });
+        assert.equal(s.players.find((pl) => pl.id === ids[1])!.drank, before + rule.sips, 'regelkollen räknades fel');
+        const outsider = ids.find((id) => id !== ids[0] && id !== rule.byId);
+        if (outsider) assert.throws(() => act(outsider, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] }), GameError, 'vem som helst kunde dela ut i regelkollen');
+        rulesChecked++;
+      }
+      const part = s.part;
       act(ids[0], { type: 'continue' });
+      assert.ok(!(s.rules ?? []).some((r) => r.part <= part), 'regler från förra delen ligger kvar');
       continue;
     }
     const overlayOwner = Object.keys(s.overlays)[0];
@@ -233,15 +251,23 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
         // Minigames har inga val – bara Nästa/Hoppa över.
         if (pausedPlayers(s).length === 0) assert.throws(() => act(ids[0], { type: 'choose', choice: 'drink' }), GameError, 'val på minigame');
       }
-      // Gruppkort, minigames och kaoskort: den som fick klunkar/minuspoäng trycker själv, och det räknas.
-      if (canTake(c, s.players.find((pl) => pl.id === ids[1])!) && rng() < 0.7) {
-        const before = s.players.find((pl) => pl.id === ids[1])!.drank;
-        act(ids[0], { type: 'take', targetId: ids[1] });
-        act(ids[2], { type: 'take', targetId: ids[1] });
-        act(ids[1], { type: 'untake', targetId: ids[1] });
-        assert.equal(s.players.find((pl) => pl.id === ids[1])!.drank, before + c.sips, 'poängen räknades fel');
-        assert.equal(s.current!.taken![ids[1]], 1);
-        assert.throws(() => act(ids[0], { type: 'untake', targetId: ids[2] }), GameError, 'tog bort poäng som inte fanns');
+      // Gruppkort, minigames och kaoskort: spelledaren (den som drog kortet) och värden delar ut – ingen annan.
+      if (isTakeCard(c) && pausedPlayers(s).length === 0 && rng() < 0.7) {
+        const target = ids[1];
+        const before = s.players.find((pl) => pl.id === target)!.drank;
+        act(ids[0], { type: 'take', targetId: target });
+        act(c.turnId, { type: 'take', targetId: target });
+        act(c.turnId, { type: 'untake', targetId: target });
+        assert.equal(s.players.find((pl) => pl.id === target)!.drank, before + c.sips, 'poängen räknades fel');
+        assert.equal(s.current!.taken![target], 1);
+        const outsider = ids.find((id) => id !== ids[0] && id !== c.turnId);
+        if (outsider) assert.throws(() => act(outsider, { type: 'take', targetId: target }), GameError, 'vem som helst kunde dela ut');
+        assert.throws(() => act(ids[0], { type: 'untake', targetId: ids.find((id) => id !== target)! }), GameError, 'tog bort poäng som inte fanns');
+      }
+      // Regler som gäller en stund: inga poäng direkt, men regeln sparas till regelkollen.
+      if (isLeaderCard(c.card) && isLastingRule(c.card, c.text)) {
+        assert.ok(!isTakeCard(c), 'regel delades ut direkt');
+        assert.ok((s.rules ?? []).some((r) => r.text === c.text && r.byId === c.turnId), 'regeln sparades inte');
       }
       if (c.card.kind === 'minigame') {
         // (inga val)
@@ -257,9 +283,10 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
         }
       }
       if (s.current?.seq === c.seq && pausedPlayers(s).length === 0) {
-        // Gruppkort: bara värden går vidare.
-        assert.throws(() => act(ids[1], { type: 'next' }), GameError, 'icke-värd fick trycka nästa på gruppkort');
-        act(ids[0], { type: 'next' });
+        // Gruppkort: värden går vidare – på minigames, kaoskort och gruppkort även spelledaren, men ingen annan.
+        const other = ids.find((id) => id !== ids[0] && !(isLeaderCard(c.card) && id === c.turnId));
+        if (other) assert.throws(() => act(other, { type: 'next' }), GameError, 'fel spelare fick trycka nästa på gruppkort');
+        act(isLeaderCard(c.card) && rng() < 0.5 ? c.turnId : ids[0], { type: 'next' });
       }
     }
     for (const p of s.players) assert.ok(p.saved <= MAX_SAVED + 12, 'för många sparade klunkar');
@@ -350,3 +377,7 @@ assert.equal(familyText('Den som pratar dricker 2 klunkar.'), 'Den som pratar f�
 assert.equal(familyText('Nämn en stad, annars drick 3 klunkar.'), 'Nämn en stad, annars ta 3 minuspoäng.');
 assert.equal(familyText('Den yngsta dricker.'), 'Den yngsta får minuspoäng.');
 console.log('180 simulerade "Bygg eget spel" (Fest, AW, Familjespel) med 3–15 spelare: OK');
+assert.ok(rulesChecked > 0, 'regelkollen testades aldrig');
+console.log(`Regelkoll testad: ${rulesChecked} regler`);
+assert.ok(errorsLogged > 0, 'ERROR loggades aldrig som händelse');
+console.log(`ERROR-händelser: ${errorsLogged}`);

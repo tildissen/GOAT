@@ -73,9 +73,13 @@ export function ChoiceButtons({
 }
 
 export function Board({ state, active, meId }: { state: PublicState; active: string[]; meId: string }) {
-  const players = [...state.players].filter((p) => p.ready).sort((a, b) => b.saved - a.saved || b.drank - a.drank);
+  // Med poäng leder den som har minst – hen står överst (B99).
+  const points = usesPoints(state);
+  const players = [...state.players]
+    .filter((p) => p.ready)
+    .sort((a, b) => (points ? a.drank - b.drank : b.saved - a.saved || b.drank - a.drank));
   return (
-    <div className="board">
+    <div className={`board${players.length > 5 ? ' compact' : ''}`}>
       {players.map((p) => (
         <div key={p.id} className={`board-row${p.id === meId ? ' me' : ''}${active.includes(p.id) ? '' : ' offline'}`}>
           <Avatar player={p} />
@@ -163,6 +167,78 @@ export function Stats({ state, meId }: { state: PublicState; meId: string }) {
           <span className="stat">{sipsText(me.drank, family)}</span>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Lista där spelledaren och värden ger klunkar/poäng till spelare (gruppkort och regelkollen).
+ * Alla andra ser bara vem som har fått något (B95).
+ */
+export function GiveList({
+  state,
+  players,
+  taken,
+  sips,
+  byId,
+  mayGive,
+  meId,
+  busy,
+  onGive,
+  onUndo,
+  prompt,
+}: {
+  state: PublicState;
+  players: { id: string; name: string }[];
+  taken: Record<string, number>;
+  sips: number;
+  byId: string;
+  mayGive: boolean;
+  meId: string;
+  busy: boolean;
+  onGive: (id: string) => void;
+  onUndo: (id: string) => void;
+  prompt?: string;
+}) {
+  const family = usesPoints(state);
+  const what = sipsText(sips, family);
+  const leader = byId === meId ? 'Du' : nameOf(state, byId);
+  if (!mayGive) {
+    const got = players.filter((pl) => (taken[pl.id] ?? 0) > 0);
+    return (
+      <div className="actions">
+        <p className="hint">
+          {leader} (spelledare) och värden delar ut {family ? 'poäng' : 'klunkar'}.
+        </p>
+        {got.length > 0 && (
+          <p className="give-summary">
+            {got.map((pl) => `${pl.name} +${(taken[pl.id] ?? 0) * sips}`).join(' · ')}
+          </p>
+        )}
+      </div>
+    );
+  }
+  return (
+    <div className="actions">
+      <p className="choice-prompt">{prompt ?? (family ? `Vem fick ${what}?` : `Vem fick dricka ${what}?`)}</p>
+      <div className="take-list">
+        {players.map((pl) => {
+          const n = taken[pl.id] ?? 0;
+          return (
+            <div key={pl.id} className={`take-row${n > 0 ? ' on' : ''}`}>
+              <button className="take-name" disabled={busy} onClick={() => onGive(pl.id)} aria-label={`Ge ${pl.name} ${what}`}>
+                <span>{pl.name}</span>
+                <strong>{n > 0 ? `+${n * sips}` : '+'}</strong>
+              </button>
+              {n > 0 && (
+                <button className="take-undo" disabled={busy} onClick={() => onUndo(pl.id)} aria-label={`Ta bort ${what} från ${pl.name}`}>
+                  −
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -2,11 +2,11 @@
 
 import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
-import { canPressNext, canTake, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
+import { canGive, canPressNext, isLastingRule, isLeaderCard, isTakeCard, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import Face from '../Face';
 import { KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
-import { Board, ChoiceButtons, choiceText, nameOf, possessive, sipsText, type GameProps } from './shared';
+import { Board, ChoiceButtons, choiceText, GiveList, nameOf, possessive, sipsText, type GameProps } from './shared';
 
 /** Visar kortet som spelas just nu – olika beroende på korttyp och vems tur det är. */
 export default function Playing(props: GameProps) {
@@ -46,9 +46,29 @@ function CardScreen({
   return (
     <Screen bg={bg ?? theme.bg}>
       <Hud me={game.me} part={game.state.part} index={game.state.cardIndex} total={game.state.cardsInPart} family={usesPoints(game.state)} />
+      <ActiveRules state={game.state} />
       <div className={`card ${card ?? theme.card}`}>{children}</div>
       {below && <div className="stack" style={{ marginTop: 18 }}>{below}</div>}
     </Screen>
+  );
+}
+
+/** Regler som gäller just nu (från tidigare kort i delen), så att alla vet hur länge de gäller (B96). */
+function ActiveRules({ state }: { state: GameProps['state'] }) {
+  const seq = state.current?.seq;
+  const rules = (state.rules ?? []).filter(
+    (r) => r.part === state.part && r.id !== `r${seq}` && (r.untilCard === null || state.cardIndex <= r.untilCard),
+  );
+  if (rules.length === 0) return null;
+  return (
+    <div className="active-rules" aria-label="Regler som gäller">
+      {rules.map((r) => (
+        <span key={r.id} className="active-rule">
+          <strong>{r.title ?? 'Regel'}</strong>
+          {r.untilCard === null ? ' · resten av delen' : ` · ${r.untilCard - state.cardIndex + 1} kort till`}
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -112,7 +132,11 @@ function canAdvance(p: CardProps) {
 
 function NextButton(p: CardProps & { label?: string; color?: 'white' | 'cyan' | 'ink' }) {
   if (!canAdvance(p)) {
-    const who = isSoloCard(p.cur.card) ? nameOf(p.state, p.cur.turnId) : `${nameOf(p.state, p.state.hostId)} (värd)`;
+    const who = isSoloCard(p.cur.card)
+      ? nameOf(p.state, p.cur.turnId)
+      : isLeaderCard(p.cur.card)
+        ? `${nameOf(p.state, p.cur.turnId)} (spelledare)`
+        : `${nameOf(p.state, p.state.hostId)} (värd)`;
     return <p className="body-text">Väntar på att {who} trycker nästa…</p>;
   }
   return (
@@ -212,6 +236,10 @@ function Challenge(p: CardProps) {
   // Gruppkort, lagkort och minigames har inga val – värden trycker Nästa.
   const canSkip = !minigame && (solo || (cur.card.players === 2 && involved));
   const mine = canSkip && (solo || !cur.choices[me.id]);
+  // Minigames, kaoskort och gruppkort har en spelledare: den som drog kortet läser, leder och delar ut (B94, B95).
+  const leads = isLeaderCard(cur.card);
+  const leaderName = nameOf(p.state, cur.turnId);
+  const lasting = isLastingRule(cur.card, cur.text);
   return (
     <CardScreen
       game={p}
@@ -223,8 +251,20 @@ function Challenge(p: CardProps) {
       {minigame && cur.card.title && <h2 className="minigame-title">{cur.card.title}</h2>}
       {kaos && <h2 className="minigame-title kaos-title">KAOS!</h2>}
       {solo && <p className="heading name-font name-big">{me.name}</p>}
+      {leads && (
+        <p className="leader-line">
+          <span className="chip">Spelledare</span>
+          <strong className="name-font">{cur.turnId === me.id ? 'Du!' : `${leaderName}!`}</strong>
+        </p>
+      )}
       <div className="card-body">
         <p className="card-text">{cur.text}</p>
+        {lasting && (
+          <p className="rule-note">
+            Regeln gäller {/de kommande \d+ korten/i.test(cur.text) ? 'de kommande korten' : 'resten av delen'}. Den som
+            bryter den räknas i regelkollen när delen är slut.
+          </p>
+        )}
         {cur.teams && (
           <div className="votes-list">
             {cur.teams.map((team, i) => (
@@ -240,54 +280,29 @@ function Challenge(p: CardProps) {
         <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" family={usesPoints(p.state)} />
       ) : canSkip ? (
         <Chosen cur={cur} meId={me.id} family={usesPoints(p.state)} />
-      ) : canTake(cur, me) ? (
+      ) : isTakeCard(cur) ? (
         <TakeButtons {...p} />
       ) : null}
     </CardScreen>
   );
 }
 
-/**
- * Gruppkort, minigames och kaoskort: tryck på den eller de som fick klunkarna/minuspoängen, så att det räknas.
- * Vem som helst kan trycka, och alla ser vem som gav vem.
- */
+/** Gruppkort, minigames och kaoskort: spelledaren och värden trycker på den eller de som fick klunkarna/poängen. */
 function TakeButtons(p: CardProps) {
   const { cur, state } = p;
-  const family = usesPoints(state);
-  const taken = cur.taken ?? {};
-  const players = state.players.filter((pl) => pl.ready);
   return (
-    <div className="actions">
-      <p className="choice-prompt">{family ? `Vem fick ${sipsText(cur.sips, true)}?` : `Vem fick dricka ${sipsText(cur.sips)}?`}</p>
-      <div className="take-list">
-        {players.map((pl) => {
-          const n = taken[pl.id] ?? 0;
-          return (
-            <div key={pl.id} className={`take-row${n > 0 ? ' on' : ''}`}>
-              <button
-                className="take-name"
-                disabled={p.busy}
-                onClick={() => p.act({ type: 'take', targetId: pl.id })}
-                aria-label={`Ge ${pl.name} ${sipsText(cur.sips, family)}`}
-              >
-                <span>{pl.name}</span>
-                <strong>{n > 0 ? `+${n * cur.sips}` : '+'}</strong>
-              </button>
-              {n > 0 && (
-                <button
-                  className="take-undo"
-                  disabled={p.busy}
-                  onClick={() => p.act({ type: 'untake', targetId: pl.id })}
-                  aria-label={`Ta bort ${sipsText(cur.sips, family)} från ${pl.name}`}
-                >
-                  −
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <GiveList
+      state={state}
+      players={state.players.filter((pl) => pl.ready)}
+      taken={cur.taken ?? {}}
+      sips={cur.sips}
+      byId={cur.turnId}
+      mayGive={canGive(state, cur.turnId, p.me.id, { active: new Set(p.view.active) })}
+      meId={p.me.id}
+      busy={p.busy}
+      onGive={(id) => p.act({ type: 'take', targetId: id })}
+      onUndo={(id) => p.act({ type: 'untake', targetId: id })}
+    />
   );
 }
 
@@ -350,9 +365,12 @@ function VoteCard(p: CardProps) {
         </>
       )}
       <div className="dots" aria-label={`${voted} av ${voters.length} har röstat`}>
-        {voters.map((v) => (
-          <i key={v.id} className={v.id in cur.votes ? 'on' : ''} />
-        ))}
+        {/* De som har röstat först, så att prickarna fylls på i ordning (B98). */}
+        {[...voters]
+          .sort((a, b) => Number(b.id in cur.votes) - Number(a.id in cur.votes))
+          .map((v) => (
+            <i key={v.id} className={v.id in cur.votes ? 'on' : ''} />
+          ))}
         <span>
           {voted} av {voters.length} har röstat
         </span>

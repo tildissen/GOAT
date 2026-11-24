@@ -346,7 +346,7 @@ button.name-pill:active { transform: scale(0.97); }
   background: rgba(0, 0, 0, 0.25);
   animation: fade 0.2s ease;
 }
-.overlay.solid-error { background: var(--error); }
+.overlay.solid-error { background: var(--error); z-index: 59; } /* ERROR överst, även över utmaningskortet (B98) */
 .overlay.solid-cyan { background: var(--cyan); }
 .overlay .panel {
   width: 100%;
@@ -819,3 +819,26 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 }
 .rules strong { font-size: 18px; }
 .rules p { margin: 2px 0 0; font-size: 16px; line-height: 1.35; }
+
+/* Spelledare på minigames, kaoskort och gruppkort (B94) */
+.leader-line { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 0; flex-wrap: wrap; }
+.leader-line strong { font-size: clamp(28px, 8vw, 38px); line-height: 1.1; }
+.rule-note { font-size: 15px; line-height: 1.35; margin: 12px 0 0; opacity: 0.85; }
+.give-summary { font-weight: 700; text-align: center; margin: 4px 0 0; }
+
+/* Regler som gäller just nu, under toppytan (B96) */
+.active-rules { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; width: 100%; margin: -4px 0 10px; }
+.active-rule { background: var(--black); color: var(--white); border-radius: 999px; padding: 4px 12px; font-size: 13px; }
+
+/* Regelkoll när delen är slut (B96) */
+.rule-check { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+.rule-check .heading { text-align: center; }
+.rule-check-card { padding: 20px 16px; gap: 10px; }
+.rule-title { margin: 0; font-size: 22px; text-align: center; }
+.rule-text { margin: 0; text-align: center; line-height: 1.35; }
+
+/* Kortare ställningslista när många spelar, så att sidan inte scrollar (B99) */
+.board.compact { gap: 5px; }
+.board.compact .board-row { padding-top: 6px; padding-bottom: 6px; }
+.board.compact .avatar { width: 36px; height: 36px; font-size: 15px; }
+.board.compact .board-row .stat { font-size: 14px; }
