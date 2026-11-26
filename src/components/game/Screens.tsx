@@ -325,7 +325,7 @@ export function PartIntro({ state }: GameProps) {
         </p>
         <p className="part-intro-info">
           {family
-            ? `${sips} minuspoäng per kort`
+            ? `${sips} poäng per kort`
             : `${sips} ${sips === 1 ? 'klunk' : 'klunkar'} per kort · max ${savedCap(state.part)} sparade`}
         </p>
       </div>

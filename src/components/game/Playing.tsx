@@ -84,7 +84,7 @@ export function Hud({
   part: number;
   index: number;
   total: number;
-  /** Familjespel: inga sparade klunkar, bara dina minuspoäng. */
+  /** Med pluspoäng: inga sparade klunkar, bara dina poäng (B102). */
   family?: boolean;
 }) {
   const cap = savedCap(part);
@@ -93,7 +93,7 @@ export function Hud({
     <div className="hud">
       {family ? (
         <div className="hud-block">
-          <span className="hud-label">Minuspoäng {me.drank}</span>
+          <span className="hud-label">Poäng {me.points ?? 0}</span>
         </div>
       ) : (
       <button
@@ -167,7 +167,7 @@ function Direct(p: CardProps) {
         family={usesPoints(p.state)}
         extra={
           <button className="btn yellow" disabled={p.busy} onClick={() => p.act({ type: 'choose', choice: 'answered' })}>
-            Jag svarar!
+            {usesPoints(p.state) ? `Jag svarar! +${p.cur.sips}` : 'Jag svarar!'}
           </button>
         }
       />
@@ -217,7 +217,9 @@ function Trivia(p: CardProps) {
       </div>
       {!answered && (
         <p className="hint">
-          {usesPoints(p.state) ? 'Fel svar: ta minuspoäng eller dra en utmaning' : 'Fel svar: drick, spara eller dra en utmaning'}
+          {usesPoints(p.state)
+            ? `Rätt svar: +${cur.sips} poäng. Fel svar: dra ett utmaningskort för att ändå få poäng`
+            : 'Fel svar: drick, spara eller dra en utmaning'}
         </p>
       )}
       {answered && !right && <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={usesPoints(p.state)} />}
@@ -245,7 +247,7 @@ function Challenge(p: CardProps) {
       game={p}
       bg={kaos ? 'yellow' : minigame ? 'cyan' : 'coral'}
       card={kaos ? 'kaos' : minigame ? 'coral' : 'green'}
-      below={<NextButton {...p} label={solo ? 'Klar!' : 'Nästa'} />}
+      below={<NextButton {...p} label={solo ? (usesPoints(p.state) && cur.turnId === me.id ? `Klar! +${cur.sips}` : 'Klar!') : 'Nästa'} />}
     >
       <KindTag kind={kaos ? 'kaos' : minigame ? 'minigame' : 'utmaning'} />
       {minigame && cur.card.title && <h2 className="minigame-title">{cur.card.title}</h2>}
@@ -277,7 +279,20 @@ function Challenge(p: CardProps) {
         {cur.card.players === 2 && involved && <p className="body-text">Det gäller dig!</p>}
       </div>
       {mine ? (
-        <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" family={usesPoints(p.state)} />
+        <ChoiceButtons
+          sips={cur.sips}
+          act={p.act}
+          busy={p.busy}
+          prompt="Vill du hoppa över?"
+          family={usesPoints(p.state)}
+          extra={
+            usesPoints(p.state) && !solo ? (
+              <button className="btn yellow" disabled={p.busy} onClick={() => p.act({ type: 'choose', choice: 'answered' })}>
+                Vi gjorde den! +{cur.sips}
+              </button>
+            ) : undefined
+          }
+        />
       ) : canSkip ? (
         <Chosen cur={cur} meId={me.id} family={usesPoints(p.state)} />
       ) : isTakeCard(cur) ? (
@@ -389,7 +404,8 @@ function ResultCard(p: CardProps) {
   const photo = cur.card.kind === 'bild';
   const owner = nameOf(state, cur.turnId);
   const iLost = cur.losers.includes(me.id);
-  const pending = cur.losers.filter((id) => !cur.choices[id] && p.view.active.includes(id));
+  // Med pluspoäng finns inga val efter röstningen – poängen är redan utdelade.
+  const pending = usesPoints(state) ? [] : cur.losers.filter((id) => !cur.choices[id] && p.view.active.includes(id));
   const loserNames = cur.losers.map((id) => nameOf(state, id));
   const everyoneTied = !photo && cur.losers.length > 2 && cur.losers.length === Object.keys(cur.tally ?? {}).length;
 
@@ -397,7 +413,7 @@ function ResultCard(p: CardProps) {
   if (photo && cur.photoSkipped) {
     headline = (
       <p className="card-text">
-        {owner} vägrade ladda upp en bild – och {usesPoints(state) ? 'får minuspoäng' : 'får dricka'}!
+        {owner} vägrade ladda upp en bild{usesPoints(state) ? ' – inga poäng!' : ' – och får dricka!'}
       </p>
     );
   } else if (photo) {
@@ -407,9 +423,13 @@ function ResultCard(p: CardProps) {
         <div className="code-box" style={{ background: 'var(--green)', fontSize: 'clamp(26px, 9vw, 40px)', cursor: 'default' }}>
           <span className="display mid name-font">{owner.toUpperCase()}</span>
         </div>
-        <p className="heading">{allRight
-            ? `ägde bilden – alla gissade rätt, så ${owner} ${usesPoints(state) ? 'får minuspoäng' : 'dricker'}!`
-            : `ägde bilden! Alla som gissade fel ${usesPoints(state) ? 'får minuspoäng' : 'dricker'}.`}</p>
+        <p className="heading">{usesPoints(state)
+            ? Object.values(cur.tally ?? {}).length > 0 && (cur.tally ?? {})[cur.turnId]
+              ? `ägde bilden! Alla som gissade rätt får +${cur.sips}.`
+              : `ägde bilden och lurade alla – ${owner} får +${cur.sips}!`
+            : allRight
+              ? `ägde bilden – alla gissade rätt, så ${owner} dricker!`
+              : 'ägde bilden! Alla som gissade fel dricker.'}</p>
       </>
     );
   } else {
@@ -422,10 +442,14 @@ function ResultCard(p: CardProps) {
         </div>
         <p className="heading">
           {everyoneTied
-            ? `fick lika många röster – alla ${usesPoints(state) ? 'får minuspoäng' : 'dricker'}!`
+            ? `fick lika många röster – alla ${usesPoints(state) ? `förlorar ${cur.sips} poäng` : 'dricker'}!`
             : cur.losers.length > 1
-              ? 'fick lika många röster'
-              : 'fick flest röstningar'}
+              ? usesPoints(state)
+                ? `fick lika många röster – och förlorar ${cur.sips} poäng`
+                : 'fick lika många röster'
+              : usesPoints(state)
+                ? `fick flest röster – och förlorar ${cur.sips} poäng`
+                : 'fick flest röstningar'}
         </p>
       </>
     );
@@ -460,7 +484,7 @@ function ResultCard(p: CardProps) {
             ))}
         </div>
       )}
-      {iLost && !cur.choices[me.id] ? (
+      {iLost && !cur.choices[me.id] && !usesPoints(state) ? (
         <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={usesPoints(state)} />
       ) : (
         <div className="votes-list">

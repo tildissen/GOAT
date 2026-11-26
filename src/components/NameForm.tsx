@@ -141,11 +141,11 @@ export default function NameForm({
 
 const OCCASIONS: { key: Occasion; icon: IconName; label: string; desc: string }[] = [
   { key: 'aw', icon: 'aw', label: 'AW', desc: 'Kollegor och vänner. Lugna frågor, inget pinsamt.' },
-  { key: 'familj', icon: 'familj', label: 'Familjespel', desc: 'Alla åldrar och alkoholfritt – minuspoäng i stället för klunkar.' },
+  { key: 'familj', icon: 'familj', label: 'Familjespel', desc: 'Alla åldrar och alkoholfritt – poäng i stället för klunkar.' },
   { key: 'fest', icon: 'fest', label: 'Fest', desc: 'Allt är tillåtet. Blir vildare för varje del.' },
 ];
 
 const SCORINGS: { key: Scoring; label: string; desc: string }[] = [
   { key: 'klunkar', label: 'Klunkar', desc: 'Den som vägrar dricker. Klunkar går att spara.' },
-  { key: 'poang', label: 'Poäng', desc: 'Minuspoäng i stället för klunkar. Minst poäng vinner.' },
+  { key: 'poang', label: 'Poäng', desc: 'Samla poäng i stället för att dricka. Flest poäng vinner.' },
 ];

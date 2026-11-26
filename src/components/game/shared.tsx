@@ -17,9 +17,12 @@ export interface GameProps {
 
 export const PART_WORDS = ['ett', 'två', 'tre', 'fyra'];
 
-/** "2 klunkar", eller "2 minuspoäng" i familjespel. */
+/** "2 klunkar", eller "2 poäng" när man spelar om pluspoäng (B102). */
 export const sipsText = (n: number, family = false) =>
-  family ? `${n} minuspoäng` : `${n} ${n === 1 ? 'klunk' : 'klunkar'}`;
+  family ? `${n} poäng` : `${n} ${n === 1 ? 'klunk' : 'klunkar'}`;
+
+/** Spelarens pluspoäng (flest vinner). */
+export const scoreOf = (p: { points?: number }) => p.points ?? 0;
 
 export function nameOf(state: PublicState, id: string): string {
   return state.players.find((p) => p.id === id)?.name ?? '?';
@@ -29,11 +32,12 @@ export function possessive(name: string): string {
   return /[sxz]$/i.test(name) ? name : `${name}s`;
 }
 
-/** Vad någon valde, t.ex. "drack 2 klunkar" eller "fick 2 minuspoäng". */
+/** Vad någon valde, t.ex. "drack 2 klunkar" eller, med pluspoäng, "fick 2 poäng". */
 export function choiceText(choice: Choice, sips: number, family = false): string {
-  if (choice === 'drink') return family ? `fick ${sipsText(sips, true)}` : `drack ${sipsText(sips)}`;
+  if (choice === 'drink') return family ? 'hoppade över (0 poäng)' : `drack ${sipsText(sips)}`;
   if (choice === 'save') return `sparade ${sipsText(sips)}`;
-  return choice === 'challenge' ? 'drog ett utmaningskort' : 'svarade';
+  if (choice === 'challenge') return 'drog ett utmaningskort';
+  return family ? `klarade det och fick ${sipsText(sips, true)}` : 'svarade';
 }
 
 /** De tre knapparna: dricka, spara eller dra ett utmaningskort. I familjespel: ta minuspoäng eller dra ett utmaningskort. */
@@ -58,7 +62,7 @@ export function ChoiceButtons({
       {extra}
       {prompt && <p className="choice-prompt">{prompt}</p>}
       <button className="btn yellow" disabled={busy} onClick={() => act({ type: 'choose', choice: 'drink' })}>
-        {family ? `Jag tar ${sipsText(sips, true)}` : `Jag dricker ${sipsText(sips)}`}
+        {family ? 'Hoppa över (0 poäng)' : `Jag dricker ${sipsText(sips)}`}
       </button>
       {!family && (
         <button className="btn yellow" disabled={busy} onClick={() => act({ type: 'choose', choice: 'save' })}>
@@ -73,11 +77,11 @@ export function ChoiceButtons({
 }
 
 export function Board({ state, active, meId }: { state: PublicState; active: string[]; meId: string }) {
-  // Med poäng leder den som har minst – hen står överst (B99).
+  // Med pluspoäng leder den som har flest – hen står överst (B99, B102).
   const points = usesPoints(state);
   const players = [...state.players]
     .filter((p) => p.ready)
-    .sort((a, b) => (points ? a.drank - b.drank : b.saved - a.saved || b.drank - a.drank));
+    .sort((a, b) => (points ? scoreOf(b) - scoreOf(a) : b.saved - a.saved || b.drank - a.drank));
   return (
     <div className={`board${players.length > 5 ? ' compact' : ''}`}>
       {players.map((p) => (
@@ -86,7 +90,7 @@ export function Board({ state, active, meId }: { state: PublicState; active: str
           <span className="name">{p.name}</span>
           {usesPoints(state) ? (
             <span className="stat">
-              minuspoäng <strong>{p.drank}</strong>
+              poäng <strong>{scoreOf(p)}</strong>
             </span>
           ) : (
             <span className="stat">
@@ -103,7 +107,7 @@ export function Board({ state, active, meId }: { state: PublicState; active: str
 
 /**
  * Slutskärmens topp 3: en ruta per person, med det personen vann ("Fick flest röster" osv.) i rutan.
- * Vanligt spel: flest klunkar överst. Familjespel: minst minuspoäng överst (vinnaren).
+ * Vanligt spel: flest klunkar överst. Med pluspoäng: flest poäng överst (vinnaren).
  */
 /** 1:a, 2:a, 3:e, 4:e, 11:e, 12:e, 21:a … */
 export const ordinal = (n: number) => `${n}:${(n % 10 === 1 || n % 10 === 2) && n % 100 !== 11 && n % 100 !== 12 ? 'a' : 'e'}`;
@@ -117,23 +121,25 @@ export function Stats({ state, meId }: { state: PublicState; meId: string }) {
     return best && best[key] > 0 ? best.id : null;
   };
   const awards: [string | null, string][] = [
-    [leader('drank'), family ? 'Flest minuspoäng' : 'Drack mest'],
+    ...(family ? [] : [[leader('drank'), 'Drack mest'] as [string | null, string]]),
     [leader('votesReceived'), 'Fick flest röster'],
     [leader('challenges'), 'Flest utmaningar'],
   ];
-  const ranked = [...players].sort((a, b) => (family ? a.drank - b.drank : b.drank - a.drank)).slice(0, 3);
+  // Med pluspoäng räknas poängen, annars klunkarna – flest överst i båda fallen.
+  const value = (p: (typeof players)[number]) => (family ? scoreOf(p) : p.drank);
+  const ranked = [...players].sort((a, b) => value(b) - value(a)).slice(0, 3);
   // Plats: lika resultat delar plats, så "5:e" betyder att fyra personer var bättre.
-  const better = (a: number, b: number) => (family ? a < b : a > b);
   const me = players.find((p) => p.id === meId);
-  const myPlace = me ? 1 + players.filter((q) => better(q.drank, me.drank)).length : 0;
-  const myShared = me ? players.some((q) => q.id !== me.id && q.drank === me.drank) : false;
+  const myPlace = me ? 1 + players.filter((q) => value(q) > value(me)).length : 0;
+  const myShared = me ? players.some((q) => q.id !== me.id && value(q) === value(me)) : false;
   const meInTop = Boolean(me && ranked.some((p) => p.id === me.id));
   const medals = ['🥇', '🥈', '🥉'];
   return (
     <div className="board podium">
       {ranked.map((p, i) => {
         const won = awards.filter(([id]) => id === p.id).map(([, label]) => label);
-        if (family && i === 0) won.unshift('Vinnare');
+        // Lika många poäng som ettan = också vinnare.
+        if (family && value(p) === value(ranked[0])) won.unshift(i === 0 ? 'Vinnare' : 'Delad vinnare');
         return (
           <div key={p.id} className={`board-row podium-row${i === 0 ? ' first' : ''}${p.id === meId ? ' me' : ''}`}>
             <span className="medal" aria-label={`Plats ${i + 1}`}>
@@ -147,7 +153,7 @@ export function Stats({ state, meId }: { state: PublicState; meId: string }) {
               </span>
               {won.length > 0 && <small>{won.join(' · ')}</small>}
             </span>
-            <span className="stat">{sipsText(p.drank, family)}</span>
+            <span className="stat">{sipsText(value(p), family)}</span>
           </div>
         );
       })}
@@ -164,7 +170,7 @@ export function Stats({ state, meId }: { state: PublicState; meId: string }) {
               {ordinal(myPlace)} av {players.length}
             </small>
           </span>
-          <span className="stat">{sipsText(me.drank, family)}</span>
+          <span className="stat">{sipsText(value(me), family)}</span>
         </div>
       )}
     </div>
@@ -212,7 +218,7 @@ export function GiveList({
         </p>
         {got.length > 0 && (
           <p className="give-summary">
-            {got.map((pl) => `${pl.name} +${(taken[pl.id] ?? 0) * sips}`).join(' · ')}
+            {got.map((pl) => `${pl.name} ${family ? '−' : '+'}${(taken[pl.id] ?? 0) * sips}`).join(' · ')}
           </p>
         )}
       </div>
@@ -220,7 +226,7 @@ export function GiveList({
   }
   return (
     <div className="actions">
-      <p className="choice-prompt">{prompt ?? (family ? `Vem fick ${what}?` : `Vem fick dricka ${what}?`)}</p>
+      <p className="choice-prompt">{prompt ?? (family ? `Vem förlorade ${what}?` : `Vem fick dricka ${what}?`)}</p>
       <div className="take-list">
         {players.map((pl) => {
           const n = taken[pl.id] ?? 0;
@@ -228,11 +234,11 @@ export function GiveList({
             <div key={pl.id} className={`take-row${n > 0 ? ' on' : ''}`}>
               <button className="take-name" disabled={busy} onClick={() => onGive(pl.id)} aria-label={`Ge ${pl.name} ${what}`}>
                 <span>{pl.name}</span>
-                <strong>{n > 0 ? `+${n * sips}` : '+'}</strong>
+                <strong>{n > 0 ? `${family ? '−' : '+'}${n * sips}` : family ? '−' : '+'}</strong>
               </button>
               {n > 0 && (
                 <button className="take-undo" disabled={busy} onClick={() => onUndo(pl.id)} aria-label={`Ta bort ${what} från ${pl.name}`}>
-                  −
+                  {family ? '↺' : '−'}
                 </button>
               )}
             </div>

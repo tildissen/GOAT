@@ -90,8 +90,8 @@ function rulesFor(state: GameProps['state']): { intro: string; rules: Rule[] } {
       rules: [
         aloud,
         { ...cards, text: cards.text.replace('vildare', 'lite svårare') },
-        { title: 'Vill du inte?', text: 'Ta minuspoäng – eller dra ett utmaningskort och gör det.' },
-        { title: 'Minst vinner', text: 'Den med minst minuspoäng i slutet vinner.' },
+        { title: 'Samla poäng', text: 'Svara, klara utmaningen eller gissa rätt – så får du kortets poäng. Vägrar du får du 0.' },
+        { title: 'Flest vinner', text: 'Straff gör att man förlorar poäng. Den med flest poäng i slutet vinner.' },
       ],
     };
   }
@@ -101,8 +101,8 @@ function rulesFor(state: GameProps['state']): { intro: string; rules: Rule[] } {
       rules: [
         aloud,
         cards,
-        { title: 'Vill du inte?', text: 'Ta minuspoäng – eller dra ett utmaningskort och gör det.' },
-        { title: 'Minst vinner', text: 'Den med minst minuspoäng i slutet vinner.' },
+        { title: 'Samla poäng', text: 'Svara, klara utmaningen eller gissa rätt – så får du kortets poäng. Vägrar du får du 0.' },
+        { title: 'Flest vinner', text: 'Straff gör att man förlorar poäng. Den med flest poäng i slutet vinner.' },
       ],
     };
   }
@@ -251,27 +251,27 @@ const CARD_TYPES: {
   },
 ];
 
-/** Familjespel: samma korttyper, men med minuspoäng i stället för att dricka. */
+/** Familjespel: samma korttyper, men med poäng i stället för att dricka (B102). */
 const FAMILY_TYPE_TEXT: Partial<Record<CardTypeKey, { desc: string; example: string }>> = {
   vem: {
-    desc: 'Ett påstående som alla röstar på. Börja gärna med "Vem …". Den som får flest röster får minuspoäng.',
+    desc: 'Ett påstående som alla röstar på. Börja gärna med "Vem …". Den som får flest röster förlorar poäng.',
     example: 'Vem skulle klara sig längst utan mobil?',
   },
   direkt: {
-    desc: 'En fråga till en person – välj vem nedan, eller låt den vars tur det är få den. Bara hen ser frågan och måste svara – eller ta minuspoäng.',
+    desc: 'En fråga till en person – välj vem nedan, eller låt den vars tur det är få den. Svarar hen får hen poäng.',
     example: 'Vilken superkraft skulle du välja, och varför?',
   },
   solo: {
-    desc: 'Något som en person måste göra – välj vem nedan, eller låt den vars tur det är få den. Vägrar hen får hen minuspoäng eller drar ett utmaningskort.',
+    desc: 'Något som en person måste göra – välj vem nedan, eller låt den vars tur det är få den. Klarar hen det får hen poäng.',
     example: 'Härma ett djur tills någon gissar vilket.',
   },
   alla: {
-    desc: 'Gäller hela gruppen. Skriv vem som får minuspoäng och hur många – antalet ökar automatiskt för varje del.',
-    example: 'Alla som har randiga strumpor får 2 minuspoäng.',
+    desc: 'Gäller hela gruppen. Skriv vem som förlorar poäng och hur många – antalet ökar automatiskt för varje del.',
+    example: 'Alla som har randiga strumpor förlorar 2 poäng.',
   },
   minigame: {
     desc: 'En lek eller regel som alla gör tillsammans. Ge den ett namn och förklara reglerna.',
-    example: 'Alla står stilla som statyer i 20 sekunder. Den som rör sig först får 2 minuspoäng.',
+    example: 'Alla står stilla som statyer i 20 sekunder. Den som rör sig först förlorar 2 poäng.',
   },
 };
 

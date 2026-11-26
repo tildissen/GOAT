@@ -49,6 +49,8 @@ export interface Player {
   ready: boolean;
   saved: number;
   drank: number;
+  /** Med poäng (Familjespel, AW/Fest med poäng): pluspoäng – flest vinner (B102). Saknas i äldre spel = 0. */
+  points?: number;
   votesReceived: number;
   challenges: number;
   turns: number;

@@ -50,6 +50,7 @@ export function newPlayer(id: string, name: string, now: number): Player {
     ready: false,
     saved: 0,
     drank: 0,
+    points: 0,
     votesReceived: 0,
     challenges: 0,
     turns: 0,
@@ -141,6 +142,31 @@ export function familyText(text: string, alcoholFree = true): string {
   // I AW/Fest med poäng dricker man fortfarande – "Den som dricker med höger" ska stå kvar (B97).
   return alcoholFree ? t.replace(/\bdricker\b/gi, 'får minuspoäng') : t;
 }
+
+/**
+ * Pluspoäng (B102): klunkar och minuspoäng i korttexterna blir poäng man förlorar.
+ * "Den som tvekar tar 2 klunkar" → "Den som tvekar förlorar 2 poäng".
+ * alcoholFree (Familjespel): även "dricker" utan siffra skrivs om.
+ */
+export function pointsText(text: string, alcoholFree = true): string {
+  return familyText(text, alcoholFree)
+    .replace(/\bdelar ut (\d+) minuspoäng/gi, 'väljer någon som förlorar $1 poäng')
+    .replace(/\bfår (\d+) minuspoäng/gi, 'förlorar $1 poäng')
+    .replace(/\bfår (du|hen|ni|alla|de|man) (\d+) minuspoäng/gi, 'förlorar $1 $2 poäng')
+    .replace(/\bta (\d+) minuspoäng/gi, 'förlora $1 poäng')
+    .replace(/\btar (\d+) minuspoäng/gi, 'förlorar $1 poäng')
+    .replace(/hur många minuspoäng man får/gi, 'hur många poäng man förlorar')
+    .replace(/\bta minuspoängen/gi, 'förlora poängen')
+    .replace(/\bfår minuspoäng/gi, 'förlorar poäng')
+    .replace(/minuspoäng/gi, 'poäng');
+}
+
+/** Ger (eller tar) pluspoäng. */
+function addPoints(p: Player, n: number) {
+  p.points = (p.points ?? 0) + n;
+}
+
+const pts = (n: number) => `${n} poäng`;
 
 const MAX_EVENTS = 8;
 
@@ -270,9 +296,9 @@ function deal(s: GameState, ctx: Ctx) {
 
   // På utmaningar och minigames gäller antalet klunkar som står på kortet.
   // Med poäng blir klunkar minuspoäng. I AW/Fest bara på kort med siffror, så att t.ex. "Vem dricker mest?" står kvar.
-  if (isFamily(s) || (usesPoints(s) && hasNumbers)) text = familyText(text, isFamily(s));
+  if (isFamily(s) || (usesPoints(s) && hasNumbers)) text = pointsText(text, isFamily(s));
   const sipsOnCard =
-    hasNumbers ? text.match(/(\d+)\s+(?:extra\s+)?(?:klunk|minuspoäng)/) : null;
+    hasNumbers ? text.match(/(\d+)\s+(?:extra\s+)?(?:klunk|minuspoäng|poäng)/) : null;
 
   s.seq += 1;
   s.current = {
@@ -315,6 +341,8 @@ function deal(s: GameState, ctx: Ctx) {
  * går vidare får klunkarna/minuspoängen ändå – annars kunde man slippa genom att låta bli att trycka.
  */
 function autoDrink(s: GameState, c: Current) {
+  // Med pluspoäng delas poängen ut direkt när rösterna räknas – inget att dricka.
+  if (usesPoints(s)) return;
   const must = c.phase === 'result' ? c.losers : c.card.kind === 'trivia' && c.triviaPick != null && c.triviaPick !== c.card.answerIndex ? [c.turnId] : [];
   for (const id of must) {
     const p = s.players.find((pl) => pl.id === id);
@@ -368,11 +396,33 @@ function resolveVotes(s: GameState, cur: Current) {
     }
   }
   cur.phase = 'result';
+  if (usesPoints(s)) {
+    // Pluspoäng (B102): Vems är bilden? – alla som gissade rätt får poäng, gissade ingen rätt får ägaren poäng.
+    // Vem i rummet? – den som fick flest röster förlorar poäng.
+    const find = (id: string) => s.players.find((pl) => pl.id === id);
+    if (cur.card.kind === 'bild') {
+      const right = Object.entries(cur.votes).filter(([, t]) => t === cur.turnId).map(([voter]) => voter);
+      const winners = right.length > 0 ? right : [cur.turnId];
+      for (const id of winners) {
+        const p = find(id);
+        if (p) addPoints(p, cur.sips);
+      }
+      logEvent(s, cur.turnId, right.length > 0 ? `ägde bilden – ${right.length} gissade rätt och fick ${pts(cur.sips)} var` : `lurade alla och fick ${pts(cur.sips)}`);
+    } else {
+      for (const id of cur.losers) {
+        const p = find(id);
+        if (p) {
+          addPoints(p, -cur.sips);
+          logEvent(s, id, `fick flest röster och förlorade ${pts(cur.sips)}`);
+        }
+      }
+    }
+  }
 }
 
 function canChoose(s: GameState, cur: Current, player: Player): boolean {
   if (cur.choices[player.id]) return false;
-  if (cur.phase === 'result') return cur.losers.includes(player.id);
+  if (cur.phase === 'result') return !usesPoints(s) && cur.losers.includes(player.id);
   if (cur.phase !== 'play') return false;
   if (isSoloCard(cur.card)) {
     if (player.id !== cur.turnId) return false;
@@ -391,7 +441,7 @@ function drawChallenge(s: GameState, ctx: Ctx): string {
   const pool = s.challengePool.filter((c) => c.level <= s.part);
   const card = pick(pool.length > 0 ? pool : s.challengePool, ctx.rng);
   const text = card ? scaleSips(card.text, s.part, s.occasion) : 'Gör en segerpose i 10 sekunder.';
-  return usesPoints(s) ? familyText(text, isFamily(s)) : text;
+  return usesPoints(s) ? pointsText(text, isFamily(s)) : text;
 }
 
 export function applyAction(input: GameState, playerId: string, action: Action, ctx: Ctx): GameState {
@@ -490,11 +540,18 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       const solo = isSoloCard(c.card) && c.phase === 'play';
       const family = usesPoints(s);
       if (action.choice === 'answered') {
-        if (c.card.kind !== 'direkt') throw new GameError('Ogiltigt val');
-        logEvent(s, playerId, 'svarade på frågan');
+        // Med pluspoäng betyder "answered" även "klarade utmaningen" (solo och X och Y).
+        if (c.card.kind !== 'direkt' && !(family && c.card.kind === 'utmaning')) throw new GameError('Ogiltigt val');
+        if (family) {
+          addPoints(me, c.sips);
+          logEvent(s, playerId, `${c.card.kind === 'direkt' ? 'svarade' : 'klarade utmaningen'} och fick ${pts(c.sips)}`);
+        } else logEvent(s, playerId, 'svarade på frågan');
       } else if (action.choice === 'drink') {
-        me.drank += c.sips;
-        logEvent(s, playerId, family ? `tog ${sipsWord(c.sips, true)}` : `drack ${sipsWord(c.sips, false)}`);
+        if (family) logEvent(s, playerId, 'hoppade över (0 poäng)');
+        else {
+          me.drank += c.sips;
+          logEvent(s, playerId, `drack ${sipsWord(c.sips, false)}`);
+        }
       } else if (action.choice === 'save') {
         if (family) throw new GameError('Man kan inte spara när ni spelar om poäng');
         me.saved += c.sips;
@@ -518,8 +575,10 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       if (c.triviaPick != null) throw new GameError('Du har redan svarat', 409);
       if (!c.card.options || action.index < 0 || action.index >= c.card.options.length) throw new GameError('Ogiltigt svar');
       c.triviaPick = action.index;
-      if (action.index === c.card.answerIndex) c.choices[playerId] = 'answered';
-      logEvent(s, playerId, action.index === c.card.answerIndex ? 'svarade rätt på trivian! 🧠' : 'svarade fel på trivian');
+      const right = action.index === c.card.answerIndex;
+      if (right) c.choices[playerId] = 'answered';
+      if (right && usesPoints(s)) addPoints(me, c.sips);
+      logEvent(s, playerId, right ? `svarade rätt på trivian! 🧠${usesPoints(s) ? ` +${pts(c.sips)}` : ''}` : 'svarade fel på trivian');
       break;
     }
     case 'upload_photo':
@@ -544,6 +603,11 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       if (!overlay) break;
       delete s.overlays[playerId];
       me.challenges += 1;
+      // Pluspoäng: gör man utmaningskortet får man kortets poäng ändå.
+      if (usesPoints(s) && cur) {
+        addPoints(me, cur.sips);
+        logEvent(s, playerId, `klarade utmaningskortet och fick ${pts(cur.sips)}`);
+      }
       if (overlay.advancesCard && cur && s.status === 'playing' && cur.turnId === playerId && cur.choices[playerId] === 'challenge') {
         assertNotPaused(s, ctx);
         advance(s, ctx);
@@ -572,18 +636,24 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       const target = s.players.find((pl) => pl.id === action.targetId);
       if (!target) throw new GameError('Spelaren finns inte', 404);
       const taken = (c.taken ??= {});
-      const family = usesPoints(s);
-      const what = sipsWord(c.sips, family);
+      const points = usesPoints(s);
+      const what = points ? pts(c.sips) : sipsWord(c.sips, false);
       const self = target.id === playerId;
       if (action.type === 'take') {
         taken[target.id] = (taken[target.id] ?? 0) + 1;
-        target.drank += c.sips;
-        logEvent(s, playerId, self ? (family ? `fick ${what}` : `drack ${what}`) : `gav ${target.name} ${what}`);
+        if (points) addPoints(target, -c.sips);
+        else target.drank += c.sips;
+        logEvent(
+          s,
+          playerId,
+          points ? (self ? `förlorade ${what}` : `tog ${what} från ${target.name}`) : self ? `drack ${what}` : `gav ${target.name} ${what}`,
+        );
       } else {
         if (!taken[target.id]) throw new GameError(`${target.name} har inte fått några på det här kortet`, 409);
         taken[target.id] -= 1;
-        target.drank = Math.max(0, target.drank - c.sips);
-        logEvent(s, playerId, `tog bort ${what} från ${self ? 'sig själv' : target.name}`);
+        if (points) addPoints(target, c.sips);
+        else target.drank = Math.max(0, target.drank - c.sips);
+        logEvent(s, playerId, points ? `gav tillbaka ${what} till ${self ? 'sig själv' : target.name}` : `tog bort ${what} från ${self ? 'sig själv' : target.name}`);
       }
       break;
     }
@@ -594,17 +664,20 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       if (!canGive(s, rule.byId, playerId, ctx)) throw new GameError(`Bara ${nameOfId(s, rule.byId)} (spelledare) och värden delar ut`, 403);
       const target = s.players.find((pl) => pl.id === action.targetId);
       if (!target) throw new GameError('Spelaren finns inte', 404);
-      const what = sipsWord(rule.sips, usesPoints(s));
+      const points = usesPoints(s);
+      const what = points ? pts(rule.sips) : sipsWord(rule.sips, false);
       const label = rule.title ?? 'regeln';
       if (action.type === 'rule_take') {
         rule.taken[target.id] = (rule.taken[target.id] ?? 0) + 1;
-        target.drank += rule.sips;
-        logEvent(s, playerId, `gav ${target.name} ${what} (${label})`);
+        if (points) addPoints(target, -rule.sips);
+        else target.drank += rule.sips;
+        logEvent(s, playerId, points ? `tog ${what} från ${target.name} (${label})` : `gav ${target.name} ${what} (${label})`);
       } else {
         if (!rule.taken[target.id]) throw new GameError(`${target.name} har inte fått några för den regeln`, 409);
         rule.taken[target.id] -= 1;
-        target.drank = Math.max(0, target.drank - rule.sips);
-        logEvent(s, playerId, `tog bort ${what} från ${target.name} (${label})`);
+        if (points) addPoints(target, rule.sips);
+        else target.drank = Math.max(0, target.drank - rule.sips);
+        logEvent(s, playerId, points ? `gav tillbaka ${what} till ${target.name} (${label})` : `tog bort ${what} från ${target.name} (${label})`);
       }
       break;
     }
@@ -615,6 +688,15 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       }
       assertNotPaused(s, ctx);
       autoDrink(s, c);
+      // Pluspoäng: "Klar!" på en utmaning till en person ger poäng.
+      if (usesPoints(s) && playerId === c.turnId && c.card.kind === 'utmaning' && isSoloCard(c.card) && !c.choices[playerId]) {
+        const p = s.players.find((pl) => pl.id === playerId);
+        if (p) {
+          addPoints(p, c.sips);
+          c.choices[playerId] = 'answered';
+          logEvent(s, playerId, `klarade utmaningen och fick ${pts(c.sips)}`);
+        }
+      }
       advance(s, ctx);
       break;
     }
@@ -643,7 +725,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       requireLeader();
       if (s.status !== 'finished' && s.status !== 'partEnd') throw new GameError('Spelet pågår fortfarande', 409);
       for (const p of s.players) {
-        Object.assign(p, { saved: 0, drank: 0, votesReceived: 0, challenges: 0, turns: 0 });
+        Object.assign(p, { saved: 0, drank: 0, points: 0, votesReceived: 0, challenges: 0, turns: 0 });
       }
       s.rules = [];
       startPlaying(s, ctx);
