@@ -226,7 +226,7 @@ export function GiveList({
     return (
       <div className="actions">
         <p className="hint">
-          {leader} (spelledare) och värden delar ut {family ? 'poäng' : 'klunkar'}.
+          {byId === state.hostId ? `${leader === 'Du' ? 'Du' : leader} (värd) delar ut` : `${leader} (spelledare) och värden delar ut`} {family ? 'poäng' : 'klunkar'}.
         </p>
         {got.length > 0 && (
           <p className="give-summary">

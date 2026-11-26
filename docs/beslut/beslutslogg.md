@@ -902,3 +902,12 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 ### B115. Introt för en ny del fastnade
 - **Tillägg (av Claude):** När Claude tog skärmbilder av hela spelet hittades en bugg. Trycktes Nästa inom cirka 3 sekunder efter att en ny del började, avbröts nedräkningen (3-2-1). Introt ("Del 1 Uppvärmning 2") låg då kvar och täckte skärmen tills någon tryckte på det. Nu går nedräkningen alltid klart och introt försvinner av sig självt.
 - **Var i koden:** `PartIntro` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+### B116. Ingen spelledare på utmaningar för alla – värden delar ut
+- **Beslut:** Utmaningar för alla (t.ex. "Den som senast var på bio delar ut 2 klunkar") ska inte ha någon spelledare. Det är värden som markerar vilka som får straff. Ändrar B94 och B95 för de korten.
+- **Tillägg (av Claude):**
+  - Etiketten "Spelledare" visas inte längre på utmaningar för alla eller lagkort.
+  - Bara värden kan trycka på namnen. Är värden borta längre än 25 sekunder kan vem som helst, så att spelet inte fastnar. De andra ser "Tilda (värd) delar ut klunkar." och vem som fått något.
+  - Värden trycker Nästa.
+  - Gäller också regelkollen för regler från sådana kort.
+  - Minigames och kaoskort har kvar sin spelledare.
+- **Var i koden:** `isLeaderCard()`, `isGroupChallenge()` och `giverOf()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `TakeButtons` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `GiveList` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx).

@@ -198,14 +198,24 @@ export function isSoloCard(card: DeckCard): boolean {
  * ("Den som har lägst batteri får 2 minuspoäng", minigames, kaoskort). Där trycker man på den eller de
  * som fick klunkarna/poängen – annars räknas de aldrig. Vem som helst kan trycka, alla ser vem som gav vem.
  */
+/** Minigames och kaoskort har en spelledare: den som drog kortet (B94). */
 export function isLeaderCard(card: DeckCard): boolean {
-  if (card.kind === 'minigame' || card.kind === 'kaos') return true;
+  return card.kind === 'minigame' || card.kind === 'kaos';
+}
+
+/** Utmaning för alla eller lagkort: ingen spelledare – värden markerar vem som får straff (B116). */
+export function isGroupChallenge(card: DeckCard): boolean {
   return card.kind === 'utmaning' && (card.players === 0 || card.players === 3);
+}
+
+/** Vem som delar ut på kortet: spelledaren på minigames och kaoskort, värden på utmaningar för alla. */
+export function giverOf(s: Pick<GameState, 'hostId'>, cur: Pick<Current, 'card' | 'turnId'>): string {
+  return isGroupChallenge(cur.card) ? s.hostId : cur.turnId;
 }
 
 /** Regel som gäller flera kort ("resten av delen", "de kommande 5 korten") – räknas i regelkollen i stället för direkt. */
 export function isLastingRule(card: DeckCard, text: string): boolean {
-  return isLeaderCard(card) && (/resten av (?:den här )?delen|de kommande \d+ korten|tills regelkollen/i.test(text));
+  return (isLeaderCard(card) || isGroupChallenge(card)) && (/resten av (?:den här )?delen|de kommande \d+ korten|tills regelkollen/i.test(text));
 }
 
 /** Regler gäller tills en regelkoll dyker upp, en slumpad stund senare – ingen vet när (B106). */
@@ -236,11 +246,11 @@ export function canGive(s: GameState | PublicState, byId: string, playerId: stri
 
 /** Kort där man delar ut klunkar/poäng direkt: gruppkort, minigames och kaoskort som inte är regler som gäller en stund. */
 export function isTakeCard(cur: Current): boolean {
-  return cur.phase === 'play' && isLeaderCard(cur.card) && !isLastingRule(cur.card, cur.text);
+  return cur.phase === 'play' && (isLeaderCard(cur.card) || isGroupChallenge(cur.card)) && !isLastingRule(cur.card, cur.text);
 }
 
 export function canTake(s: GameState | PublicState, cur: Current, playerId: string, ctx: Pick<Ctx, 'active'>): boolean {
-  return isTakeCard(cur) && canGive(s, cur.turnId, playerId, ctx);
+  return isTakeCard(cur) && canGive(s, giverOf(s, cur), playerId, ctx);
 }
 
 export function pausedPlayers(state: GameState | PublicState): Player[] {
@@ -373,7 +383,7 @@ function deal(s: GameState, ctx: Ctx) {
         id,
         ...(card.title ? { title: card.title } : {}),
         text: s.current.text,
-        byId: turn.id,
+        byId: isGroupChallenge(card) ? s.hostId : turn.id,
         sips: s.current.sips,
         part: s.part,
         untilCard: null,
@@ -687,7 +697,8 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
     case 'untake': {
       const c = requireCurrent();
       if (!isTakeCard(c)) throw new GameError('Det här kortet är redan klart – kolla skärmen', 409);
-      if (!canTake(s, c, playerId, ctx)) throw new GameError(`Bara ${nameOfId(s, c.turnId)} (spelledare) och värden delar ut`, 403);
+      if (!canTake(s, c, playerId, ctx))
+        throw new GameError(isGroupChallenge(c.card) ? 'Bara värden delar ut på utmaningar för alla' : `Bara ${nameOfId(s, c.turnId)} (spelledare) och värden delar ut`, 403);
       const target = s.players.find((pl) => pl.id === action.targetId);
       if (!target) throw new GameError('Spelaren finns inte', 404);
       const taken = (c.taken ??= {});

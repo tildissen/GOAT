@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
-import { canGive, canPressNext, isLastingRule, isLeaderCard, isTakeCard, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
+import { canGive, canPressNext, giverOf, isLastingRule, isLeaderCard, isTakeCard, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import Face from '../Face';
 import { ActionBar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
@@ -343,8 +343,8 @@ function TakeButtons(p: CardProps) {
       players={state.players.filter((pl) => pl.ready)}
       taken={cur.taken ?? {}}
       sips={cur.sips}
-      byId={cur.turnId}
-      mayGive={canGive(state, cur.turnId, p.me.id, { active: new Set(p.view.active) })}
+      byId={giverOf(state, cur)}
+      mayGive={canGive(state, giverOf(state, cur), p.me.id, { active: new Set(p.view.active) })}
       meId={p.me.id}
       busy={p.busy}
       onGive={(id) => p.act({ type: 'take', targetId: id })}
