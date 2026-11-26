@@ -17,6 +17,8 @@ import {
   sipsForPart,
   isTakeCard,
   isLeaderCard,
+  giverOf,
+  isGroupChallenge,
   isLastingRule,
   GameError,
   isSoloCard,
@@ -282,22 +284,24 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
         if (pausedPlayers(s).length === 0) assert.throws(() => act(ids[0], { type: 'choose', choice: 'drink' }), GameError, 'val på minigame');
       }
       // Gruppkort, minigames och kaoskort: spelledaren (den som drog kortet) och värden delar ut – ingen annan.
+      // Utmaningar för alla: bara värden. Minigames och kaoskort: spelledaren och värden (B116).
       if (isTakeCard(c) && pausedPlayers(s).length === 0 && rng() < 0.7) {
         const target = ids[1];
         const before = score(target);
         act(ids[0], { type: 'take', targetId: target });
-        act(c.turnId, { type: 'take', targetId: target });
-        act(c.turnId, { type: 'untake', targetId: target });
+        act(giverOf(s, c), { type: 'take', targetId: target });
+        act(giverOf(s, c), { type: 'untake', targetId: target });
         assert.equal(score(target), before + (points ? -c.sips : c.sips), 'poängen räknades fel');
         assert.equal(s.current!.taken![target], 1);
-        const outsider = ids.find((id) => id !== ids[0] && id !== c.turnId);
+        const outsider = ids.find((id) => id !== ids[0] && id !== giverOf(s, c));
+        if (isGroupChallenge(c.card) && c.turnId !== ids[0]) assert.throws(() => act(c.turnId, { type: 'take', targetId: target }), GameError, 'den som drog en utmaning för alla kunde dela ut');
         if (outsider) assert.throws(() => act(outsider, { type: 'take', targetId: target }), GameError, 'vem som helst kunde dela ut');
         assert.throws(() => act(ids[0], { type: 'untake', targetId: ids.find((id) => id !== target)! }), GameError, 'tog bort poäng som inte fanns');
       }
       // Regler som gäller en stund: inga poäng direkt, men regeln sparas till regelkollen.
       if (isLeaderCard(c.card) && isLastingRule(c.card, c.text)) {
         assert.ok(!isTakeCard(c), 'regel delades ut direkt');
-        assert.ok((s.rules ?? []).some((r) => r.text === c.text && r.byId === c.turnId), 'regeln sparades inte');
+        assert.ok((s.rules ?? []).some((r) => r.text === c.text && r.byId === giverOf(s, c)), 'regeln sparades inte');
         assert.ok(/tills regelkollen dyker upp/.test(c.text) && !/resten av|de kommande \d+ korten/.test(c.text), `regeln säger fortfarande hur länge: ${c.text}`);
       }
       if (c.card.kind === 'minigame') {
