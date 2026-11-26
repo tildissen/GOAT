@@ -5,12 +5,12 @@ import { compressImage, loadLocal, saveLocal } from '@/lib/client';
 import { isFamily, usesPoints, MAX_OWN_CARDS, MIN_OWN_CARDS, MIN_PLAYERS, ownCardCount } from '@/lib/engine';
 import type { CustomCard, CustomKind } from '@/lib/types';
 import Face from '../Face';
-import { ActionBar, Avatar, Screen } from '../ui';
+import { ActionBar, Avatar, Icon, Screen, type IconName } from '../ui';
 import { nameOf, type GameProps } from './shared';
 
-type Step = 'storej' | 'regler' | 'selfie' | 'egna';
+type Step = 'storej' | 'regler' | 'korten' | 'selfie' | 'egna';
 
-/** Stegen varje spelare går igenom innan spelet: stör ej, regler, selfie och egna kort. */
+/** Stegen varje spelare går igenom innan spelet: stör ej, regler, korten, selfie och egna kort. */
 export default function Intro(props: GameProps) {
   const { code, state, me, act } = props;
   const key = `goat:${code}:${me.id}:step`;
@@ -31,7 +31,8 @@ export default function Intro(props: GameProps) {
   }, [late, act]);
 
   if (step === 'storej') return <StorEj onDone={() => go('regler')} />;
-  if (step === 'regler') return <Regler state={state} onDone={() => go('selfie')} />;
+  if (step === 'regler') return <Regler state={state} onDone={() => go('korten')} />;
+  if (step === 'korten') return <Korten state={state} onDone={() => go('selfie')} />;
   if (step === 'selfie') return <Selfie {...props} onDone={() => (canAddCards ? go('egna') : finish())} />;
   if (late) return null;
   return <EgnaKort {...props} onDone={finish} />;
@@ -140,6 +141,52 @@ function Regler({ state, onDone }: { state: GameProps['state']; onDone: () => vo
             </li>
           ))}
         </ol>
+      </div>
+      <ActionBar>
+        <button className="btn ink" onClick={onDone}>
+          Nästa
+        </button>
+      </ActionBar>
+    </Screen>
+  );
+}
+
+/**
+ * Korten förklarade (B109): en rad per korttyp med samma ikon som i spelet – kort så att alla hinner läsa.
+ * Texterna följer spelläget: klunkar, eller poäng (Familjespel och AW/Fest med poäng).
+ */
+function kortTexter(state: GameProps['state']): { icon: IconName; name: string; text: string }[] {
+  const p = usesPoints(state);
+  return [
+    { icon: 'vem', name: 'Vem i rummet?', text: p ? 'Alla röstar. Flest röster förlorar poäng – eller vinner om frågan är positiv.' : 'Alla röstar. Den med flest röster dricker.' },
+    { icon: 'direkt', name: 'Direkt fråga', text: p ? 'En fråga till dig. Svara och få poäng.' : 'En fråga till dig. Svara – eller drick.' },
+    { icon: 'trivia', name: 'Trivia', text: p ? 'Fyra svar. Rätt svar ger poäng.' : 'Fyra svar. Fel svar – drick.' },
+    { icon: 'utmaning', name: 'Utmaning', text: p ? 'Gör det och få poäng.' : 'Gör det – eller drick.' },
+    { icon: 'minigame', name: 'Minigame', text: 'En lek för alla. Spelledaren leder och delar ut.' },
+    { icon: 'kaos', name: 'Kaos!', text: 'Något galet händer – alla är med.' },
+    { icon: 'bild', name: 'Vems är bilden?', text: 'Någon laddar upp en bild i hemlighet. Gissa vems.' },
+    { icon: 'trofe', name: 'Regelkoll', text: 'En regel gäller en stund. Regelkollen kommer när ingen anar.' },
+  ];
+}
+
+function Korten({ state, onDone }: { state: GameProps['state']; onDone: () => void }) {
+  return (
+    <Screen bg="yellow">
+      <h1 className="display big" style={{ marginTop: 12, marginBottom: 16 }}>
+        KORTEN
+      </h1>
+      <div className="card green kort-list" style={{ padding: '18px 16px', gap: 10 }}>
+        {kortTexter(state).map((k) => (
+          <div key={k.name} className="kort-row">
+            <span className="kort-icon" aria-hidden="true">
+              <Icon name={k.icon} size={22} />
+            </span>
+            <div>
+              <strong>{k.name}</strong>
+              <p>{k.text}</p>
+            </div>
+          </div>
+        ))}
       </div>
       <ActionBar>
         <button className="btn ink" onClick={onDone}>

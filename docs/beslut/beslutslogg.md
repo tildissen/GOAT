@@ -844,3 +844,20 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Listan skickas inte till mobilerna.
   - Testat med tolv omgångar i rad i vanligt spel, AW, Familjespel och Fest. I andra omgången kommer ingen "Vem i rummet?", utmaning eller trivia igen.
 - **Var i koden:** `freshDeck()` och `presetIds()` i [`src/lib/deck.ts`](../../src/lib/deck.ts), `startPlaying()` och `toPublic()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `performAction()` i [`src/lib/game-service.ts`](../../src/lib/game-service.ts).
+### B109. Skärmen "Korten" efter spelreglerna
+- **Beslut:** Efter spelreglerna kommer en skärm som förklarar korten. Den ska vara kort och tydlig, så att alla förstår.
+- **Tillägg (av Claude):**
+  - Tilda skrev "bortförklaringar". Claude tolkade det som förklaringar av korttyperna.
+  - Skärmen heter **KORTEN** och har en rad per korttyp, med samma ikon som i spelet och en mening var:
+    - Vem i rummet?
+    - Direkt fråga
+    - Trivia
+    - Utmaning
+    - Minigame
+    - Kaos!
+    - Vems är bilden?
+    - Regelkoll
+  - Texterna följer spelläget: med klunkar t.ex. "En fråga till dig. Svara – eller drick.", med poäng "En fråga till dig. Svara och få poäng.".
+  - Ordningen i introt är nu: Stör ej → Spelregler → Korten → Selfie → Egna kort.
+  - Testat på Safari-ytan för iPhone SE och iPhone 13: skärmen ryms utan att man scrollar.
+- **Var i koden:** `Korten` och `kortTexter()` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.kort-*` i [`src/app/globals.css`](../../src/app/globals.css).

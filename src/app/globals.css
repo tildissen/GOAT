@@ -900,3 +900,10 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .votes-list.chips { flex-direction: row; flex-wrap: wrap; justify-content: center; }
 .votes-list.chips div { font-size: 14px; }
 .card .option { min-height: 44px; padding: 6px 14px; font-size: 17px; }
+
+/* Korten förklarade efter spelreglerna (B109) */
+.kort-list { align-items: stretch; }
+.kort-row { display: flex; gap: 12px; align-items: flex-start; text-align: left; }
+.kort-icon { flex: none; width: 36px; height: 36px; border-radius: 999px; background: var(--black); color: var(--white); display: grid; place-items: center; }
+.kort-row strong { font-size: 17px; }
+.kort-row p { margin: 1px 0 0; font-size: 15px; line-height: 1.3; }
