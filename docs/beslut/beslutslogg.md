@@ -893,3 +893,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Rubriken på skärmen "Korten" ska vara i det andra typsnittet.
 - **Tillägg (av Claude):** Rubriken använder Knewave, samma typsnitt som "Del ett är klar!" och minigamenas namn. Den skrivs "Korten" med vit skugga mot den knallrosa bakgrunden.
 - **Var i koden:** `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.kort-title` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B114. Större rubrik på "Korten"
+- **Beslut:** Texten "Korten" ska vara större.
+- **Tillägg (av Claude):** Rubriken är cirka 70 px på en iPhone 13 (`clamp(60px, 18vw, 88px)`). Tidigare var den cirka 47 px. Skärmen ryms fortfarande utan att man scrollar.
+- **Var i koden:** `.display.kort-title` i [`src/app/globals.css`](../../src/app/globals.css).
