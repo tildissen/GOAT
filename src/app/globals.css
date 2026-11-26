@@ -911,3 +911,4 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .kort-icon { flex: none; width: 36px; height: 36px; border-radius: 999px; background: var(--black); color: var(--white); display: grid; place-items: center; }
 .kort-row strong { font-size: 17px; }
 .kort-row p { margin: 1px 0 0; font-size: 15px; line-height: 1.3; }
+.kort-title { text-shadow: 3px 3px 0 var(--white); }

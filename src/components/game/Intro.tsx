@@ -172,8 +172,9 @@ function kortTexter(state: GameProps['state']): { icon: IconName; name: string; 
 function Korten({ state, onDone }: { state: GameProps['state']; onDone: () => void }) {
   return (
     <Screen bg="pink">
-      <h1 className="display big" style={{ marginTop: 12, marginBottom: 16 }}>
-        KORTEN
+      {/* Rubriken i Knewave, samma typsnitt som "Del ett är klar!" (B113). */}
+      <h1 className="display big name-font kort-title" style={{ marginTop: 12, marginBottom: 16 }}>
+        Korten
       </h1>
       <div className="card pink kort-list" style={{ padding: '18px 16px', gap: 10 }}>
         {kortTexter(state).map((k) => (

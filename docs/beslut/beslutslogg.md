@@ -888,3 +888,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
     - Ikonerna är vita på svart (21 : 1).
     - Kortet mot bakgrunden: 2,4 : 1.
 - **Var i koden:** `--pink` och `--pink-light` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B113. "Korten" har rubriken i det andra typsnittet
+- **Beslut:** Rubriken på skärmen "Korten" ska vara i det andra typsnittet.
+- **Tillägg (av Claude):** Rubriken använder Knewave, samma typsnitt som "Del ett är klar!" och minigamenas namn. Den skrivs "Korten" med vit skugga mot den knallrosa bakgrunden.
+- **Var i koden:** `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.kort-title` i [`src/app/globals.css`](../../src/app/globals.css).
