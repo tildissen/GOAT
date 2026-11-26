@@ -844,3 +844,57 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Listan skickas inte till mobilerna.
   - Testat med tolv omgångar i rad i vanligt spel, AW, Familjespel och Fest. I andra omgången kommer ingen "Vem i rummet?", utmaning eller trivia igen.
 - **Var i koden:** `freshDeck()` och `presetIds()` i [`src/lib/deck.ts`](../../src/lib/deck.ts), `startPlaying()` och `toPublic()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `performAction()` i [`src/lib/game-service.ts`](../../src/lib/game-service.ts).
+### B109. Skärmen "Korten" efter spelreglerna
+- **Beslut:** Efter spelreglerna kommer en skärm som förklarar korten. Den ska vara kort och tydlig, så att alla förstår.
+- **Tillägg (av Claude):**
+  - Tilda skrev "bortförklaringar". Claude tolkade det som förklaringar av korttyperna.
+  - Skärmen heter **KORTEN** och har en rad per korttyp, med samma ikon som i spelet och en mening var:
+    - Vem i rummet?
+    - Direkt fråga
+    - Trivia
+    - Utmaning
+    - Minigame
+    - Kaos!
+    - Vems är bilden?
+    - Regelkoll
+  - Texterna följer spelläget: med klunkar t.ex. "En fråga till dig. Svara – eller drick.", med poäng "En fråga till dig. Svara och få poäng.".
+  - Ordningen i introt är nu: Stör ej → Spelregler → Korten → Selfie → Egna kort.
+  - Testat på Safari-ytan för iPhone SE och iPhone 13: skärmen ryms utan att man scrollar.
+- **Var i koden:** `Korten` och `kortTexter()` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.kort-*` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B110. Skärmen "Korten" är rosa (**Färgerna ersatta av B111**)
+- **Beslut:** Skärmen "Korten" (B109) ska ha rosa färg.
+- **Tillägg (av Claude):** Det är en ny färg i paletten, `--pink` (#ff9ed2). Bakgrunden är rosa och kortet med förklaringarna är grönt som förut. Färgen används bara på den här skärmen.
+- **Var i koden:** `--pink` och `.screen.pink` i [`src/app/globals.css`](../../src/app/globals.css), `Color` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B111. "Korten": rosalila bakgrund och ljusrosa kort (**Färgerna ersatta av B112**)
+- **Beslut:** Skärmen "Korten" ska ha en rosa/lila bakgrund och en annan rosa på kortet där texten ligger. Kontrasten ska vara bra. Ersätter färgerna i B110.
+- **Tillägg (av Claude):**
+  - Bakgrunden är rosalila (`--pink`, #cf9bff) och kortet ljusrosa (`--pink-light`, #ffd6ec).
+  - Kontrast:
+    - Svart text på kortet: 16 : 1.
+    - Svart rubrik på bakgrunden: 9,8 : 1.
+    - Ikonerna är vita på svart.
+    - Kortet mot bakgrunden: 1,6 : 1, och kortet har skugga. Det är mer än de andra skärmarna, där t.ex. grönt kort på gult är cirka 1,1 : 1.
+- **Var i koden:** `--pink`, `--pink-light`, `.screen.pink` och `.card.pink` i [`src/app/globals.css`](../../src/app/globals.css), `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B112. "Korten": knallrosa bakgrund och ljusare rosa kort
+- **Beslut:** Skärmen "Korten" ska ha en mer knallrosa bakgrund och en ljusare rosa som kortfärg. Ersätter färgerna i B111.
+- **Tillägg (av Claude):**
+  - Bakgrunden är knallrosa (`--pink`, #ff4fb8) och kortet ljust rosa (`--pink-light`, #ffe0f1).
+  - Kontrast:
+    - Svart text på kortet: 17 : 1.
+    - Svart rubrik på bakgrunden: 7,1 : 1.
+    - Ikonerna är vita på svart (21 : 1).
+    - Kortet mot bakgrunden: 2,4 : 1.
+- **Var i koden:** `--pink` och `--pink-light` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B113. "Korten" har rubriken i det andra typsnittet
+- **Beslut:** Rubriken på skärmen "Korten" ska vara i det andra typsnittet.
+- **Tillägg (av Claude):** Rubriken använder Knewave, samma typsnitt som "Del ett är klar!" och minigamenas namn. Den skrivs "Korten" med vit skugga mot den knallrosa bakgrunden.
+- **Var i koden:** `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.kort-title` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B114. Större rubrik på "Korten"
+- **Beslut:** Texten "Korten" ska vara större.
+- **Tillägg (av Claude):** Rubriken är cirka 70 px på en iPhone 13 (`clamp(60px, 18vw, 88px)`). Tidigare var den cirka 47 px. Skärmen ryms fortfarande utan att man scrollar.
+- **Var i koden:** `.display.kort-title` i [`src/app/globals.css`](../../src/app/globals.css).

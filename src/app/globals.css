@@ -3,6 +3,8 @@
   --cyan: #5ce1e6;
   --coral: #ff5757;
   --yellow: #ffde59;
+  --pink: #ff4fb8; /* knallrosa bakgrund (B112): svart rubrik 7,1 : 1 */
+  --pink-light: #ffe0f1; /* ljusrosa kort: svart text 17 : 1 */
   --white: #ffffff;
   --black: #000000;
   --error: #ff3131;
@@ -48,6 +50,8 @@ textarea {
 .screen.cyan { background: var(--cyan); --bar-bg: var(--cyan); }
 .screen.coral { background: var(--coral); --bar-bg: var(--coral); }
 .screen.yellow { background: var(--yellow); --bar-bg: var(--yellow); }
+.screen.pink { background: var(--pink); --bar-bg: var(--pink); }
+.card.pink { background: var(--pink-light); }
 
 .column {
   width: 100%;
@@ -900,3 +904,11 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .votes-list.chips { flex-direction: row; flex-wrap: wrap; justify-content: center; }
 .votes-list.chips div { font-size: 14px; }
 .card .option { min-height: 44px; padding: 6px 14px; font-size: 17px; }
+
+/* Korten förklarade efter spelreglerna (B109) */
+.kort-list { align-items: stretch; }
+.kort-row { display: flex; gap: 12px; align-items: flex-start; text-align: left; }
+.kort-icon { flex: none; width: 36px; height: 36px; border-radius: 999px; background: var(--black); color: var(--white); display: grid; place-items: center; }
+.kort-row strong { font-size: 17px; }
+.kort-row p { margin: 1px 0 0; font-size: 15px; line-height: 1.3; }
+.display.kort-title { text-shadow: 3px 3px 0 var(--white); font-size: clamp(60px, 18vw, 88px); line-height: 1; } /* större rubrik (B114) */
