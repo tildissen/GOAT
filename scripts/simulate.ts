@@ -133,14 +133,14 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
     // Alla egna kort och det egna minigamet är med, alltid 4 delar, trivia blandas in.
     assert.equal(s.deck.length, PARTS, 'eget spel ska ha 4 delar');
     // 10 kort per del, om inte spelarna skrivit så många kort att de inte får plats.
-    if (ownCards <= PARTS * 7) s.deck.forEach((part) => assert.ok(part.length <= CARDS_PER_PART, `för lång del: ${part.length}`));
+    if (ownCards <= PARTS * 7) s.deck.forEach((part) => assert.ok(part.filter((c) => c.kind !== 'regelkoll').length <= CARDS_PER_PART, `för lång del: ${part.length}`));
     assert.equal(all.filter((c) => c.custom).length, ownCards + 1, 'egna kort saknas');
     if (ownCards <= PARTS * 7) assert.ok(all.some((c) => c.kind === 'trivia'), 'trivia saknas');
     assert.ok(all.some((c) => c.custom && c.kind === 'minigame' && c.title === 'Tyst minut'));
   } else {
     // Kortleken: 4 delar à 15 kort, egna kort med.
     assert.equal(s.deck.length, PARTS);
-    s.deck.forEach((part) => assert.equal(part.length, CARDS_PER_PART));
+    s.deck.forEach((part) => assert.equal(part.filter((c) => c.kind !== 'regelkoll').length, CARDS_PER_PART));
     assert.equal(all.filter((c) => c.custom).length, 2, 'egna kort saknas');
     // Vildare för varje del: kaoskort bara i del 3–4, ingen trivia i del 3–4.
     const count = (i: number, kind: string) => s.deck[i].filter((c) => c.kind === kind && !c.custom).length;
@@ -169,18 +169,7 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       continue;
     }
     if (s.status === 'partEnd') {
-      // Regelkoll: spelledaren delar ut för de regler som gällt i delen, ingen annan (utom värden).
-      for (const rule of (s.rules ?? []).filter((r) => r.part === s.part)) {
-        const before = score(ids[1]);
-        act(rule.byId, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] });
-        assert.equal(score(ids[1]), before + (points ? -rule.sips : rule.sips), 'regelkollen räknades fel');
-        const outsider = ids.find((id) => id !== ids[0] && id !== rule.byId);
-        if (outsider) assert.throws(() => act(outsider, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] }), GameError, 'vem som helst kunde dela ut i regelkollen');
-        rulesChecked++;
-      }
-      const part = s.part;
       act(ids[0], { type: 'continue' });
-      assert.ok(!(s.rules ?? []).some((r) => r.part <= part), 'regler från förra delen ligger kvar');
       continue;
     }
     const overlayOwner = Object.keys(s.overlays)[0];
@@ -209,6 +198,20 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
     const choices = points ? (['drink', 'challenge'] as const) : (['drink', 'save', 'challenge'] as const);
     const chooseAny = () => choices[Math.floor(rng() * choices.length)];
 
+    if (c.card.kind === 'regelkoll') {
+      // Regelkoll mitt i spelet (B106): spelledaren för regeln delar ut, sedan slutar regeln gälla.
+      const rule = (s.rules ?? []).find((r) => r.id === c.card.id)!;
+      assert.ok(rule, 'regelkoll utan regel');
+      const before = score(ids[1]);
+      act(rule.byId, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] });
+      assert.equal(score(ids[1]), before + (points ? -rule.sips : rule.sips), 'regelkollen räknades fel');
+      const outsider = ids.find((id) => id !== ids[0] && id !== rule.byId);
+      if (outsider) assert.throws(() => act(outsider, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] }), GameError, 'vem som helst kunde dela ut i regelkollen');
+      act(rule.byId, { type: 'next', seq: c.seq });
+      assert.ok(!(s.rules ?? []).some((r) => r.id === rule.id), 'regeln gäller fortfarande efter regelkollen');
+      rulesChecked++;
+      continue;
+    }
     if (c.phase === 'upload') {
       if (rng() < 0.2) act(c.turnId, { type: 'skip_photo' });
       else act(c.turnId, { type: 'upload_photo', url: 'https://example.com/a.jpg' });
@@ -295,6 +298,7 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       if (isLeaderCard(c.card) && isLastingRule(c.card, c.text)) {
         assert.ok(!isTakeCard(c), 'regel delades ut direkt');
         assert.ok((s.rules ?? []).some((r) => r.text === c.text && r.byId === c.turnId), 'regeln sparades inte');
+        assert.ok(/tills regelkollen dyker upp/.test(c.text) && !/resten av|de kommande \d+ korten/.test(c.text), `regeln säger fortfarande hur länge: ${c.text}`);
       }
       if (c.card.kind === 'minigame') {
         // (inga val)
@@ -339,7 +343,7 @@ const kinds = new Set<string>();
 for (let seed = 1; seed <= 200; seed++) {
   for (const k of play(seed, 3 + (seed % 13))) kinds.add(k);
 }
-assert.deepEqual([...kinds].sort(), ['bild', 'direkt', 'kaos', 'minigame', 'trivia', 'utmaning', 'vem']);
+assert.deepEqual([...kinds].filter((k) => k !== 'regelkoll').sort(), ['bild', 'direkt', 'kaos', 'minigame', 'trivia', 'utmaning', 'vem']);
 console.log('200 simulerade spel med 3–15 spelare: OK');
 
 // Samma namn: upptaget om den spelaren är med, annars får man tillbaka sin plats.
@@ -424,3 +428,7 @@ for (const c of cards) {
   assert.ok(!/\b(?:dricker|dricka|tar|får)\s+(?:\w+\s+)?\d+\s+poäng(?! från andra)/i.test(t), `konstig poängtext: ${t}`);
 }
 console.log('Poängtexter i alla kort: OK');
+// Positiva Vem i rummet?-frågor (B105): ger poäng till den med flest röster när man spelar om poäng.
+assert.equal(cards.filter((c) => c.positive).length, 28, 'antal positiva frågor');
+assert.ok(cards.filter((c) => c.positive).every((c) => c.kind === 'vem'), 'positiv fråga som inte är Vem i rummet?');
+console.log('Positiva frågor: OK');

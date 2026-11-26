@@ -1,5 +1,5 @@
 # Vem i rummet? – alla röstar på mobilen.
-# Format: kategori|fråga
+# Format: kategori|fråga  (+kategori|fråga = positiv fråga: med poäng får den med flest röster poäng, B105)
 # Kategorier: casual (del 1), party (del 2), cheeky (del 3), dirty (del 4), framtid (alla delar)
 casual|Vem i rummet är sämst på att svara på sms?
 casual|Vem har sämst lokalsinne och går vilse med GPS?
@@ -26,7 +26,7 @@ party|Vem måste alltid ha fyllekäk?
 party|Vem är mest benägen att dansa på bordet efter tre drinkar?
 party|Vem blir mest aggressiv när man spelar sällskapsspel?
 party|Vem kommer att vara den mest pinsamma föräldern på fest?
-party|Vem är bäst på att snacka sig ur en jobbig situation med en dörrvakt?
++party|Vem är bäst på att snacka sig ur en jobbig situation med en dörrvakt?
 party|Vem har den sämsta musiksmaken i sällskapet?
 party|Vem är mest trolig att föreslå tequila-shots kl 04:00?
 party|Vem dricker upp alla slattar på fest?
@@ -38,14 +38,14 @@ party|Vem är mest trolig att vakna upp i en fyllecell?
 party|Vem gömmer sig i ett hörn med hunden/katten på en hemmafest?
 cheeky|Vem är mest trolig att smsa sitt ex klockan 03:00?
 cheeky|Vem är bäst på att ghosta?
-cheeky|Vem är snyggast här enligt dig? (det kön du attraheras av)
++cheeky|Vem är snyggast här enligt dig? (det kön du attraheras av)
 cheeky|Vem har flest olästa matchningar på Tinder just nu?
 cheeky|Vem blir lättast kär efter bara en dejt?
 cheeky|Vem är mest trolig att ligga med en främling på en hemmafest?
 cheeky|Vem har högst body count i gruppen?
 cheeky|Vem har bäst chanser att bli en Sugar Baby?
 cheeky|Vem har bäst chanser att bli en Sugar Mommy/Daddy?
-cheeky|Vem är bäst på att ragga, som faktiskt lyckas?
++cheeky|Vem är bäst på att ragga, som faktiskt lyckas?
 cheeky|Vem blir lättast svartsjuk i ett förhållande?
 cheeky|Vem stalkar sitt ex (och exets nya) mest på sociala medier?
 cheeky|Vem är mest benägen att ha ett hemligt förhållande?
@@ -89,9 +89,9 @@ framtid|Vem blir den som ordnar den absolut vildaste svensexan/möhippan?
 framtid|Vem kommer att glömma bort sina gamla vänner när de blir kända?
 framtid|Vem kommer att öppna en bar på en strand i Thailand?
 framtid|Vem kommer att bli en konspirationsteoretiker på äldre dar?
-framtid|Vem i rummet kommer att åldras bäst?
++framtid|Vem i rummet kommer att åldras bäst?
 framtid|Vem kommer att vinna på Triss men förlora alla pengar på en vecka?
 framtid|Vem kommer att bli sällskapets eviga singel?
 framtid|Vem kommer att jobba med något helt annat än vad de pluggade till?
-framtid|Vem kommer att starta ett eget framgångsrikt företag?
-framtid|Vem kommer att bli den som håller ihop kompisgänget om 20 år?
++framtid|Vem kommer att starta ett eget framgångsrikt företag?
++framtid|Vem kommer att bli den som håller ihop kompisgänget om 20 år?

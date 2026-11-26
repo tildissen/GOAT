@@ -43,7 +43,7 @@ export default function NameForm({
   }
 
   return (
-    <Screen bg="cyan">
+    <Screen bg="cyan" scroll>
       <form onSubmit={submit} className="stack grow" style={{ gap: 0 }}>
         <h1 className="display mid coral" style={{ marginTop: 48, marginBottom: 48 }}>
           {mode === 'join' ? 'JOINA G.O.A.T.' : custom ? 'BYGG EGET SPEL' : 'SKAPA G.O.A.T.'}

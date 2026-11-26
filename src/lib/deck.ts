@@ -31,6 +31,7 @@ function toDeckCard(card: CardRow, rng: Rng): DeckCard {
     level: levelOf(card),
   };
   if (card.title) base.title = card.title;
+  if (card.positive) base.positive = true;
   if (card.kind === 'trivia' && card.answer) {
     const options = shuffle([card.answer, ...(card.wrong_answers ?? [])], rng);
     base.options = options;
@@ -50,6 +51,7 @@ function customToDeckCard(custom: CustomCard): DeckCard {
   };
   if (custom.title) card.title = custom.title;
   if (custom.targetId) card.targetId = custom.targetId;
+  if (custom.positive) card.positive = true;
   return card;
 }
 

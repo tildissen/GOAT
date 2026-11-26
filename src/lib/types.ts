@@ -3,7 +3,8 @@ export type Category = 'casual' | 'party' | 'cheeky' | 'dirty' | 'framtid';
 export type Occasion = 'fest' | 'aw' | 'familj';
 /** Klunkar eller (minus)poäng. */
 export type Scoring = 'klunkar' | 'poang';
-export type CardKind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild' | 'kaos';
+/** 'regelkoll' läggs in i leken av spelet självt, en slumpad stund efter ett regelkort (B106). */
+export type CardKind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild' | 'kaos' | 'regelkoll';
 
 /** Ett kort som det ligger i databasen (tabellen cards). */
 export interface CardRow {
@@ -18,6 +19,8 @@ export interface CardRow {
   players?: number | null;
   /** null = vanliga kort (och Fest). 'aw'/'familj' = förvalda kort för det tillfället. */
   occasion?: Occasion | null;
+  /** Vem i rummet?: positiv fråga – med poäng får den med flest röster poäng i stället för att förlora (B105). */
+  positive?: boolean | null;
 }
 
 /** Ett kort i en blandad kortlek. */
@@ -36,6 +39,8 @@ export interface DeckCard {
   custom?: boolean;
   /** Eget kort till en viss spelare (direkt fråga eller utmaning till en person). */
   targetId?: string;
+  /** Positiv Vem i rummet?-fråga (B105). */
+  positive?: boolean;
 }
 
 export type Choice = 'drink' | 'save' | 'challenge' | 'answered';
@@ -100,6 +105,8 @@ export interface CustomCard {
   /** Direkt fråga eller utmaning till en person: vem kortet ska gå till. Saknas = vem som helst. */
   targetId?: string;
   by: string;
+  /** Positiv Vem i rummet?-fråga (B105). */
+  positive?: boolean;
 }
 
 /** classic = vanliga G.O.A.T., custom = "Bygg eget spel" där alla skriver kort. */
@@ -141,7 +148,7 @@ export interface ActiveRule {
   byId: string;
   sips: number;
   part: number;
-  /** Sista kortet (cardIndex) regeln gäller. null = resten av delen. */
+  /** Används inte längre – regeln gäller tills regelkollen dyker upp (B106). */
   untilCard: number | null;
   /** Hur många gånger varje spelare har brutit regeln. */
   taken: Record<string, number>;
@@ -174,7 +181,7 @@ export type Action =
   | { type: 'start_intro' }
   | { type: 'ready' }
   | { type: 'set_selfie'; url: string }
-  | { type: 'add_custom'; kind: CustomKind; text: string; title?: string; players?: number; targetId?: string }
+  | { type: 'add_custom'; kind: CustomKind; text: string; title?: string; players?: number; targetId?: string; positive?: boolean }
   | { type: 'remove_custom'; id: string }
   | { type: 'start_game' }
   | { type: 'vote'; targetId: string }

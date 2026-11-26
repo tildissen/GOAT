@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import type { Player } from '@/lib/types';
 
 export type Color = 'green' | 'cyan' | 'coral' | 'yellow';
@@ -14,10 +14,53 @@ const PART_THEME: { bg: Color; card: Color }[] = [
 ];
 export const partTheme = (part: number) => PART_THEME[Math.min(Math.max(part, 1), 4) - 1];
 
-export function Screen({ bg, center, children }: { bg: Color; center?: boolean; children: ReactNode }) {
+const MIN_ZOOM = 0.6;
+// useLayoutEffect ger en varning på servern – där finns ingen skärm att mäta.
+const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
+/**
+ * En hel skärm. Allt ska rymmas utan att man scrollar (B107): blir innehållet högre än skärmen krymps
+ * hela skärmen (CSS zoom) tills det får plats, som minst till 60 %. scroll = får scrolla (lobbyn och formulär).
+ */
+export function Screen({ bg, center, scroll, children }: { bg: Color; center?: boolean; scroll?: boolean; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useIsoLayoutEffect(() => {
+    const el = ref.current;
+    if (!el || scroll) return;
+    const fit = () => {
+      el.style.zoom = '1';
+      el.style.minHeight = '0';
+      const natural = el.scrollHeight;
+      const room = window.innerHeight;
+      let zoom = natural > room ? Math.max(MIN_ZOOM, Math.floor((room / natural) * 100) / 100) : 1;
+      const apply = () => {
+        el.style.zoom = zoom === 1 ? '' : String(zoom);
+        // Krympt innehåll är redan minst lika högt som skärmen – ingen minsta höjd, annars kan det aldrig få plats.
+        el.style.minHeight = zoom === 1 ? '' : '0';
+      };
+      apply();
+      // Avrundning kan lämna några pixlar över – krymp lite till tills det får plats.
+      for (let i = 0; i < 6 && zoom > MIN_ZOOM && document.documentElement.scrollHeight > room + 1; i++) {
+        zoom = Math.max(MIN_ZOOM, Math.round((zoom - 0.02) * 100) / 100);
+        apply();
+      }
+    };
+    // Mäts om vid varje rendering (nytt kort, nytt läge), när skärmen ändras och när en bild har laddats.
+    fit();
+    const fonts = document.fonts?.ready.then(fit);
+    void fonts;
+    window.addEventListener('resize', fit);
+    el.addEventListener('load', fit, true);
+    return () => {
+      window.removeEventListener('resize', fit);
+      el.removeEventListener('load', fit, true);
+    };
+  });
   return (
     <main className={`screen ${bg}`}>
-      <div className={`column${center ? ' center' : ''}`}>{children}</div>
+      <div ref={ref} className={`column${center ? ' center' : ''}`}>
+        {children}
+      </div>
     </main>
   );
 }
@@ -75,7 +118,7 @@ const ICONS = {
 } as const;
 
 export type IconName = keyof typeof ICONS;
-export type Kind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild' | 'kaos';
+export type Kind = 'vem' | 'direkt' | 'trivia' | 'utmaning' | 'minigame' | 'bild' | 'kaos' | 'regelkoll';
 
 export function Icon({ name, size = 24, className }: { name: IconName; size?: number; className?: string }) {
   return (
@@ -103,13 +146,14 @@ const KIND_LABEL: Record<Kind, string> = {
   minigame: 'Minigame',
   bild: 'Vems är bilden?',
   kaos: 'Kaos!',
+  regelkoll: 'Regelkoll!',
 };
 
 /** Svart tagg överst på kortet: ikon och korttyp. */
 export function KindTag({ kind }: { kind: Kind }) {
   return (
     <span className="kind">
-      <Icon name={kind} size={22} />
+      <Icon name={kind === 'regelkoll' ? 'trofe' : kind} size={22} />
       {KIND_LABEL[kind]}
     </span>
   );

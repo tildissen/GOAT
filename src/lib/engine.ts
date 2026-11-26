@@ -202,7 +202,28 @@ export function isLeaderCard(card: DeckCard): boolean {
 
 /** Regel som gäller flera kort ("resten av delen", "de kommande 5 korten") – räknas i regelkollen i stället för direkt. */
 export function isLastingRule(card: DeckCard, text: string): boolean {
-  return isLeaderCard(card) && /resten av (?:den här )?delen|de kommande \d+ korten/i.test(text);
+  return isLeaderCard(card) && (/resten av (?:den här )?delen|de kommande \d+ korten|tills regelkollen/i.test(text));
+}
+
+/** Regler gäller tills en regelkoll dyker upp, en slumpad stund senare – ingen vet när (B106). */
+function untilCheck(text: string): string {
+  return text
+    .replace(/resten av (?:den här )?delen/gi, 'tills regelkollen dyker upp')
+    .replace(/(?:under )?de kommande \d+ korten/gi, 'tills regelkollen dyker upp');
+}
+
+/** Lägger in ett regelkoll-kort 2–6 kort senare, även in i nästa del. */
+function scheduleCheck(s: GameState, ruleId: string, ctx: Ctx) {
+  const check: DeckCard = { id: ruleId, kind: 'regelkoll', text: '', players: 0, level: 1 };
+  let part = s.part - 1;
+  let pos = s.cardIndex + 2 + Math.floor(ctx.rng() * 5);
+  while (pos > s.deck[part].length && part < s.deck.length - 1) {
+    pos -= s.deck[part].length + 1;
+    part += 1;
+    pos = Math.max(0, pos);
+  }
+  pos = Math.min(pos, s.deck[part].length);
+  s.deck[part].splice(pos, 0, check);
 }
 
 /** Bara spelledaren (den som drog kortet) och värden delar ut – värdens roll tas över av vem som helst om värden är borta (B95). */
@@ -244,7 +265,7 @@ function isLeader(s: GameState, playerId: string, ctx: Ctx): boolean {
 export function canPressNext(s: GameState | PublicState, cur: Current, playerId: string, ctx: Pick<Ctx, 'active'>): boolean {
   const leader = playerId === s.hostId || !ctx.active.has(s.hostId);
   // Spelledaren (den som drog minigamet, kaoskortet eller gruppkortet) kan också gå vidare.
-  if (isLeaderCard(cur.card) && cur.phase === 'play') return leader || playerId === cur.turnId;
+  if ((isLeaderCard(cur.card) || cur.card.kind === 'regelkoll') && cur.phase === 'play') return leader || playerId === cur.turnId;
   if (!isSoloCard(cur.card)) return leader;
   return leader || playerId === cur.turnId || !ctx.active.has(cur.turnId);
 }
@@ -269,6 +290,27 @@ function pickTurn(s: GameState, ctx: Ctx): Player {
 
 function deal(s: GameState, ctx: Ctx) {
   const card = s.deck[s.part - 1][s.cardIndex];
+  if (card.kind === 'regelkoll') {
+    const rule = (s.rules ?? []).find((r) => r.id === card.id);
+    // Regeln finns inte längre (t.ex. efter Börja om) – hoppa över kortet.
+    if (!rule) return advance(s, ctx);
+    s.seq += 1;
+    s.current = {
+      seq: s.seq,
+      card: { ...card, ...(rule.title ? { title: rule.title } : {}) },
+      text: rule.text,
+      turnId: rule.byId,
+      targetIds: [rule.byId],
+      sips: rule.sips,
+      phase: 'play',
+      votes: {},
+      losers: [],
+      choices: {},
+      photoUrl: null,
+      triviaPick: null,
+    };
+    return;
+  }
   // Eget kort till en viss spelare går till den personen, om hen är med och uppkopplad.
   const target = card.targetId ? s.players.find((p) => p.id === card.targetId && p.ready && ctx.active.has(p.id)) : undefined;
   const turn = target ?? pickTurn(s, ctx);
@@ -320,20 +362,22 @@ function deal(s: GameState, ctx: Ctx) {
     triviaPick: null,
   };
   if (isLastingRule(card, text)) {
-    const coming = text.match(/de kommande (\d+) korten/i);
+    s.current.text = untilCheck(text);
+    const id = `r${s.seq}`;
     s.rules = [
       ...(s.rules ?? []),
       {
-        id: `r${s.seq}`,
+        id,
         ...(card.title ? { title: card.title } : {}),
-        text,
+        text: s.current.text,
         byId: turn.id,
         sips: s.current.sips,
         part: s.part,
-        untilCard: coming ? s.cardIndex + Number(coming[1]) : null,
+        untilCard: null,
         taken: {},
       },
     ];
+    scheduleCheck(s, id, ctx);
   }
   turn.turns += 1;
   s.lastTurnId = turn.id;
@@ -412,11 +456,13 @@ function resolveVotes(s: GameState, cur: Current) {
       }
       logEvent(s, cur.turnId, right.length > 0 ? `ägde bilden – ${right.length} gissade rätt och fick ${pts(cur.sips)} var` : `lurade alla och fick ${pts(cur.sips)}`);
     } else {
+      // Positiva frågor ("Vem har bäst humor?") ger poäng till den med flest röster (B105).
+      const sign = cur.card.positive ? 1 : -1;
       for (const id of cur.losers) {
         const p = find(id);
         if (p) {
-          addPoints(p, -cur.sips);
-          logEvent(s, id, `fick flest röster och förlorade ${pts(cur.sips)}`);
+          addPoints(p, sign * cur.sips);
+          logEvent(s, id, `fick flest röster och ${sign > 0 ? 'fick' : 'förlorade'} ${pts(cur.sips)}`);
         }
       }
     }
@@ -502,6 +548,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
         if (title.length > 40) throw new GameError('Namnet får vara max 40 tecken');
         card.title = title;
       }
+      if (kind === 'vem' && action.positive) card.positive = true;
       s.customCards.push(card);
       break;
     }
@@ -691,6 +738,8 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
         throw new GameError(isSoloCard(c.card) ? 'Det är inte din tur' : 'Bara värden kan gå vidare på gruppkort', 403);
       }
       assertNotPaused(s, ctx);
+      // Regelkollen är gjord – regeln slutar gälla.
+      if (c.card.kind === 'regelkoll') s.rules = (s.rules ?? []).filter((r) => r.id !== c.card.id);
       autoDrink(s, c);
       // Pluspoäng: "Klar!" på en utmaning till en person ger poäng.
       if (usesPoints(s) && playerId === c.turnId && c.card.kind === 'utmaning' && isSoloCard(c.card) && !c.choices[playerId]) {
@@ -708,7 +757,6 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       requireLeader();
       if (s.status !== 'partEnd') throw new GameError('Delen är inte slut än', 409);
       assertNotPaused(s, ctx);
-      s.rules = (s.rules ?? []).filter((r) => r.part > s.part);
       const before = new Set(pausedPlayers(s).map((p) => p.id));
       s.part += 1;
       s.cardIndex = 0;

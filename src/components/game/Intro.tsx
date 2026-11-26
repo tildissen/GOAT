@@ -288,6 +288,7 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
   const [text, setText] = useState('');
   const [title, setTitle] = useState('');
   const [targetId, setTargetId] = useState<string | null>(null);
+  const [positive, setPositive] = useState(false);
   const [added, setAdded] = useState(0);
   const baseType = CARD_TYPES.find((t) => t.key === typeKey)!;
   const type = isFamily(state)
@@ -308,17 +309,19 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
       title,
       text,
       targetId: personal && targetId ? targetId : undefined,
+      positive: type.kind === 'vem' && usesPoints(state) ? positive : undefined,
     });
     if (ok) {
       setText('');
       setTitle('');
       setTargetId(null);
+      setPositive(false);
       setAdded(added + 1);
     }
   }
 
   return (
-    <Screen bg="cyan">
+    <Screen bg="cyan" scroll>
       <h1 className="display mid coral" style={{ marginTop: 24 }}>
         {custom ? 'SKRIV DINA KORT' : 'EGNA KORT'}
       </h1>
@@ -374,6 +377,29 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
               ? `Kortet går till ${state.players.find((pl) => pl.id === targetId)?.name}.`
               : 'Kortet går till den vars tur det är.'}
           </p>
+        </>
+      )}
+      {type.kind === 'vem' && usesPoints(state) && (
+        <>
+          <p className="choice-prompt" style={{ margin: '14px 0 8px' }}>
+            Är det bra eller dåligt att få flest röster?
+          </p>
+          <div className="names" style={{ gap: 8 }}>
+            {[
+              [false, 'Dåligt – förlorar poäng'],
+              [true, 'Bra – får poäng'],
+            ].map(([value, label]) => (
+              <button
+                key={String(value)}
+                className={`name-pill${positive === value ? ' selected' : ''}`}
+                style={{ fontSize: 15, minHeight: 44, flex: '1 1 auto' }}
+                onClick={() => setPositive(value as boolean)}
+                aria-pressed={positive === value}
+              >
+                {label as string}
+              </button>
+            ))}
+          </div>
         </>
       )}
       {type.kind === 'minigame' && (

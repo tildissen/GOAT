@@ -14,6 +14,7 @@ export default function Playing(props: GameProps) {
   if (!cur) return null;
   const { card } = cur;
 
+  if (card.kind === 'regelkoll') return <RuleCheckCard {...props} cur={cur} />;
   if (card.kind === 'vem') return cur.phase === 'voting' ? <VoteCard {...props} cur={cur} /> : <ResultCard {...props} cur={cur} />;
   if (card.kind === 'bild') {
     if (cur.phase === 'upload') return <PhotoUpload {...props} cur={cur} />;
@@ -53,22 +54,54 @@ function CardScreen({
   );
 }
 
-/** Regler som gäller just nu (från tidigare kort i delen), så att alla vet hur länge de gäller (B96). */
+/** Regler som gäller just nu, tills deras regelkoll dyker upp – ingen vet när (B96, B106). */
 function ActiveRules({ state }: { state: GameProps['state'] }) {
-  const seq = state.current?.seq;
-  const rules = (state.rules ?? []).filter(
-    (r) => r.part === state.part && r.id !== `r${seq}` && (r.untilCard === null || state.cardIndex <= r.untilCard),
-  );
+  const cur = state.current;
+  const rules = (state.rules ?? []).filter((r) => r.id !== `r${cur?.seq}` && !(cur?.card.kind === 'regelkoll' && cur.card.id === r.id));
   if (rules.length === 0) return null;
   return (
     <div className="active-rules" aria-label="Regler som gäller">
       {rules.map((r) => (
         <span key={r.id} className="active-rule">
-          <strong>{r.title ?? 'Regel'}</strong>
-          {r.untilCard === null ? ' · resten av delen' : ` · ${r.untilCard - state.cardIndex + 1} kort till`}
+          <strong>Regel:</strong> {r.title ?? r.text.slice(0, 28) + (r.text.length > 28 ? '…' : '')}
         </span>
       ))}
     </div>
+  );
+}
+
+/** Regelkoll mitt i spelet: spelledaren för regeln och värden trycker på dem som bröt den (B106). */
+function RuleCheckCard(p: CardProps) {
+  const { cur, state } = p;
+  const rule = (state.rules ?? []).find((r) => r.id === cur.card.id);
+  return (
+    <CardScreen game={p} bg="yellow" card="green" below={<NextButton {...p} />}>
+      <KindTag kind="regelkoll" />
+      <h2 className="minigame-title">{cur.card.title ?? 'Regelkoll'}</h2>
+      <p className="leader-line">
+        <span className="chip">Spelledare</span>
+        <strong className="name-font">{cur.turnId === p.me.id ? 'Du!' : `${nameOf(state, cur.turnId)}!`}</strong>
+      </p>
+      <div className="card-body">
+        <p className="card-text">{cur.text}</p>
+        <p className="rule-note">Regeln slutar gälla nu.</p>
+      </div>
+      {rule && (
+        <GiveList
+          state={state}
+          players={state.players.filter((pl) => pl.ready)}
+          taken={rule.taken}
+          sips={rule.sips}
+          byId={rule.byId}
+          mayGive={canGive(state, rule.byId, p.me.id, { active: new Set(p.view.active) })}
+          meId={p.me.id}
+          busy={p.busy}
+          prompt="Vem bröt regeln?"
+          onGive={(id) => p.act({ type: 'rule_take', ruleId: rule.id, targetId: id })}
+          onUndo={(id) => p.act({ type: 'rule_untake', ruleId: rule.id, targetId: id })}
+        />
+      )}
+    </CardScreen>
   );
 }
 
@@ -263,8 +296,7 @@ function Challenge(p: CardProps) {
         <p className="card-text">{cur.text}</p>
         {lasting && (
           <p className="rule-note">
-            Regeln gäller {/de kommande \d+ korten/i.test(cur.text) ? 'de kommande korten' : 'resten av delen'}. Den som
-            bryter den räknas i regelkollen när delen är slut.
+            Regeln gäller tills regelkollen dyker upp – det kan dröja några kort, ingen vet när. Den som bryter den räknas då.
           </p>
         )}
         {cur.teams && (
@@ -442,13 +474,13 @@ function ResultCard(p: CardProps) {
         </div>
         <p className="heading">
           {everyoneTied
-            ? `fick lika många röster – alla ${usesPoints(state) ? `förlorar ${cur.sips} poäng` : 'dricker'}!`
+            ? `fick lika många röster – alla ${usesPoints(state) ? (cur.card.positive ? `får +${cur.sips} poäng` : `förlorar ${cur.sips} poäng`) : 'dricker'}!`
             : cur.losers.length > 1
               ? usesPoints(state)
-                ? `fick lika många röster – och förlorar ${cur.sips} poäng`
+                ? `fick lika många röster – och ${cur.card.positive ? `får +${cur.sips}` : `förlorar ${cur.sips}`} poäng`
                 : 'fick lika många röster'
               : usesPoints(state)
-                ? `fick flest röster – och förlorar ${cur.sips} poäng`
+                ? `fick flest röster – och ${cur.card.positive ? `får +${cur.sips}` : `förlorar ${cur.sips}`} poäng`
                 : 'fick flest röstningar'}
         </p>
       </>
@@ -462,11 +494,11 @@ function ResultCard(p: CardProps) {
     >
       {photo && cur.photoUrl && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img className="photo" style={{ maxHeight: '24dvh' }} src={cur.photoUrl} alt="" />
+        <img className="photo" style={{ maxHeight: '20dvh' }} src={cur.photoUrl} alt="" />
       )}
       <div className="card-body">{headline}</div>
       {cur.tally && Object.keys(cur.tally).length > 0 && (
-        <div className="votes-list">
+        <div className="votes-list chips">
           {Object.entries(cur.tally)
             .sort(([, a], [, b]) => b - a)
             .map(([id, n]) => (
@@ -487,7 +519,7 @@ function ResultCard(p: CardProps) {
       {iLost && !cur.choices[me.id] && !usesPoints(state) ? (
         <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={usesPoints(state)} />
       ) : (
-        <div className="votes-list">
+        <div className="votes-list chips">
           {cur.losers
             .filter((id) => cur.choices[id])
             .map((id) => (
@@ -582,7 +614,7 @@ function Waiting(p: CardProps) {
       below={
         <>
           {!p.view.active.includes(cur.turnId) && <NextButton {...p} label="Hoppa över" />}
-          <Board state={state} active={p.view.active} meId={p.me.id} />
+          <Board state={state} active={p.view.active} meId={p.me.id} mini />
         </>
       }
     >
