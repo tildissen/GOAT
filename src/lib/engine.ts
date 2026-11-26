@@ -413,7 +413,45 @@ function autoDrink(s: GameState, c: Current) {
   }
 }
 
+/**
+ * Klunkar som värden eller spelledaren delar ut (B117): personen får välja – dricka, spara eller dra ett
+ * utmaningskort – som på alla andra kort. Fram till dess ligger de som "pending" på kortet.
+ */
+function giveSips(s: GameState, target: Player, n: number) {
+  const c = s.current;
+  if (c && s.status === 'playing') (c.pending ??= {})[target.id] = (c.pending[target.id] ?? 0) + n;
+  else target.drank += n;
+}
+
+/** Värden ångrar: ta bort det som inte valts än, annars det som personen valde. */
+function takeBackSips(s: GameState, target: Player, n: number) {
+  const c = s.current;
+  const waiting = c?.pending?.[target.id] ?? 0;
+  if (c?.pending && waiting >= n) {
+    c.pending[target.id] = waiting - n;
+    if (!c.pending[target.id]) delete c.pending[target.id];
+    return;
+  }
+  const choice = c?.givenChoice?.[target.id];
+  if (choice === 'save') target.saved = Math.max(0, target.saved - n);
+  else if (choice !== 'challenge') target.drank = Math.max(0, target.drank - n);
+}
+
+/** Har någon inte valt när kortet går vidare dricker hen klunkarna. */
+function flushPending(s: GameState) {
+  const c = s.current;
+  if (!c?.pending) return;
+  for (const [id, n] of Object.entries(c.pending)) {
+    const p = s.players.find((pl) => pl.id === id);
+    if (!p || !n) continue;
+    p.drank += n;
+    logEvent(s, id, `drack ${sipsWord(n, false)}`);
+  }
+  c.pending = {};
+}
+
 function advance(s: GameState, ctx: Ctx) {
+  flushPending(s);
   s.cardIndex += 1;
   if (s.cardIndex >= s.deck[s.part - 1].length) {
     s.current = null;
@@ -708,7 +746,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       if (action.type === 'take') {
         taken[target.id] = (taken[target.id] ?? 0) + 1;
         if (points) addPoints(target, -c.sips);
-        else target.drank += c.sips;
+        else giveSips(s, target, c.sips);
         logEvent(
           s,
           playerId,
@@ -718,9 +756,29 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
         if (!taken[target.id]) throw new GameError(`${target.name} har inte fått några på det här kortet`, 409);
         taken[target.id] -= 1;
         if (points) addPoints(target, c.sips);
-        else target.drank = Math.max(0, target.drank - c.sips);
+        else takeBackSips(s, target, c.sips);
         logEvent(s, playerId, points ? `gav tillbaka ${what} till ${self ? 'sig själv' : target.name}` : `tog bort ${what} från ${self ? 'sig själv' : target.name}`);
       }
+      break;
+    }
+    case 'resolve_given': {
+      const c = requireCurrent();
+      const n = c.pending?.[playerId] ?? 0;
+      if (!n || !c.pending) throw new GameError('Du har inga klunkar att välja för – kolla skärmen', 409);
+      delete c.pending[playerId];
+      (c.givenChoice ??= {})[playerId] = action.choice;
+      if (action.choice === 'drink') {
+        me.drank += n;
+        logEvent(s, playerId, `drack ${sipsWord(n, false)}`);
+      } else if (action.choice === 'save') {
+        me.saved += n;
+        logEvent(s, playerId, `sparade ${sipsWord(n, false)} (har ${me.saved} sparade)`);
+        if (me.saved >= savedCap(s.part)) logEvent(s, playerId, `fick ERROR med ${me.saved} sparade klunkar!`, 'error');
+      } else if (action.choice === 'challenge') {
+        const text = drawChallenge(s, ctx);
+        s.overlays[playerId] = { text, advancesCard: false };
+        logEvent(s, playerId, `drog ett utmaningskort: ”${text}”`);
+      } else throw new GameError('Ogiltigt val');
       break;
     }
     case 'rule_take':
@@ -736,13 +794,13 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       if (action.type === 'rule_take') {
         rule.taken[target.id] = (rule.taken[target.id] ?? 0) + 1;
         if (points) addPoints(target, -rule.sips);
-        else target.drank += rule.sips;
+        else giveSips(s, target, rule.sips);
         logEvent(s, playerId, points ? `tog ${what} från ${target.name} (${label})` : `gav ${target.name} ${what} (${label})`);
       } else {
         if (!rule.taken[target.id]) throw new GameError(`${target.name} har inte fått några för den regeln`, 409);
         rule.taken[target.id] -= 1;
         if (points) addPoints(target, rule.sips);
-        else target.drank = Math.max(0, target.drank - rule.sips);
+        else takeBackSips(s, target, rule.sips);
         logEvent(s, playerId, points ? `gav tillbaka ${what} till ${target.name} (${label})` : `tog bort ${what} från ${target.name} (${label})`);
       }
       break;

@@ -912,3 +912,7 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .kort-row strong { font-size: 17px; }
 .kort-row p { margin: 1px 0 0; font-size: 15px; line-height: 1.3; }
 .display.kort-title { text-shadow: 3px 3px 0 var(--white); font-size: clamp(60px, 18vw, 88px); line-height: 1; } /* större rubrik (B114) */
+
+/* "Du fick 2 klunkar!" (B117): ruta ovanpå kortet med valen */
+.overlay.given-overlay { background: rgba(0, 0, 0, 0.55); z-index: 52; padding: 16px; }
+.panel.given-panel { background: var(--green); gap: 14px; text-align: center; align-items: center; }

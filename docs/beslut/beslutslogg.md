@@ -911,3 +911,17 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Gäller också regelkollen för regler från sådana kort.
   - Minigames och kaoskort har kvar sin spelledare.
 - **Var i koden:** `isLeaderCard()`, `isGroupChallenge()` och `giverOf()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `TakeButtons` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `GiveList` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx).
+
+### B117. "Du fick 2 klunkar!" – man väljer själv
+- **Beslut:** När värden eller spelledaren delar ut klunkar ska spelaren få upp "Du har fått 2 klunkar" och välja: spara, drick eller dra en utmaning. Det ska fungera som på alla andra kort.
+- **Tillägg (av Claude):**
+  - När någon trycker på ditt namn kommer en ruta upp på din mobil: **Du fick 2 klunkar!** med *Jag dricker*, *Jag sparar* och *Dra ett utmaningskort*. Under knapparna står hur många sparade du har av max.
+  - Valet syns för alla i notisen.
+  - Får flera klunkar samtidigt väljer alla på en gång, och värden behöver inte vänta.
+  - Har någon inte valt när kortet går vidare dricker hen klunkarna, som efter röstningar.
+  - Sparar man upp till taket blir det ERROR som vanligt.
+  - Ångrar värden ("−") försvinner rutan. Har personen redan valt tas det personen valde bort: sparade klunkar från de sparade och druckna från de druckna.
+  - Gäller också regelkollen.
+  - Med poäng kommer ingen ruta, för där finns inget att spara. Poängen dras direkt som förut.
+  - Testat i persona-spel i AW, vanligt spel och Familjespel på Safari-ytan för iPhone 13 och iPhone SE: inga fel, ingen skärm behövde scrollas.
+- **Var i koden:** `giveSips()`, `takeBackSips()`, `flushPending()` och åtgärden `resolve_given` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `pending` och `givenChoice` i [`src/lib/types.ts`](../../src/lib/types.ts), `GivenPrompt` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `.given-overlay` i [`src/app/globals.css`](../../src/app/globals.css).

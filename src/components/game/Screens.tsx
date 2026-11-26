@@ -213,6 +213,38 @@ export function ChallengeOverlay({ state, me, busy, act }: GameProps) {
   );
 }
 
+/**
+ * "Du fick 2 klunkar!" – när värden eller spelledaren har gett dig klunkar väljer du, som på alla andra kort:
+ * dricka, spara eller dra ett utmaningskort (B117). Väljer du inte innan kortet går vidare dricker du dem.
+ */
+export function GivenPrompt({ state, me, busy, act }: GameProps) {
+  const n = state.current?.pending?.[me.id] ?? 0;
+  if (!n || state.overlays[me.id]) return null;
+  const cap = savedCap(state.part);
+  return (
+    <div className="overlay given-overlay" role="dialog" aria-label="Du fick klunkar">
+      <div className="panel given-panel">
+        <h2 className="display mid name-font">Du fick {sipsText(n)}!</h2>
+        <p className="body-text">Vad gör du?</p>
+        <div className="stack" style={{ gap: 10, width: '100%' }}>
+          <button className="btn yellow wide" disabled={busy} onClick={() => act({ type: 'resolve_given', choice: 'drink' })}>
+            Jag dricker {sipsText(n)}
+          </button>
+          <button className="btn yellow wide" disabled={busy} onClick={() => act({ type: 'resolve_given', choice: 'save' })}>
+            Jag sparar {n === 1 ? 'min klunk' : `${n} klunkar`}
+          </button>
+          <button className="btn yellow wide" disabled={busy} onClick={() => act({ type: 'resolve_given', choice: 'challenge' })}>
+            Dra ett utmaningskort
+          </button>
+        </div>
+        <p className="hint">
+          Du har {me.saved} sparade av max {cap}.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 /** Tryck på "Sparade klunkar" för att dricka dem när du vill. */
 export function SavedSheet({ state, me, busy, act }: GameProps) {
   const [open, setOpen] = useState(false);
