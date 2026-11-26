@@ -5,7 +5,7 @@ import { compressImage, loadLocal, saveLocal } from '@/lib/client';
 import { isFamily, usesPoints, MAX_OWN_CARDS, MIN_OWN_CARDS, MIN_PLAYERS, ownCardCount } from '@/lib/engine';
 import type { CustomCard, CustomKind } from '@/lib/types';
 import Face from '../Face';
-import { Avatar, Screen } from '../ui';
+import { ActionBar, Avatar, Screen } from '../ui';
 import { nameOf, type GameProps } from './shared';
 
 type Step = 'storej' | 'regler' | 'selfie' | 'egna';
@@ -140,10 +140,12 @@ function Regler({ state, onDone }: { state: GameProps['state']; onDone: () => vo
             </li>
           ))}
         </ol>
-        <button className="btn ink" onClick={onDone} style={{ marginTop: 8 }}>
+      </div>
+      <ActionBar>
+        <button className="btn ink" onClick={onDone}>
           Nästa
         </button>
-      </div>
+      </ActionBar>
     </Screen>
   );
 }
@@ -185,7 +187,7 @@ function Selfie({ me, busy, upload, onDone }: GameProps & { onDone: () => void }
           {working ? 'Laddar upp…' : me.selfie ? 'Byt bild' : 'Ladda upp här!'}
         </button>
       </div>
-      <div className="stack">
+      <ActionBar>
         {!me.selfie && (
           <button className="link-btn" onClick={onDone}>
             Hoppa över
@@ -194,7 +196,7 @@ function Selfie({ me, busy, upload, onDone }: GameProps & { onDone: () => void }
         <button className="btn ink" disabled={!me.selfie || working} onClick={onDone}>
           Nästa
         </button>
-      </div>
+      </ActionBar>
     </Screen>
   );
 }
@@ -432,9 +434,11 @@ function EgnaKort({ state, me, busy, act, onDone }: GameProps & { onDone: () => 
         </p>
       )}
       <div className="grow" style={{ minHeight: 24 }} />
-      <button className="btn ink" disabled={busy || missing > 0} onClick={onDone}>
-        {missing > 0 ? `Skriv ${missing} kort till` : custom || mine.length > 0 ? 'Nästa' : 'Hoppa över'}
-      </button>
+      <ActionBar>
+        <button className="btn ink" disabled={busy || missing > 0} onClick={onDone}>
+          {missing > 0 ? `Skriv ${missing} kort till` : custom || mine.length > 0 ? 'Nästa' : 'Hoppa över'}
+        </button>
+      </ActionBar>
     </Screen>
   );
 }
@@ -459,12 +463,12 @@ export function ReadyWait({ state, view, isLeader, busy, act }: GameProps) {
         </p>
       </div>
       {isLeader ? (
-        <div className="stack">
+        <ActionBar>
           {ready.length < MIN_PLAYERS && <p className="body-text">Minst {MIN_PLAYERS} måste vara redo.</p>}
           <button className="btn ink" disabled={busy || ready.length < MIN_PLAYERS} onClick={() => act({ type: 'start_game' })}>
             Starta spelet
           </button>
-        </div>
+        </ActionBar>
       ) : (
         <p className="body-text">Väntar på att {nameOf(state, state.hostId)} startar spelet…</p>
       )}

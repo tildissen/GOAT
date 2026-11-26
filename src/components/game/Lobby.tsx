@@ -3,7 +3,7 @@
 import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useState } from 'react';
 import { MIN_PLAYERS } from '@/lib/engine';
-import { Avatar, Screen } from '../ui';
+import { ActionBar, Avatar, Screen } from '../ui';
 import { nameOf, type GameProps } from './shared';
 
 const PILL_COLORS = ['coral', 'yellow', 'green', 'white'] as const;
@@ -65,12 +65,12 @@ export default function Lobby({ state, view, isLeader, busy, act, code }: GamePr
 
       <div className="grow" style={{ minHeight: 24 }} />
       {isLeader ? (
-        <div className="stack">
+        <ActionBar>
           {!enough && <p className="body-text">Minst {MIN_PLAYERS} spelare behövs, dela koden!</p>}
           <button className="btn ink" disabled={busy || !enough} onClick={() => act({ type: 'start_intro' })}>
             Nästa
           </button>
-        </div>
+        </ActionBar>
       ) : (
         <p className="body-text">Väntar på att {nameOf(state, state.hostId)} går vidare…</p>
       )}

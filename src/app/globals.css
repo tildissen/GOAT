@@ -44,10 +44,10 @@ textarea {
   justify-content: center;
   transition: background-color 0.35s ease;
 }
-.screen.green { background: var(--green); }
-.screen.cyan { background: var(--cyan); }
-.screen.coral { background: var(--coral); }
-.screen.yellow { background: var(--yellow); }
+.screen.green { background: var(--green); --bar-bg: var(--green); }
+.screen.cyan { background: var(--cyan); --bar-bg: var(--cyan); }
+.screen.coral { background: var(--coral); --bar-bg: var(--coral); }
+.screen.yellow { background: var(--yellow); --bar-bg: var(--yellow); }
 
 .column {
   width: 100%;
@@ -527,6 +527,7 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .kind svg { width: 22px; height: 22px; flex: none; }
 .card-top { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .chip {
+  color: var(--black); /* annars vit text på vit pill på svarta kaoskort */
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.1em;
@@ -850,6 +851,18 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .overlay.solid-punish { background: var(--green); z-index: 59; animation: card-in 0.3s ease; }
 .panel.punish { background: transparent; color: var(--black); box-shadow: none; text-align: center; }
 
-/* Värdens knappar på "Del X är klar!" ligger kvar längst ned även när regelkollen gör sidan lång (B103) */
-.part-end-actions { width: 100%; display: flex; justify-content: center; }
-.part-end-actions.floating { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: auto; z-index: 20; }
+/* Fast knappfält längst ned (B104): huvudknappen syns alltid och innehållet skrollar bakom.
+   Det ersätter de flytande knapparna på "Del X är klar!" (B103), som täckte "Avsluta". */
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 15;
+  width: 100%;
+  margin-top: auto;
+  padding: 24px 0 calc(8px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(to bottom, transparent, var(--bar-bg, transparent) 28%);
+}

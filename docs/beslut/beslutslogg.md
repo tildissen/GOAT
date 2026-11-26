@@ -760,7 +760,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Ändrat också i valet "Poäng" när man skapar spelet, Familjespel-texten, korttypernas förklaringar i Familjespel och användarvillkoren.
 - **Var i koden:** `Player.points` i [`src/lib/types.ts`](../../src/lib/types.ts), `pointsText()`, `addPoints()`, `resolveVotes()`, `choose`, `trivia_answer`, `dismiss_overlay`, `next`, `take` och `rule_take` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `sipsText`, `choiceText`, `ChoiceButtons`, `Board`, `Stats` och `GiveList` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `Hud`, `Direct`, `Trivia`, `Challenge` och `ResultCard` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `rulesFor()` och `FAMILY_TYPE_TEXT` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `SCORINGS` i [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx).
 
-### B103. Buggar från persona-testet
+### B103. Buggar från persona-testet (**Flytande Fortsätt ersatt av B104**)
 - **Beslut:** Tilda bad Claude spela spelet med olika personas och leta buggar.
 - **Tillägg (av Claude):**
   - Claude spelade tre hela spel i riktiga webbläsare: AW med klunkar, Familjespel med pluspoäng och vanligt spel. Sex personas på olika mobiler var med: värd, sparare, utmanare, vägrare, en som alltid röstar på samma, en som laddar om sidan mitt i och en som kommer in sent.
@@ -772,3 +772,21 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
     - **Poängtexter:** några kort blev konstiga med poäng, t.ex. "tar hen 4 poäng", "dricker du 2 poäng" och "måste dricka 3 poäng". Nu står det "förlorar hen 4 poäng", "förlora 3 poäng" och "ta 3 poäng från andra". Ett test går igenom alla kort.
 - **Inte ändrat:** Med många spelare hamnar valknapparna ("Jag dricker …", "Dra ett utmaningskort") ibland under kanten även på en iPhone 13, så man får scrolla. I testet med pluspoäng hade flera spelare minus i slutet, eftersom straff på gruppkort och röstningar ofta drar mer än man hinner samla. Tilda har inte tagit ställning till någon av dem.
 - **Var i koden:** `next` (seq) i [`src/lib/engine.ts`](../../src/lib/engine.ts) och [`src/lib/types.ts`](../../src/lib/types.ts), `pointsText()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `PartEnd` och `Finished` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `.rule-check-card` och `.part-end-actions` i [`src/app/globals.css`](../../src/app/globals.css).
+
+---
+
+## 2026-11-26 – Knappar och etiketter
+
+### B104. Fast knappfält längst ned, och etiketten "Spelledare" syns
+- **Beslut:** Efter Claudes UX-genomgång (omgång två) bestämde Tilda tre saker:
+  1. "Avsluta" ska inte gömmas bakom "Fortsätt spela". Båda knapparna ligger i samma fasta fält längst ned.
+  2. Textfärgen på etiketten "Spelledare" sätts uttryckligen till svart.
+  3. Kortets huvudknapp ligger i samma fasta knappfält, och kortet skrollar bakom. Det löser också de skärmar där knappen hamnade under kanten på små mobiler.
+- **Varför:** I mätningen låg den flytande "Fortsätt spela" (768–828 px) över "Avsluta" (760–820 px) även längst ned, så värden kunde inte avsluta spelet när regelkollen gjorde sidan lång. Etiketten "Spelledare" var vit text på vit pill (1 : 1) på svarta kaoskort. På 360×640 låg huvudknappen under kanten på 15 av 39 skärmar.
+- **Tillägg (av Claude):**
+  - Ett nytt knappfält (`ActionBar`) som sitter fast längst ned med en nedtonad kant mot innehållet. Det används på korten (Nästa och Klar!), "Del … är klar!" (Fortsätt spela och Avsluta), slutskärmen (Börja om! och Avsluta), lobbyn (Nästa), Spelregler, selfiesidan, Egna kort och "Är ni redo?" (Starta spelet).
+  - Det ersätter den flytande knappen från B103.
+  - Valen inne i korten ("Jag dricker …", "Jag vill spara …") ligger kvar i kortet och skrollar med det. De är inte kortets huvudknapp.
+  - Mätt på 360×640 och 390×844: alla huvudknappar ligger inom skärmen, "Fortsätt spela" och "Avsluta" överlappar inte, och etiketten är svart på vit.
+- **Inte ändrat:** Stör ej-skärmen, namnformuläret och den lilla "Hoppa över"-länken på selfiesidan. Valknapparna inne i korten kan fortfarande hamna under kanten på en liten mobil.
+- **Var i koden:** `ActionBar` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `.action-bar` och `.chip` i [`src/app/globals.css`](../../src/app/globals.css), `PartEnd` och `Finished` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `CardScreen` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Lobby.tsx`](../../src/components/game/Lobby.tsx) och [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).

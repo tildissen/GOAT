@@ -5,7 +5,7 @@ import { compressImage } from '@/lib/client';
 import { canGive, canPressNext, isLastingRule, isLeaderCard, isTakeCard, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import Face from '../Face';
-import { KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
+import { ActionBar, KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
 import { Board, ChoiceButtons, choiceText, GiveList, nameOf, possessive, sipsText, type GameProps } from './shared';
 
 /** Visar kortet som spelas just nu – olika beroende på korttyp och vems tur det är. */
@@ -48,7 +48,7 @@ function CardScreen({
       <Hud me={game.me} part={game.state.part} index={game.state.cardIndex} total={game.state.cardsInPart} family={usesPoints(game.state)} />
       <ActiveRules state={game.state} />
       <div className={`card ${card ?? theme.card}`}>{children}</div>
-      {below && <div className="stack" style={{ marginTop: 18 }}>{below}</div>}
+      {below && <ActionBar>{below}</ActionBar>}
     </Screen>
   );
 }
