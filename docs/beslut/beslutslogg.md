@@ -898,3 +898,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Beslut:** Texten "Korten" ska vara större.
 - **Tillägg (av Claude):** Rubriken är cirka 70 px på en iPhone 13 (`clamp(60px, 18vw, 88px)`). Tidigare var den cirka 47 px. Skärmen ryms fortfarande utan att man scrollar.
 - **Var i koden:** `.display.kort-title` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B115. Introt för en ny del fastnade
+- **Tillägg (av Claude):** När Claude tog skärmbilder av hela spelet hittades en bugg. Trycktes Nästa inom cirka 3 sekunder efter att en ny del började, avbröts nedräkningen (3-2-1). Introt ("Del 1 Uppvärmning 2") låg då kvar och täckte skärmen tills någon tryckte på det. Nu går nedräkningen alltid klart och introt försvinner av sig självt.
+- **Var i koden:** `PartIntro` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).

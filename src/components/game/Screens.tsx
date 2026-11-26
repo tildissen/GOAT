@@ -297,15 +297,18 @@ export function PartIntro({ state }: GameProps) {
   const cur = state.current;
   const startOfPart = state.status === 'playing' && state.cardIndex === 0 && cur ? cur.seq : null;
   const shownFor = useRef<number | null>(null);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [count, setCount] = useState<number | null>(null);
 
   useEffect(() => {
     if (startOfPart === null || shownFor.current === startOfPart) return;
     shownFor.current = startOfPart;
     setCount(3);
-    const timers = [1, 2, 3].map((i) => setTimeout(() => setCount(i === 3 ? null : 3 - i), i * 1100));
-    return () => timers.forEach(clearTimeout);
+    // Nedräkningen får gå klart även om nästa kort kommer under tiden – annars fastnade introt (B115).
+    timers.current.forEach(clearTimeout);
+    timers.current = [1, 2, 3].map((i) => setTimeout(() => setCount(i === 3 ? null : 3 - i), i * 1100));
   }, [startOfPart]);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   if (count === null) return null;
   const last = state.part >= state.parts;
