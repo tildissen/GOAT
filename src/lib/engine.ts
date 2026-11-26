@@ -152,7 +152,10 @@ export function pointsText(text: string, alcoholFree = true): string {
   return familyText(text, alcoholFree)
     .replace(/\bdelar ut (\d+) minuspoäng/gi, 'väljer någon som förlorar $1 poäng')
     .replace(/\bfår (\d+) minuspoäng/gi, 'förlorar $1 poäng')
-    .replace(/\bfår (du|hen|ni|alla|de|man) (\d+) minuspoäng/gi, 'förlorar $1 $2 poäng')
+    .replace(/\b(?:får|tar|dricker) (du|hen|ni|alla|de|man) (\d+) minuspoäng/gi, 'förlorar $1 $2 poäng')
+    .replace(/\bdricka (\d+) minuspoäng/gi, 'förlora $1 poäng')
+    .replace(/\bdela ut (\d+) minuspoäng/gi, 'ta $1 poäng från andra')
+    .replace(/= (\d+) minuspoäng var/gi, '= båda förlorar $1 poäng')
     .replace(/\bta (\d+) minuspoäng/gi, 'förlora $1 poäng')
     .replace(/\btar (\d+) minuspoäng/gi, 'förlorar $1 poäng')
     .replace(/hur många minuspoäng man får/gi, 'hur många poäng man förlorar')
@@ -683,6 +686,7 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
     }
     case 'next': {
       const c = requireCurrent();
+      if (action.seq !== undefined && action.seq !== c.seq) throw new GameError('Kortet har redan bytts – kolla skärmen', 409);
       if (!canPressNext(s, c, playerId, ctx)) {
         throw new GameError(isSoloCard(c.card) ? 'Det är inte din tur' : 'Bara värden kan gå vidare på gruppkort', 403);
       }

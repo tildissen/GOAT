@@ -189,7 +189,8 @@ export type Action =
   | { type: 'drink_saved' }
   | { type: 'upload_photo'; url: string }
   | { type: 'skip_photo' }
-  | { type: 'next' }
+  /** seq = kortet man såg när man tryckte – har det redan bytts säger servern det i stället för ett förvirrande fel. */
+  | { type: 'next'; seq?: number }
   | { type: 'continue' }
   | { type: 'end' }
   | { type: 'restart' };

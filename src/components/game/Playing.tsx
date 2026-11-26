@@ -140,7 +140,7 @@ function NextButton(p: CardProps & { label?: string; color?: 'white' | 'cyan' | 
     return <p className="body-text">Väntar på att {who} trycker nästa…</p>;
   }
   return (
-    <button className={`btn ${p.color ?? 'ink'}`} disabled={p.busy} onClick={() => p.act({ type: 'next' })}>
+    <button className={`btn ${p.color ?? 'ink'}`} disabled={p.busy} onClick={() => p.act({ type: 'next', seq: p.cur.seq })}>
       {p.label ?? 'Nästa'}
     </button>
   );

@@ -759,3 +759,16 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Ingen spara-knapp och inget ERROR, som förut.
   - Ändrat också i valet "Poäng" när man skapar spelet, Familjespel-texten, korttypernas förklaringar i Familjespel och användarvillkoren.
 - **Var i koden:** `Player.points` i [`src/lib/types.ts`](../../src/lib/types.ts), `pointsText()`, `addPoints()`, `resolveVotes()`, `choose`, `trivia_answer`, `dismiss_overlay`, `next`, `take` och `rule_take` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `sipsText`, `choiceText`, `ChoiceButtons`, `Board`, `Stats` och `GiveList` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `Hud`, `Direct`, `Trivia`, `Challenge` och `ResultCard` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `rulesFor()` och `FAMILY_TYPE_TEXT` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `SCORINGS` i [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx).
+
+### B103. Buggar från persona-testet
+- **Beslut:** Tilda bad Claude spela spelet med olika personas och leta buggar.
+- **Tillägg (av Claude):**
+  - Claude spelade tre hela spel i riktiga webbläsare: AW med klunkar, Familjespel med pluspoäng och vanligt spel. Sex personas på olika mobiler var med: värd, sparare, utmanare, vägrare, en som alltid röstar på samma, en som laddar om sidan mitt i och en som kommer in sent.
+  - Inga fel i webbläsaren, inga "undefined"/"NaN" och inga dryckesord i Familjespel. Spelet tog slut ordentligt i alla tre.
+  - Det här rättades:
+    - **Regelkollens kort** var grönt på grön bakgrund och såg nästan genomskinligt ut. Nu är det vitt med grå namnknappar.
+    - **"Fortsätt spela"** (och "Börja om!") hamnade långt ner när regelkollen gjorde sidan lång. Nu flyter knappen längst ner på skärmen när det finns en regelkoll.
+    - **Fel felmeddelande när två trycker Nästa samtidigt:** det stod "Bara värden kan gå vidare på gruppkort" fast kortet bara hade bytts. Nu skickar mobilen med vilket kort den såg, och servern svarar "Kortet har redan bytts – kolla skärmen".
+    - **Poängtexter:** några kort blev konstiga med poäng, t.ex. "tar hen 4 poäng", "dricker du 2 poäng" och "måste dricka 3 poäng". Nu står det "förlorar hen 4 poäng", "förlora 3 poäng" och "ta 3 poäng från andra". Ett test går igenom alla kort.
+- **Inte ändrat:** Med många spelare hamnar valknapparna ("Jag dricker …", "Dra ett utmaningskort") ibland under kanten även på en iPhone 13, så man får scrolla. I testet med pluspoäng hade flera spelare minus i slutet, eftersom straff på gruppkort och röstningar ofta drar mer än man hinner samla. Tilda har inte tagit ställning till någon av dem.
+- **Var i koden:** `next` (seq) i [`src/lib/engine.ts`](../../src/lib/engine.ts) och [`src/lib/types.ts`](../../src/lib/types.ts), `pointsText()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `PartEnd` och `Finished` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `.rule-check-card` och `.part-end-actions` i [`src/app/globals.css`](../../src/app/globals.css).
