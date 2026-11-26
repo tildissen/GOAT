@@ -3,7 +3,8 @@
   --cyan: #5ce1e6;
   --coral: #ff5757;
   --yellow: #ffde59;
-  --pink: #ff9ed2;
+  --pink: #cf9bff; /* rosa/lila bakgrund (B111) */
+  --pink-light: #ffd6ec; /* ljusrosa kort: svart text 16 : 1 */
   --white: #ffffff;
   --black: #000000;
   --error: #ff3131;
@@ -50,6 +51,7 @@ textarea {
 .screen.coral { background: var(--coral); --bar-bg: var(--coral); }
 .screen.yellow { background: var(--yellow); --bar-bg: var(--yellow); }
 .screen.pink { background: var(--pink); --bar-bg: var(--pink); }
+.card.pink { background: var(--pink-light); }
 
 .column {
   width: 100%;

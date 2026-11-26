@@ -175,7 +175,7 @@ function Korten({ state, onDone }: { state: GameProps['state']; onDone: () => vo
       <h1 className="display big" style={{ marginTop: 12, marginBottom: 16 }}>
         KORTEN
       </h1>
-      <div className="card green kort-list" style={{ padding: '18px 16px', gap: 10 }}>
+      <div className="card pink kort-list" style={{ padding: '18px 16px', gap: 10 }}>
         {kortTexter(state).map((k) => (
           <div key={k.name} className="kort-row">
             <span className="kort-icon" aria-hidden="true">

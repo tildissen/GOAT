@@ -862,7 +862,18 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Testat på Safari-ytan för iPhone SE och iPhone 13: skärmen ryms utan att man scrollar.
 - **Var i koden:** `Korten` och `kortTexter()` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.kort-*` i [`src/app/globals.css`](../../src/app/globals.css).
 
-### B110. Skärmen "Korten" är rosa
+### B110. Skärmen "Korten" är rosa (**Färgerna ersatta av B111**)
 - **Beslut:** Skärmen "Korten" (B109) ska ha rosa färg.
 - **Tillägg (av Claude):** Det är en ny färg i paletten, `--pink` (#ff9ed2). Bakgrunden är rosa och kortet med förklaringarna är grönt som förut. Färgen används bara på den här skärmen.
 - **Var i koden:** `--pink` och `.screen.pink` i [`src/app/globals.css`](../../src/app/globals.css), `Color` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B111. "Korten": rosalila bakgrund och ljusrosa kort
+- **Beslut:** Skärmen "Korten" ska ha en rosa/lila bakgrund och en annan rosa på kortet där texten ligger. Kontrasten ska vara bra. Ersätter färgerna i B110.
+- **Tillägg (av Claude):**
+  - Bakgrunden är rosalila (`--pink`, #cf9bff) och kortet ljusrosa (`--pink-light`, #ffd6ec).
+  - Kontrast:
+    - Svart text på kortet: 16 : 1.
+    - Svart rubrik på bakgrunden: 9,8 : 1.
+    - Ikonerna är vita på svart.
+    - Kortet mot bakgrunden: 1,6 : 1, och kortet har skugga. Det är mer än de andra skärmarna, där t.ex. grönt kort på gult är cirka 1,1 : 1.
+- **Var i koden:** `--pink`, `--pink-light`, `.screen.pink` och `.card.pink` i [`src/app/globals.css`](../../src/app/globals.css), `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
