@@ -867,7 +867,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Tillägg (av Claude):** Det är en ny färg i paletten, `--pink` (#ff9ed2). Bakgrunden är rosa och kortet med förklaringarna är grönt som förut. Färgen används bara på den här skärmen.
 - **Var i koden:** `--pink` och `.screen.pink` i [`src/app/globals.css`](../../src/app/globals.css), `Color` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
 
-### B111. "Korten": rosalila bakgrund och ljusrosa kort
+### B111. "Korten": rosalila bakgrund och ljusrosa kort (**Färgerna ersatta av B112**)
 - **Beslut:** Skärmen "Korten" ska ha en rosa/lila bakgrund och en annan rosa på kortet där texten ligger. Kontrasten ska vara bra. Ersätter färgerna i B110.
 - **Tillägg (av Claude):**
   - Bakgrunden är rosalila (`--pink`, #cf9bff) och kortet ljusrosa (`--pink-light`, #ffd6ec).
@@ -877,3 +877,14 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
     - Ikonerna är vita på svart.
     - Kortet mot bakgrunden: 1,6 : 1, och kortet har skugga. Det är mer än de andra skärmarna, där t.ex. grönt kort på gult är cirka 1,1 : 1.
 - **Var i koden:** `--pink`, `--pink-light`, `.screen.pink` och `.card.pink` i [`src/app/globals.css`](../../src/app/globals.css), `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+
+### B112. "Korten": knallrosa bakgrund och ljusare rosa kort
+- **Beslut:** Skärmen "Korten" ska ha en mer knallrosa bakgrund och en ljusare rosa som kortfärg. Ersätter färgerna i B111.
+- **Tillägg (av Claude):**
+  - Bakgrunden är knallrosa (`--pink`, #ff4fb8) och kortet ljust rosa (`--pink-light`, #ffe0f1).
+  - Kontrast:
+    - Svart text på kortet: 17 : 1.
+    - Svart rubrik på bakgrunden: 7,1 : 1.
+    - Ikonerna är vita på svart (21 : 1).
+    - Kortet mot bakgrunden: 2,4 : 1.
+- **Var i koden:** `--pink` och `--pink-light` i [`src/app/globals.css`](../../src/app/globals.css).
