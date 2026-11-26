@@ -3,6 +3,7 @@
   --cyan: #5ce1e6;
   --coral: #ff5757;
   --yellow: #ffde59;
+  --pink: #ff9ed2;
   --white: #ffffff;
   --black: #000000;
   --error: #ff3131;
@@ -48,6 +49,7 @@ textarea {
 .screen.cyan { background: var(--cyan); --bar-bg: var(--cyan); }
 .screen.coral { background: var(--coral); --bar-bg: var(--coral); }
 .screen.yellow { background: var(--yellow); --bar-bg: var(--yellow); }
+.screen.pink { background: var(--pink); --bar-bg: var(--pink); }
 
 .column {
   width: 100%;

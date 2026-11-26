@@ -861,3 +861,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Ordningen i introt är nu: Stör ej → Spelregler → Korten → Selfie → Egna kort.
   - Testat på Safari-ytan för iPhone SE och iPhone 13: skärmen ryms utan att man scrollar.
 - **Var i koden:** `Korten` och `kortTexter()` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `.kort-*` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B110. Skärmen "Korten" är rosa
+- **Beslut:** Skärmen "Korten" (B109) ska ha rosa färg.
+- **Tillägg (av Claude):** Det är en ny färg i paletten, `--pink` (#ff9ed2). Bakgrunden är rosa och kortet med förklaringarna är grönt som förut. Färgen används bara på den här skärmen.
+- **Var i koden:** `--pink` och `.screen.pink` i [`src/app/globals.css`](../../src/app/globals.css), `Color` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `Korten` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).

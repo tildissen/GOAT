@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react';
 import type { Player } from '@/lib/types';
 
-export type Color = 'green' | 'cyan' | 'coral' | 'yellow';
+export type Color = 'green' | 'cyan' | 'coral' | 'yellow' | 'pink';
 
 /** Varje del har sin egen färgvärld: bakgrund och kortfärg. Del 1–3 matchar skärmarna mellan delarna. */
 const PART_THEME: { bg: Color; card: Color }[] = [

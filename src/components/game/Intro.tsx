@@ -171,7 +171,7 @@ function kortTexter(state: GameProps['state']): { icon: IconName; name: string; 
 
 function Korten({ state, onDone }: { state: GameProps['state']; onDone: () => void }) {
   return (
-    <Screen bg="yellow">
+    <Screen bg="pink">
       <h1 className="display big" style={{ marginTop: 12, marginBottom: 16 }}>
         KORTEN
       </h1>
