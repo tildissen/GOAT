@@ -313,6 +313,8 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
         // Gruppkort: värden går vidare – på minigames, kaoskort och gruppkort även spelledaren, men ingen annan.
         const other = ids.find((id) => id !== ids[0] && !(isLeaderCard(c.card) && id === c.turnId));
         if (other) assert.throws(() => act(other, { type: 'next' }), GameError, 'fel spelare fick trycka nästa på gruppkort');
+        // Trycker man Nästa på ett kort som redan bytts säger servern det (B103).
+        assert.throws(() => act(ids[0], { type: 'next', seq: c.seq - 1 }), /redan bytts/, 'gammalt kort gick vidare');
         act(isLeaderCard(c.card) && rng() < 0.5 ? c.turnId : ids[0], { type: 'next' });
       }
     }
@@ -409,8 +411,16 @@ assert.equal(pointsText('Den som rör sig först får 2 minuspoäng.'), 'Den som
 assert.equal(pointsText('Den som senast åt glass delar ut 2 minuspoäng.'), 'Den som senast åt glass väljer någon som förlorar 2 poäng.');
 assert.equal(pointsText('Nämn fem frukter, annars får du 2 minuspoäng.'), 'Nämn fem frukter, annars förlorar du 2 poäng.');
 assert.equal(pointsText('Den som dricker med höger tar 1 extra klunk.', false), 'Den som dricker med höger förlorar 1 poäng.');
+assert.equal(pointsText('Säger någon fel namn tar hen 2 klunkar.', false), 'Säger någon fel namn förlorar hen 2 poäng.');
 console.log('180 simulerade "Bygg eget spel" (Fest, AW, Familjespel) med 3–15 spelare: OK');
 assert.ok(rulesChecked > 0, 'regelkollen testades aldrig');
 console.log(`Regelkoll testad: ${rulesChecked} regler`);
 assert.ok(errorsLogged > 0, 'ERROR loggades aldrig som händelse');
 console.log(`ERROR-händelser: ${errorsLogged}`);
+// Pluspoäng: inga kort får säga att man "dricker/tar/får N poäng" – straff ska alltid vara "förlorar" (B103).
+for (const c of cards) {
+  if (!/klunk|minuspoäng/.test(c.text)) continue;
+  const t = pointsText(c.text, c.occasion === 'familj');
+  assert.ok(!/\b(?:dricker|dricka|tar|får)\s+(?:\w+\s+)?\d+\s+poäng(?! från andra)/i.test(t), `konstig poängtext: ${t}`);
+}
+console.log('Poängtexter i alla kort: OK');

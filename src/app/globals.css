@@ -834,6 +834,9 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .rule-check { width: 100%; display: flex; flex-direction: column; gap: 14px; }
 .rule-check .heading { text-align: center; }
 .rule-check-card { padding: 20px 16px; gap: 10px; }
+.card.rule-check-card { background: var(--white); } /* syns mot den gröna skärmen (B103) */
+.rule-check-card .take-name, .rule-check-card .take-undo { background: #ececec; }
+.rule-check-card .take-row.on .take-name { background: var(--black); color: var(--white); }
 .rule-title { margin: 0; font-size: 22px; text-align: center; }
 .rule-text { margin: 0; text-align: center; line-height: 1.35; }
 
@@ -846,3 +849,7 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 /* Grön skärm när någon dricker sitt straff efter ERROR (B101) */
 .overlay.solid-punish { background: var(--green); z-index: 59; animation: card-in 0.3s ease; }
 .panel.punish { background: transparent; color: var(--black); box-shadow: none; text-align: center; }
+
+/* Värdens knappar på "Del X är klar!" ligger kvar längst ned även när regelkollen gör sidan lång (B103) */
+.part-end-actions { width: 100%; display: flex; justify-content: center; }
+.part-end-actions.floating { position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); width: auto; z-index: 20; }

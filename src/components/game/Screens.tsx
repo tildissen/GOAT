@@ -16,6 +16,8 @@ const PART_END: { bg: Color; title: 'coral' | 'cyan'; tagline: string; end: 'cor
 export function PartEnd(props: GameProps) {
   const { state, isLeader, busy, act } = props;
   const look = PART_END[state.part - 1] ?? PART_END[2];
+  // Med regelkoll blir sidan lång – då flyter "Fortsätt spela" längst ned så att värden hittar den (B103).
+  const floating = (state.rules ?? []).some((r) => r.part === state.part);
   return (
     <Screen bg={look.bg} center>
       <div className="stack" style={{ gap: 36 }}>
@@ -24,9 +26,12 @@ export function PartEnd(props: GameProps) {
         <RuleCheck {...props} />
         {isLeader ? (
           <div className="stack" style={{ marginTop: 60, gap: 28 }}>
-            <button className="btn ink" disabled={busy} onClick={() => act({ type: 'continue' })}>
-              Fortsätt spela
-            </button>
+            <div className={`part-end-actions${floating ? ' floating' : ''}`}>
+              <button className="btn ink" disabled={busy} onClick={() => act({ type: 'continue' })}>
+                Fortsätt spela
+              </button>
+            </div>
+            {floating && <div style={{ height: 70 }} aria-hidden="true" />}
             <button className={`btn ${look.end}`} disabled={busy} onClick={() => confirmEnd() && act({ type: 'end' })}>
               Avsluta
             </button>
@@ -45,6 +50,7 @@ const confirmEnd = () => window.confirm('Avsluta spelet för alla? Alla bilder r
 
 export function Finished(props: GameProps) {
   const { state, me, isLeader, busy, act } = props;
+  const floating = (state.rules ?? []).some((r) => r.part === state.part);
   return (
     <Screen bg="yellow">
       <div className="stack" style={{ marginTop: 48, gap: 20 }}>
@@ -58,9 +64,12 @@ export function Finished(props: GameProps) {
       <div className="grow" />
       {isLeader ? (
         <div className="stack" style={{ gap: 24 }}>
-          <button className="btn ink" disabled={busy} onClick={() => act({ type: 'restart' })}>
-            Börja om!
-          </button>
+          <div className={`part-end-actions${floating ? ' floating' : ''}`}>
+            <button className="btn ink" disabled={busy} onClick={() => act({ type: 'restart' })}>
+              Börja om!
+            </button>
+          </div>
+          {floating && <div style={{ height: 70 }} aria-hidden="true" />}
           <button className="btn coral" disabled={busy} onClick={() => confirmEnd() && act({ type: 'end' })}>
             Avsluta
           </button>
