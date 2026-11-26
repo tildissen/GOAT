@@ -49,6 +49,8 @@ export interface Player {
   ready: boolean;
   saved: number;
   drank: number;
+  /** Med poäng (Familjespel, AW/Fest med poäng): pluspoäng – flest vinner (B102). Saknas i äldre spel = 0. */
+  points?: number;
   votesReceived: number;
   challenges: number;
   turns: number;
@@ -126,6 +128,23 @@ export interface GameState {
   seq: number;
   /** Senaste valen som gjorts, så att alla ser vad någon valde (inget fusk). */
   events?: GameEvent[];
+  /** Regler som gäller en stund ("resten av delen", "de kommande 5 korten"). Räknas i regelkollen när delen är slut. */
+  rules?: ActiveRule[];
+}
+
+/** En regel från ett minigame eller kaoskort som gäller flera kort (B96). */
+export interface ActiveRule {
+  id: string;
+  title?: string;
+  text: string;
+  /** Spelledaren: den som drog kortet. Hen och värden delar ut i regelkollen. */
+  byId: string;
+  sips: number;
+  part: number;
+  /** Sista kortet (cardIndex) regeln gäller. null = resten av delen. */
+  untilCard: number | null;
+  /** Hur många gånger varje spelare har brutit regeln. */
+  taken: Record<string, number>;
 }
 
 export interface GameEvent {
@@ -133,6 +152,8 @@ export interface GameEvent {
   actorId: string;
   /** T.ex. "drack 2 klunkar" – namnet sätts framför i appen. */
   text: string;
+  /** 'error' = någon nådde sparataket. 'punish' = hen drack sina sparade efter ERROR – då visas en grön skärm hos alla (B101). */
+  kind?: 'error' | 'punish';
 }
 
 /** Det klienterna får se: framtida kort skickas aldrig ut. */
@@ -162,6 +183,8 @@ export type Action =
   | { type: 'trivia_answer'; index: number }
   | { type: 'take'; targetId: string }
   | { type: 'untake'; targetId: string }
+  | { type: 'rule_take'; ruleId: string; targetId: string }
+  | { type: 'rule_untake'; ruleId: string; targetId: string }
   | { type: 'dismiss_overlay' }
   | { type: 'drink_saved' }
   | { type: 'upload_photo'; url: string }

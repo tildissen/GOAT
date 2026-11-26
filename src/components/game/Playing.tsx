@@ -2,11 +2,11 @@
 
 import { useRef, useState } from 'react';
 import { compressImage } from '@/lib/client';
-import { canPressNext, canTake, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
+import { canGive, canPressNext, isLastingRule, isLeaderCard, isTakeCard, usesPoints, isSoloCard, savedCap } from '@/lib/engine';
 import type { Current } from '@/lib/types';
 import Face from '../Face';
 import { KindTag, partTheme, Screen, Spinner, type Color } from '../ui';
-import { Board, ChoiceButtons, choiceText, nameOf, possessive, sipsText, type GameProps } from './shared';
+import { Board, ChoiceButtons, choiceText, GiveList, nameOf, possessive, sipsText, type GameProps } from './shared';
 
 /** Visar kortet som spelas just nu – olika beroende på korttyp och vems tur det är. */
 export default function Playing(props: GameProps) {
@@ -46,9 +46,29 @@ function CardScreen({
   return (
     <Screen bg={bg ?? theme.bg}>
       <Hud me={game.me} part={game.state.part} index={game.state.cardIndex} total={game.state.cardsInPart} family={usesPoints(game.state)} />
+      <ActiveRules state={game.state} />
       <div className={`card ${card ?? theme.card}`}>{children}</div>
       {below && <div className="stack" style={{ marginTop: 18 }}>{below}</div>}
     </Screen>
+  );
+}
+
+/** Regler som gäller just nu (från tidigare kort i delen), så att alla vet hur länge de gäller (B96). */
+function ActiveRules({ state }: { state: GameProps['state'] }) {
+  const seq = state.current?.seq;
+  const rules = (state.rules ?? []).filter(
+    (r) => r.part === state.part && r.id !== `r${seq}` && (r.untilCard === null || state.cardIndex <= r.untilCard),
+  );
+  if (rules.length === 0) return null;
+  return (
+    <div className="active-rules" aria-label="Regler som gäller">
+      {rules.map((r) => (
+        <span key={r.id} className="active-rule">
+          <strong>{r.title ?? 'Regel'}</strong>
+          {r.untilCard === null ? ' · resten av delen' : ` · ${r.untilCard - state.cardIndex + 1} kort till`}
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -64,7 +84,7 @@ export function Hud({
   part: number;
   index: number;
   total: number;
-  /** Familjespel: inga sparade klunkar, bara dina minuspoäng. */
+  /** Med pluspoäng: inga sparade klunkar, bara dina poäng (B102). */
   family?: boolean;
 }) {
   const cap = savedCap(part);
@@ -73,7 +93,7 @@ export function Hud({
     <div className="hud">
       {family ? (
         <div className="hud-block">
-          <span className="hud-label">Minuspoäng {me.drank}</span>
+          <span className="hud-label">Poäng {me.points ?? 0}</span>
         </div>
       ) : (
       <button
@@ -112,7 +132,11 @@ function canAdvance(p: CardProps) {
 
 function NextButton(p: CardProps & { label?: string; color?: 'white' | 'cyan' | 'ink' }) {
   if (!canAdvance(p)) {
-    const who = isSoloCard(p.cur.card) ? nameOf(p.state, p.cur.turnId) : `${nameOf(p.state, p.state.hostId)} (värd)`;
+    const who = isSoloCard(p.cur.card)
+      ? nameOf(p.state, p.cur.turnId)
+      : isLeaderCard(p.cur.card)
+        ? `${nameOf(p.state, p.cur.turnId)} (spelledare)`
+        : `${nameOf(p.state, p.state.hostId)} (värd)`;
     return <p className="body-text">Väntar på att {who} trycker nästa…</p>;
   }
   return (
@@ -143,7 +167,7 @@ function Direct(p: CardProps) {
         family={usesPoints(p.state)}
         extra={
           <button className="btn yellow" disabled={p.busy} onClick={() => p.act({ type: 'choose', choice: 'answered' })}>
-            Jag svarar!
+            {usesPoints(p.state) ? `Jag svarar! +${p.cur.sips}` : 'Jag svarar!'}
           </button>
         }
       />
@@ -193,7 +217,9 @@ function Trivia(p: CardProps) {
       </div>
       {!answered && (
         <p className="hint">
-          {usesPoints(p.state) ? 'Fel svar: ta minuspoäng eller dra en utmaning' : 'Fel svar: drick, spara eller dra en utmaning'}
+          {usesPoints(p.state)
+            ? `Rätt svar: +${cur.sips} poäng. Fel svar: dra ett utmaningskort för att ändå få poäng`
+            : 'Fel svar: drick, spara eller dra en utmaning'}
         </p>
       )}
       {answered && !right && <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={usesPoints(p.state)} />}
@@ -212,19 +238,35 @@ function Challenge(p: CardProps) {
   // Gruppkort, lagkort och minigames har inga val – värden trycker Nästa.
   const canSkip = !minigame && (solo || (cur.card.players === 2 && involved));
   const mine = canSkip && (solo || !cur.choices[me.id]);
+  // Minigames, kaoskort och gruppkort har en spelledare: den som drog kortet läser, leder och delar ut (B94, B95).
+  const leads = isLeaderCard(cur.card);
+  const leaderName = nameOf(p.state, cur.turnId);
+  const lasting = isLastingRule(cur.card, cur.text);
   return (
     <CardScreen
       game={p}
       bg={kaos ? 'yellow' : minigame ? 'cyan' : 'coral'}
       card={kaos ? 'kaos' : minigame ? 'coral' : 'green'}
-      below={<NextButton {...p} label={solo ? 'Klar!' : 'Nästa'} />}
+      below={<NextButton {...p} label={solo ? (usesPoints(p.state) && cur.turnId === me.id ? `Klar! +${cur.sips}` : 'Klar!') : 'Nästa'} />}
     >
       <KindTag kind={kaos ? 'kaos' : minigame ? 'minigame' : 'utmaning'} />
       {minigame && cur.card.title && <h2 className="minigame-title">{cur.card.title}</h2>}
       {kaos && <h2 className="minigame-title kaos-title">KAOS!</h2>}
       {solo && <p className="heading name-font name-big">{me.name}</p>}
+      {leads && (
+        <p className="leader-line">
+          <span className="chip">Spelledare</span>
+          <strong className="name-font">{cur.turnId === me.id ? 'Du!' : `${leaderName}!`}</strong>
+        </p>
+      )}
       <div className="card-body">
         <p className="card-text">{cur.text}</p>
+        {lasting && (
+          <p className="rule-note">
+            Regeln gäller {/de kommande \d+ korten/i.test(cur.text) ? 'de kommande korten' : 'resten av delen'}. Den som
+            bryter den räknas i regelkollen när delen är slut.
+          </p>
+        )}
         {cur.teams && (
           <div className="votes-list">
             {cur.teams.map((team, i) => (
@@ -237,57 +279,45 @@ function Challenge(p: CardProps) {
         {cur.card.players === 2 && involved && <p className="body-text">Det gäller dig!</p>}
       </div>
       {mine ? (
-        <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} prompt="Vill du hoppa över?" family={usesPoints(p.state)} />
+        <ChoiceButtons
+          sips={cur.sips}
+          act={p.act}
+          busy={p.busy}
+          prompt="Vill du hoppa över?"
+          family={usesPoints(p.state)}
+          extra={
+            usesPoints(p.state) && !solo ? (
+              <button className="btn yellow" disabled={p.busy} onClick={() => p.act({ type: 'choose', choice: 'answered' })}>
+                Vi gjorde den! +{cur.sips}
+              </button>
+            ) : undefined
+          }
+        />
       ) : canSkip ? (
         <Chosen cur={cur} meId={me.id} family={usesPoints(p.state)} />
-      ) : canTake(cur, me) ? (
+      ) : isTakeCard(cur) ? (
         <TakeButtons {...p} />
       ) : null}
     </CardScreen>
   );
 }
 
-/**
- * Gruppkort, minigames och kaoskort: tryck på den eller de som fick klunkarna/minuspoängen, så att det räknas.
- * Vem som helst kan trycka, och alla ser vem som gav vem.
- */
+/** Gruppkort, minigames och kaoskort: spelledaren och värden trycker på den eller de som fick klunkarna/poängen. */
 function TakeButtons(p: CardProps) {
   const { cur, state } = p;
-  const family = usesPoints(state);
-  const taken = cur.taken ?? {};
-  const players = state.players.filter((pl) => pl.ready);
   return (
-    <div className="actions">
-      <p className="choice-prompt">{family ? `Vem fick ${sipsText(cur.sips, true)}?` : `Vem fick dricka ${sipsText(cur.sips)}?`}</p>
-      <div className="take-list">
-        {players.map((pl) => {
-          const n = taken[pl.id] ?? 0;
-          return (
-            <div key={pl.id} className={`take-row${n > 0 ? ' on' : ''}`}>
-              <button
-                className="take-name"
-                disabled={p.busy}
-                onClick={() => p.act({ type: 'take', targetId: pl.id })}
-                aria-label={`Ge ${pl.name} ${sipsText(cur.sips, family)}`}
-              >
-                <span>{pl.name}</span>
-                <strong>{n > 0 ? `+${n * cur.sips}` : '+'}</strong>
-              </button>
-              {n > 0 && (
-                <button
-                  className="take-undo"
-                  disabled={p.busy}
-                  onClick={() => p.act({ type: 'untake', targetId: pl.id })}
-                  aria-label={`Ta bort ${sipsText(cur.sips, family)} från ${pl.name}`}
-                >
-                  −
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    <GiveList
+      state={state}
+      players={state.players.filter((pl) => pl.ready)}
+      taken={cur.taken ?? {}}
+      sips={cur.sips}
+      byId={cur.turnId}
+      mayGive={canGive(state, cur.turnId, p.me.id, { active: new Set(p.view.active) })}
+      meId={p.me.id}
+      busy={p.busy}
+      onGive={(id) => p.act({ type: 'take', targetId: id })}
+      onUndo={(id) => p.act({ type: 'untake', targetId: id })}
+    />
   );
 }
 
@@ -350,9 +380,12 @@ function VoteCard(p: CardProps) {
         </>
       )}
       <div className="dots" aria-label={`${voted} av ${voters.length} har röstat`}>
-        {voters.map((v) => (
-          <i key={v.id} className={v.id in cur.votes ? 'on' : ''} />
-        ))}
+        {/* De som har röstat först, så att prickarna fylls på i ordning (B98). */}
+        {[...voters]
+          .sort((a, b) => Number(b.id in cur.votes) - Number(a.id in cur.votes))
+          .map((v) => (
+            <i key={v.id} className={v.id in cur.votes ? 'on' : ''} />
+          ))}
         <span>
           {voted} av {voters.length} har röstat
         </span>
@@ -371,7 +404,8 @@ function ResultCard(p: CardProps) {
   const photo = cur.card.kind === 'bild';
   const owner = nameOf(state, cur.turnId);
   const iLost = cur.losers.includes(me.id);
-  const pending = cur.losers.filter((id) => !cur.choices[id] && p.view.active.includes(id));
+  // Med pluspoäng finns inga val efter röstningen – poängen är redan utdelade.
+  const pending = usesPoints(state) ? [] : cur.losers.filter((id) => !cur.choices[id] && p.view.active.includes(id));
   const loserNames = cur.losers.map((id) => nameOf(state, id));
   const everyoneTied = !photo && cur.losers.length > 2 && cur.losers.length === Object.keys(cur.tally ?? {}).length;
 
@@ -379,7 +413,7 @@ function ResultCard(p: CardProps) {
   if (photo && cur.photoSkipped) {
     headline = (
       <p className="card-text">
-        {owner} vägrade ladda upp en bild – och {usesPoints(state) ? 'får minuspoäng' : 'får dricka'}!
+        {owner} vägrade ladda upp en bild{usesPoints(state) ? ' – inga poäng!' : ' – och får dricka!'}
       </p>
     );
   } else if (photo) {
@@ -389,9 +423,13 @@ function ResultCard(p: CardProps) {
         <div className="code-box" style={{ background: 'var(--green)', fontSize: 'clamp(26px, 9vw, 40px)', cursor: 'default' }}>
           <span className="display mid name-font">{owner.toUpperCase()}</span>
         </div>
-        <p className="heading">{allRight
-            ? `ägde bilden – alla gissade rätt, så ${owner} ${usesPoints(state) ? 'får minuspoäng' : 'dricker'}!`
-            : `ägde bilden! Alla som gissade fel ${usesPoints(state) ? 'får minuspoäng' : 'dricker'}.`}</p>
+        <p className="heading">{usesPoints(state)
+            ? Object.values(cur.tally ?? {}).length > 0 && (cur.tally ?? {})[cur.turnId]
+              ? `ägde bilden! Alla som gissade rätt får +${cur.sips}.`
+              : `ägde bilden och lurade alla – ${owner} får +${cur.sips}!`
+            : allRight
+              ? `ägde bilden – alla gissade rätt, så ${owner} dricker!`
+              : 'ägde bilden! Alla som gissade fel dricker.'}</p>
       </>
     );
   } else {
@@ -404,10 +442,14 @@ function ResultCard(p: CardProps) {
         </div>
         <p className="heading">
           {everyoneTied
-            ? `fick lika många röster – alla ${usesPoints(state) ? 'får minuspoäng' : 'dricker'}!`
+            ? `fick lika många röster – alla ${usesPoints(state) ? `förlorar ${cur.sips} poäng` : 'dricker'}!`
             : cur.losers.length > 1
-              ? 'fick lika många röster'
-              : 'fick flest röstningar'}
+              ? usesPoints(state)
+                ? `fick lika många röster – och förlorar ${cur.sips} poäng`
+                : 'fick lika många röster'
+              : usesPoints(state)
+                ? `fick flest röster – och förlorar ${cur.sips} poäng`
+                : 'fick flest röstningar'}
         </p>
       </>
     );
@@ -442,7 +484,7 @@ function ResultCard(p: CardProps) {
             ))}
         </div>
       )}
-      {iLost && !cur.choices[me.id] ? (
+      {iLost && !cur.choices[me.id] && !usesPoints(state) ? (
         <ChoiceButtons sips={cur.sips} act={p.act} busy={p.busy} family={usesPoints(state)} />
       ) : (
         <div className="votes-list">

@@ -312,7 +312,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Tillägg (av Claude):** Tillfället väljs på samma skärm som namnet och syns i lobbyn ("Bygg eget spel · AW"). Fest använder de vanliga korten och blir vildare per del. Ändrar delvis B57.
 - **Var i koden:** `occasion` i [`src/lib/types.ts`](../../src/lib/types.ts), `OCCASIONS` i [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx).
 
-### B59. Familjespel är alkoholfritt och för alla åldrar
+### B59. Familjespel är alkoholfritt och för alla åldrar (**Poängen ersatta av B102**)
 - **Beslut:** Barn ska kunna vara med i Familjespel, så det är alkoholfritt.
 - **Tillägg (av Claude):** "Klunkar" blir **minuspoäng**, och den med minst minuspoäng vinner. Knappen "spara" och ERROR-skärmen finns inte i familjespel. Spelreglerna har en egen familjeversion. Om spelarna själva skriver "dricker 2 klunkar" skrivs det om till "får 2 minuspoäng". Användarvillkoren har ett undantag från 18-årsgränsen för Familjespel (tillsammans med en vuxen; barn under 13 behöver förälderns tillåtelse för att ladda upp bilder).
 - **Var i koden:** `isFamily()`, `familyText()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `Regler` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), avsnitt 2 i [`src/app/villkor/page.tsx`](../../src/app/villkor/page.tsx).
@@ -487,7 +487,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
 - **Tillägg (av Claude):** Ny korttyp "Kaos!" – oväntade händelser för alla ("Lägg alla mobiler i mitten. Den som rör sin först dricker 3 klunkar", "Alla byter plats med personen till vänster. NU!"). Svart kort med gul text som skakar till. Inga val, värden trycker Nästa. 19 vanliga kaoskort (de grova bara i del 4), 6 för AW och 6 alkoholfria för Familjespel. Lagt in i Supabase via connectorn (migreringen `allow_kaos_cards`, 31 nya kort, inga befintliga ändrade).
 - **Var i koden:** [`content/kaos.txt`](../../content/kaos.txt), `kaos|` i [`content/aw.txt`](../../content/aw.txt) och [`content/familj.txt`](../../content/familj.txt).
 
-### B78. Klunkar eller poäng i "Bygg eget spel"
+### B78. Klunkar eller poäng i "Bygg eget spel" (**Hur poängen räknas ersatt av B102**)
 - **Beslut:** När man bygger ett eget spel med AW eller Fest väljer värden om spelet ska vara om **klunkar** eller **poäng**. Familjespel är som tidigare (alltid minuspoäng).
 - **Tillägg (av Claude):**
   - Klunkar är förvalt.
@@ -549,7 +549,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Bildkorten är fortfarande hemliga.
 - **Var i koden:** `Waiting` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
 
-### B83. Klunkar och minuspoäng räknas även när ingen väljer något
+### B83. Klunkar och minuspoäng räknas även när ingen väljer något (**Vem som får dela ut ersatt av B95**)
 - **Beslut:** Tilda märkte att kort som säger att någon får minuspoäng (t.ex. "Den som har lägst batteri i mobilen får 2 minuspoäng") aldrig räknades, eftersom ingen aktivt valde något. På sådana kort ska man välja vem som får poängen.
 - **Tillägg (av Claude):**
   - **Gruppkort, lagkort, minigames och kaoskort:** under kortet står "Vem fick 2 minuspoäng?" (eller "Vem fick dricka 2 klunkar?") med alla spelare. Tryck på namnet för att ge personen kortets klunkar eller minuspoäng. Man kan trycka flera gånger, t.ex. i ett minigame, och "−" tar bort en gång.
@@ -661,3 +661,101 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Fest och vanligt spel är oförändrade.
   - Testerna kontrollerar att inget AW-kort har mer än 4.
 - **Var i koden:** `AW_MAX_SIPS` och `scaleSips()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
+
+---
+
+## 2026-11-24 – Efter första riktiga spelet (sju spelare, AW med poäng)
+
+### B94. Spelledare på minigames, kaoskort och gruppkort
+- **Beslut:** Minigames och utmaningar för alla ska riktas till en person, t.ex. "Sabina! Byt namn med personen till vänster". Är det lekar där alla är med ska någon vara spelledare, så att det blir struktur.
+- **Tillägg (av Claude):**
+  - Den som drog kortet blir spelledare. Kortet visar "Spelledare Sabina!", eller "Spelledare Du!" hos den som är spelledare.
+  - Spelledaren läser kortet och leder leken.
+  - Spelledaren kan också trycka Nästa, inte bara värden.
+  - Gäller minigames, kaoskort, utmaningar för alla och lagkort.
+- **Var i koden:** `isLeaderCard()` och `canPressNext()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `Challenge` och `NextButton` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B95. Bara spelledaren och värden delar ut klunkar och poäng
+- **Beslut:** Bara spelledaren och värden får dela ut klunkar eller poäng på kort där flera kan få dem. Ersätter "vem som helst kan trycka" i B83.
+- **Varför:** När alla kunde ge alla poäng blev det kaos.
+- **Alternativ:** bara värden · alla, som förut.
+- **Tillägg (av Claude):**
+  - Alla andra ser vem som fått något ("PH +4 · Sabbe +2") och kan inte trycka. Servern stoppar också försök.
+  - Är värden borta längre än 25 sekunder kan vem som helst dela ut, så att spelet inte fastnar.
+- **Var i koden:** `canGive()`, `canTake()` och `isTakeCard()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `GiveList` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx).
+
+### B96. Regelkoll när delen är slut
+- **Beslut:** Regler som gäller en stund ("byt namn resten av delen", "de kommande 5 korten") räknas i en regelkoll när delen är slut, inte direkt på kortet.
+- **Varför:** Det blev konstigt när kortet sa "resten av delen" men man skulle dela ut poäng direkt, och det var oklart hur länge regeln gällde.
+- **Alternativ:** poäng direkt, men regeln syns · ta bort sådana kort.
+- **Tillägg (av Claude):**
+  - Kortet säger "Regeln gäller resten av delen" (eller "de kommande korten") och att den räknas i regelkollen.
+  - Så länge regeln gäller syns den under toppytan, t.ex. "Frågemästaren · 5 kort till" eller "Kaos · resten av delen".
+  - När delen är slut finns rutan "Regelkoll" på "Del ett är klar!" (och på slutskärmen efter del 4). Där trycker spelledaren för regeln eller värden på vilka som bröt den ("Vem bröt regeln?"), med "−" för att ångra.
+  - Reglerna försvinner när nästa del börjar.
+- **Var i koden:** `ActiveRule` i [`src/lib/types.ts`](../../src/lib/types.ts), `isLastingRule()`, `deal()` och åtgärderna `rule_take`/`rule_untake` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `RuleCheck` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `ActiveRules` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx).
+
+### B97. "Dricker" står kvar i AW och Fest med poäng
+- **Tillägg (av Claude):** I AW och Fest med poäng skrevs "Den som dricker med höger" om till "Den som får minuspoäng med höger" (Vänsterhanden). Nu byts bara siffror med klunkar ut mot poäng. Ordet "dricker" står kvar, eftersom man fortfarande dricker där. Familjespel skriver om allt som förut.
+- **Var i koden:** `familyText()` i [`src/lib/engine.ts`](../../src/lib/engine.ts).
+
+### B98. ERROR syns hos alla, och prickarna för röster fylls på i ordning
+- **Beslut:** ERROR syntes inte på allas skärmar, och prickarna för röster fylldes inte i ordning. Båda ska rättas.
+- **Tillägg (av Claude):**
+  - **ERROR:** det fanns två orsaker.
+    - Utmaningskortet låg i samma lager och kunde täcka ERROR. Nu ligger ERROR alltid överst.
+    - Drack personen direkt hann ERROR försvinna innan de andras mobiler hämtade läget. Nu sparas ERROR som en händelse, och alla ser ERROR i minst 4 sekunder ("OVVE SPARADE FÖR MÅNGA KLUNKAR – OCH HAR DRUCKIT DEM!").
+    - Sjunker sparataket vid ny del och någon då har för många, får också det en ERROR-händelse.
+  - **Prickarna:** varje prick hörde till en bestämd spelare, så fyllda och tomma blandades. Nu kommer de fyllda först.
+- **Var i koden:** `PauseOverlay` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `logEvent()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `VoteCard` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `.overlay.solid-error` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B99. Ställningslistan: ledaren överst och kortare med många spelare
+- **Tillägg (av Claude):**
+  - Med poäng leder den som har minst, så den personen står nu överst. Tidigare stod flest minuspoäng överst.
+  - Med fler än 5 spelare blir raderna lägre, så att sidan inte behöver scrolla lika mycket. När den scrollade hamnade toppytan under mobilens klocka.
+- **Var i koden:** `Board` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `.board.compact` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B100. Ingen pensionstext när personen redan har druckit (**Ersatt av B101**)
+- **Beslut:** När ERROR visas för att någon redan har druckit ska texten "DET HÄR ÄR INTE DITT PENSIONSSPARANDE!" inte vara med. Den passar bara medan personen fortfarande har klunkarna sparade.
+- **Tillägg (av Claude):** Den korta ERROR-skärmen (4 sekunder) visar nu bara "ERROR – OVVE SPARADE FÖR MÅNGA KLUNKAR – OCH HAR DRUCKIT DEM!". Den vanliga ERROR-skärmen, medan personen inte har druckit än, är oförändrad. Ändrar B98.
+- **Var i koden:** `PauseOverlay` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+
+### B101. Grön skärm när någon dricker sitt straff
+- **Beslut:** Det ska bli större och tydligare när någon dricker efter ERROR. Det blir en grön skärm med texten "XXX sparade för mycket, nu dricker XXX sitt straff". Ersätter den korta röda ERROR-skärmen i B98 och B100.
+- **Tillägg (av Claude):**
+  - När personen trycker "Jag har druckit" ser alla i 4 sekunder: **SKÅL!** OVVE SPARADE FÖR MYCKET – NU DRICKER OVVE SITT STRAFF: 4 KLUNKAR!
+  - Personen själv ser "DU SPARADE FÖR MYCKET – NU DRICKER DU DITT STRAFF".
+  - Även de som missade den röda ERROR-skärmen ser den gröna, eftersom den sparas som en händelse.
+  - Claude använder namnet i stället för "han", eftersom spelet inte vet vilket pronomen spelarna har.
+  - Den vanliga röda ERROR-skärmen, medan personen inte har druckit än, är oförändrad.
+- **Var i koden:** `PauseOverlay` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `drink_saved` och `logEvent()` (händelsen `punish`) i [`src/lib/engine.ts`](../../src/lib/engine.ts), `.overlay.solid-punish` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B102. Pluspoäng: flest poäng vinner
+- **Beslut:** Minuspoäng förvirrade spelarna. Familjespel och AW/Fest med poäng använder i stället **pluspoäng**, och flest poäng vinner (alternativ A). Den som får flest röster på "Vem i rummet?" förlorar poäng. Vägrar man får man 0 poäng.
+- **Alternativ:** straffpoäng där minst vinner (som golf) · alla börjar med poäng och tappar dem. För Vem i rummet?: inga poäng, eller att den med flest röster vinner poäng. För att vägra: att man förlorar poängen.
+- **Varför:** "Minuspoäng" och "minst vinner" var svårt att förstå mitt i spelet.
+- **Tillägg (av Claude):**
+  - Kortet är värt lika mycket som klunkarna skulle ha varit, och värdet ökar per del.
+  - **Får poäng:**
+    - "Jag svarar! +2" på direkta frågor.
+    - Rätt svar på trivia.
+    - "Klar! +2" på utmaningar till en person.
+    - "Vi gjorde den! +2" på X och Y.
+    - Ett utmaningskort som man gör.
+    - Alla som gissar rätt på "Vems är bilden?". Gissar ingen rätt får ägaren poängen, eftersom hen lurade alla.
+  - **Förlorar poäng:**
+    - Den som får flest röster på "Vem i rummet?".
+    - Den spelledaren eller värden trycker på, på gruppkort, minigames och kaoskort ("Vem förlorade 2 poäng?").
+    - Den som bröt en regel i regelkollen.
+  - **0 poäng:** "Hoppa över (0 poäng)", att vägra ladda upp en bild och fel svar på trivia (då kan man dra ett utmaningskort och ändå få poäng).
+  - Efter röstningar finns inga val. Poängen delas ut direkt.
+  - Korttexterna skrivs om:
+    - "får 2 minuspoäng" och "tar 2 klunkar" blir "förlorar 2 poäng".
+    - "delar ut 2 klunkar" blir "väljer någon som förlorar 2 poäng".
+  - Poängen kan bli under noll.
+  - Toppen visar "POÄNG 18".
+  - Ställningslistan och slutskärmen har flest poäng överst, och "Vinnare" (eller "Delad vinnare" vid lika).
+  - Spelreglerna har punkterna "Samla poäng" och "Flest vinner".
+  - Ingen spara-knapp och inget ERROR, som förut.
+  - Ändrat också i valet "Poäng" när man skapar spelet, Familjespel-texten, korttypernas förklaringar i Familjespel och användarvillkoren.
+- **Var i koden:** `Player.points` i [`src/lib/types.ts`](../../src/lib/types.ts), `pointsText()`, `addPoints()`, `resolveVotes()`, `choose`, `trivia_answer`, `dismiss_overlay`, `next`, `take` och `rule_take` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `sipsText`, `choiceText`, `ChoiceButtons`, `Board`, `Stats` och `GiveList` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `Hud`, `Direct`, `Trivia`, `Challenge` och `ResultCard` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `rulesFor()` och `FAMILY_TYPE_TEXT` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), `SCORINGS` i [`src/components/NameForm.tsx`](../../src/components/NameForm.tsx).

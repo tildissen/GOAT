@@ -12,9 +12,12 @@ import {
   applyAction,
   housekeeping,
   familyText,
+  pointsText,
   usesPoints,
   sipsForPart,
-  canTake,
+  isTakeCard,
+  isLeaderCard,
+  isLastingRule,
   GameError,
   isSoloCard,
   MAX_SAVED,
@@ -60,6 +63,9 @@ for (const kind of ['vem', 'direkt', 'trivia', 'utmaning', 'minigame', 'bild']) 
   console.log(`  ${kind}: ${cards.filter((c) => c.kind === kind).length}`);
 }
 
+let rulesChecked = 0;
+let errorsLogged = 0;
+
 function play(seed: number, playerCount: number, mode: GameMode = 'classic', occasion: Occasion = 'fest', scoring: Scoring = 'klunkar') {
   const rng = makeRng(seed);
   let now = 1000;
@@ -68,6 +74,11 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
   const family = occasion === 'familj' && mode === 'custom';
   // Poäng (Familjespel, eller AW/Fest där värden valt poäng): inga klunkar och ingen spara-knapp.
   const points = usesPoints(s);
+  // Med pluspoäng: poäng (flest vinner). Annars: klunkar.
+  const score = (id: string) => {
+    const p = s.players.find((pl) => pl.id === id)!;
+    return points ? (p.points ?? 0) : p.drank;
+  };
   if (mode === 'custom' && occasion !== 'familj') assert.equal(points, scoring === 'poang');
   for (const id of ids.slice(1)) s = addPlayer(s, `Spelare ${id}`, id, now).state;
   const active = new Set(ids);
@@ -151,12 +162,25 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
     // Den som har för många sparade klunkar måste dricka först.
     const paused = pausedPlayers(s);
     if (paused.length > 0) {
+      // ERROR loggas som händelse, så att alla ser den även om personen dricker direkt.
+      if ((s.events ?? []).some((e) => e.kind === 'error' && paused.some((p) => p.id === e.actorId))) errorsLogged++;
       assert.throws(() => act(paused[0].id, { type: s.status === 'partEnd' ? 'continue' : 'next' }), GameError);
       act(paused[0].id, { type: 'drink_saved' });
       continue;
     }
     if (s.status === 'partEnd') {
+      // Regelkoll: spelledaren delar ut för de regler som gällt i delen, ingen annan (utom värden).
+      for (const rule of (s.rules ?? []).filter((r) => r.part === s.part)) {
+        const before = score(ids[1]);
+        act(rule.byId, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] });
+        assert.equal(score(ids[1]), before + (points ? -rule.sips : rule.sips), 'regelkollen räknades fel');
+        const outsider = ids.find((id) => id !== ids[0] && id !== rule.byId);
+        if (outsider) assert.throws(() => act(outsider, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] }), GameError, 'vem som helst kunde dela ut i regelkollen');
+        rulesChecked++;
+      }
+      const part = s.part;
       act(ids[0], { type: 'continue' });
+      assert.ok(!(s.rules ?? []).some((r) => r.part <= part), 'regler från förra delen ligger kvar');
       continue;
     }
     const overlayOwner = Object.keys(s.overlays)[0];
@@ -178,6 +202,7 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       assert.ok(!words.test(c.text), `dryckesord i familjespel: ${c.text}`);
     } else if (points && ['utmaning', 'minigame', 'kaos'].includes(c.card.kind)) {
       assert.ok(!/\d+\s+(?:extra\s+)?klunk/i.test(c.text), `klunkar i poängspel: ${c.text}`);
+      assert.ok(!/minuspoäng/i.test(c.text), `minuspoäng i pluspoängspel: ${c.text}`);
     }
     assert.ok(!/\bX\b|\bY\b|LAG1|LAG2/.test(c.text), `oersatt namn: ${c.text}`);
     assert.ok(s.players.find((p) => p.id === c.turnId), 'turen saknar spelare');
@@ -206,6 +231,11 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       );
     } else if (c.phase === 'result') {
       for (const id of c.losers) {
+        if (points) {
+          // Pluspoäng: inga val efter röstningen – poängen delades ut när rösterna räknades.
+          assert.throws(() => act(id, { type: 'choose', choice: 'drink' }), GameError, 'val efter röstning med pluspoäng');
+          continue;
+        }
         if (!s.current?.choices[id] && pausedPlayers(s).length === 0 && rng() < 0.8) act(id, { type: 'choose', choice: chooseAny() });
       }
       if (s.current?.seq === c.seq && pausedPlayers(s).length === 0) {
@@ -216,32 +246,55 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
         const before = new Map(skipped.map((id) => [id, s.players.find((pl) => pl.id === id)!.drank]));
         const sips = s.current!.sips;
         act(ids[0], { type: 'next' });
-        for (const id of skipped) assert.equal(s.players.find((pl) => pl.id === id)!.drank, before.get(id)! + sips, 'förlorare slapp dricka');
+        if (!points) for (const id of skipped) assert.equal(s.players.find((pl) => pl.id === id)!.drank, before.get(id)! + sips, 'förlorare slapp dricka');
       }
     } else if (c.card.kind === 'trivia') {
+      const before = score(c.turnId);
       act(c.turnId, { type: 'trivia_answer', index: Math.floor(rng() * 4) });
-      if (s.current!.triviaPick === c.card.answerIndex) act(c.turnId, { type: 'next' });
+      const right = s.current!.triviaPick === c.card.answerIndex;
+      if (points) assert.equal(score(c.turnId), before + (right ? c.sips : 0), 'trivia gav fel poäng');
+      if (right) act(c.turnId, { type: 'next' });
       else act(c.turnId, { type: 'choose', choice: chooseAny() });
     } else if (isSoloCard(c.card)) {
       const other = ids.find((id) => id !== c.turnId)!;
       assert.throws(() => act(other, { type: 'choose', choice: 'drink' }), GameError, 'fel spelare fick välja');
-      if (c.card.kind === 'direkt' && rng() < 0.5) act(c.turnId, { type: 'choose', choice: 'answered' });
-      else if (rng() < 0.3) act(c.turnId, { type: 'next' });
-      else act(c.turnId, { type: 'choose', choice: chooseAny() });
+      const before = score(c.turnId);
+      const r = rng();
+      if (c.card.kind === 'direkt' && r < 0.5) {
+        act(c.turnId, { type: 'choose', choice: 'answered' });
+        if (points) assert.equal(score(c.turnId), before + c.sips, 'svar gav inte poäng');
+      } else if (r < 0.65) {
+        act(c.turnId, { type: 'next' });
+        // Pluspoäng: "Klar!" på en utmaning ger poäng.
+        if (points) assert.equal(score(c.turnId), before + (c.card.kind === 'utmaning' ? c.sips : 0), 'Klar! gav fel poäng');
+      } else {
+        const choice = chooseAny();
+        act(c.turnId, { type: 'choose', choice });
+        // Pluspoäng: hoppa över ger 0.
+        if (points && choice === 'drink') assert.equal(score(c.turnId), before, 'hoppa över gav poäng');
+      }
     } else {
       if (c.card.kind === 'minigame') {
         // Minigames har inga val – bara Nästa/Hoppa över.
         if (pausedPlayers(s).length === 0) assert.throws(() => act(ids[0], { type: 'choose', choice: 'drink' }), GameError, 'val på minigame');
       }
-      // Gruppkort, minigames och kaoskort: den som fick klunkar/minuspoäng trycker själv, och det räknas.
-      if (canTake(c, s.players.find((pl) => pl.id === ids[1])!) && rng() < 0.7) {
-        const before = s.players.find((pl) => pl.id === ids[1])!.drank;
-        act(ids[0], { type: 'take', targetId: ids[1] });
-        act(ids[2], { type: 'take', targetId: ids[1] });
-        act(ids[1], { type: 'untake', targetId: ids[1] });
-        assert.equal(s.players.find((pl) => pl.id === ids[1])!.drank, before + c.sips, 'poängen räknades fel');
-        assert.equal(s.current!.taken![ids[1]], 1);
-        assert.throws(() => act(ids[0], { type: 'untake', targetId: ids[2] }), GameError, 'tog bort poäng som inte fanns');
+      // Gruppkort, minigames och kaoskort: spelledaren (den som drog kortet) och värden delar ut – ingen annan.
+      if (isTakeCard(c) && pausedPlayers(s).length === 0 && rng() < 0.7) {
+        const target = ids[1];
+        const before = score(target);
+        act(ids[0], { type: 'take', targetId: target });
+        act(c.turnId, { type: 'take', targetId: target });
+        act(c.turnId, { type: 'untake', targetId: target });
+        assert.equal(score(target), before + (points ? -c.sips : c.sips), 'poängen räknades fel');
+        assert.equal(s.current!.taken![target], 1);
+        const outsider = ids.find((id) => id !== ids[0] && id !== c.turnId);
+        if (outsider) assert.throws(() => act(outsider, { type: 'take', targetId: target }), GameError, 'vem som helst kunde dela ut');
+        assert.throws(() => act(ids[0], { type: 'untake', targetId: ids.find((id) => id !== target)! }), GameError, 'tog bort poäng som inte fanns');
+      }
+      // Regler som gäller en stund: inga poäng direkt, men regeln sparas till regelkollen.
+      if (isLeaderCard(c.card) && isLastingRule(c.card, c.text)) {
+        assert.ok(!isTakeCard(c), 'regel delades ut direkt');
+        assert.ok((s.rules ?? []).some((r) => r.text === c.text && r.byId === c.turnId), 'regeln sparades inte');
       }
       if (c.card.kind === 'minigame') {
         // (inga val)
@@ -257,9 +310,10 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
         }
       }
       if (s.current?.seq === c.seq && pausedPlayers(s).length === 0) {
-        // Gruppkort: bara värden går vidare.
-        assert.throws(() => act(ids[1], { type: 'next' }), GameError, 'icke-värd fick trycka nästa på gruppkort');
-        act(ids[0], { type: 'next' });
+        // Gruppkort: värden går vidare – på minigames, kaoskort och gruppkort även spelledaren, men ingen annan.
+        const other = ids.find((id) => id !== ids[0] && !(isLeaderCard(c.card) && id === c.turnId));
+        if (other) assert.throws(() => act(other, { type: 'next' }), GameError, 'fel spelare fick trycka nästa på gruppkort');
+        act(isLeaderCard(c.card) && rng() < 0.5 ? c.turnId : ids[0], { type: 'next' });
       }
     }
     for (const p of s.players) assert.ok(p.saved <= MAX_SAVED + 12, 'för många sparade klunkar');
@@ -349,4 +403,14 @@ assert.ok(!buildDeck(cards, [], makeRng(1)).deck.flat().some((c) => c.text.inclu
 assert.equal(familyText('Den som pratar dricker 2 klunkar.'), 'Den som pratar får 2 minuspoäng.');
 assert.equal(familyText('Nämn en stad, annars drick 3 klunkar.'), 'Nämn en stad, annars ta 3 minuspoäng.');
 assert.equal(familyText('Den yngsta dricker.'), 'Den yngsta får minuspoäng.');
+// Pluspoäng (B102): straff blir poäng man förlorar.
+assert.equal(pointsText('Den som pratar dricker 2 klunkar.'), 'Den som pratar förlorar 2 poäng.');
+assert.equal(pointsText('Den som rör sig först får 2 minuspoäng.'), 'Den som rör sig först förlorar 2 poäng.');
+assert.equal(pointsText('Den som senast åt glass delar ut 2 minuspoäng.'), 'Den som senast åt glass väljer någon som förlorar 2 poäng.');
+assert.equal(pointsText('Nämn fem frukter, annars får du 2 minuspoäng.'), 'Nämn fem frukter, annars förlorar du 2 poäng.');
+assert.equal(pointsText('Den som dricker med höger tar 1 extra klunk.', false), 'Den som dricker med höger förlorar 1 poäng.');
 console.log('180 simulerade "Bygg eget spel" (Fest, AW, Familjespel) med 3–15 spelare: OK');
+assert.ok(rulesChecked > 0, 'regelkollen testades aldrig');
+console.log(`Regelkoll testad: ${rulesChecked} regler`);
+assert.ok(errorsLogged > 0, 'ERROR loggades aldrig som händelse');
+console.log(`ERROR-händelser: ${errorsLogged}`);

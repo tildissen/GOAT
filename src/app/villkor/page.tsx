@@ -41,8 +41,8 @@ export default function TermsPage() {
             kontrollerar inte åldern – det ansvaret ligger på er som spelar.
           </p>
           <p>
-            <strong>Undantag:</strong> Tillfället <strong>Familjespel</strong> i ”Bygg eget spel” är alkoholfritt (man får
-            minuspoäng i stället för att dricka) och får spelas av alla åldrar tillsammans med en vuxen. Den vuxne som
+            <strong>Undantag:</strong> Tillfället <strong>Familjespel</strong> i ”Bygg eget spel” är alkoholfritt (man samlar
+            poäng i stället för att dricka) och får spelas av alla åldrar tillsammans med en vuxen. Den vuxne som
             skapar spelet ansvarar för att det passar dem som är med – spelarna skriver själva en del av korten. Barn
             under 13 år ska ha en förälders tillåtelse innan de laddar upp en selfie eller en bild.
           </p>

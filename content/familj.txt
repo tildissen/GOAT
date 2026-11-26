@@ -1,5 +1,5 @@
 # Förvalda kort för tillfället Familjespel i "Bygg eget spel".
-# Alla åldrar, alkoholfritt: i stället för klunkar får man minuspoäng. Minst minuspoäng vinner.
+# Alla åldrar, alkoholfritt: man spelar om pluspoäng (B102). "får 2 minuspoäng" visas som "förlorar 2 poäng". Flest poäng vinner.
 # Format:
 #   vem|påstående              – Vem i rummet? (alla röstar)
 #   direkt|fråga               – fråga till den vars tur det är

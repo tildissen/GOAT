@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
-import { usesPoints, pausedPlayers, savedCap, sipsForPart } from '@/lib/engine';
+import { canGive, usesPoints, pausedPlayers, savedCap, sipsForPart } from '@/lib/engine';
 import Face from '../Face';
 import { Screen, type Color } from '../ui';
-import { nameOf, PART_WORDS, possessive, sipsText, Stats, type GameProps } from './shared';
+import { GiveList, nameOf, PART_WORDS, possessive, sipsText, Stats, type GameProps } from './shared';
 
 const PART_END: { bg: Color; title: 'coral' | 'cyan'; tagline: string; end: 'coral' | 'yellow' }[] = [
   { bg: 'green', title: 'coral', tagline: 'Vågar ni fortsätta?', end: 'coral' },
@@ -13,13 +13,15 @@ const PART_END: { bg: Color; title: 'coral' | 'cyan'; tagline: string; end: 'cor
   { bg: 'coral', title: 'cyan', tagline: 'Nu börjar det lukta kaos!', end: 'yellow' },
 ];
 
-export function PartEnd({ state, isLeader, busy, act }: GameProps) {
+export function PartEnd(props: GameProps) {
+  const { state, isLeader, busy, act } = props;
   const look = PART_END[state.part - 1] ?? PART_END[2];
   return (
     <Screen bg={look.bg} center>
       <div className="stack" style={{ gap: 36 }}>
         <h1 className={`display big name-font ${look.title}`}>Del {PART_WORDS[state.part - 1]} är klar!</h1>
         <p className="tagline">{look.tagline}</p>
+        <RuleCheck {...props} />
         {isLeader ? (
           <div className="stack" style={{ marginTop: 60, gap: 28 }}>
             <button className="btn ink" disabled={busy} onClick={() => act({ type: 'continue' })}>
@@ -41,13 +43,15 @@ export function PartEnd({ state, isLeader, busy, act }: GameProps) {
 
 const confirmEnd = () => window.confirm('Avsluta spelet för alla? Alla bilder raderas.');
 
-export function Finished({ state, me, isLeader, busy, act }: GameProps) {
+export function Finished(props: GameProps) {
+  const { state, me, isLeader, busy, act } = props;
   return (
     <Screen bg="yellow">
       <div className="stack" style={{ marginTop: 48, gap: 20 }}>
         <h1 className="display big name-font coral">Del {PART_WORDS[state.part - 1]} är klar!</h1>
         <p className="tagline">wow, vilka GOATs</p>
       </div>
+      <RuleCheck {...props} />
       <div style={{ width: '100%', margin: '32px 0' }}>
         <Stats state={state} meId={me.id} />
       </div>
@@ -92,7 +96,39 @@ export function Ended({ state, me }: GameProps) {
 /** ERROR: någon har sparat för många klunkar – spelet står still. */
 export function PauseOverlay({ state, me, busy, act }: GameProps) {
   const paused = pausedPlayers(state);
-  if (paused.length === 0) return null;
+  // När någon dricker sitt straff efter ERROR ser alla en grön skärm i 4 sekunder – även de som missade ERROR (B101).
+  const events = state.events ?? [];
+  const latest = [...events].reverse().find((e) => e.kind === 'punish');
+  const seen = useRef<number | null>(null);
+  const [flash, setFlash] = useState<{ id: string; sips: number } | null>(null);
+  useEffect(() => {
+    const id = latest?.id ?? 0;
+    if (seen.current === null) {
+      seen.current = id;
+      return;
+    }
+    if (!latest || id <= seen.current) return;
+    seen.current = id;
+    setFlash({ id: latest.actorId, sips: Number(latest.text.match(/\d+/)?.[0] ?? 0) });
+    const t = setTimeout(() => setFlash(null), 4000);
+    return () => clearTimeout(t);
+  }, [latest?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (paused.length === 0) {
+    const who = flash ? state.players.find((p) => p.id === flash.id) : undefined;
+    if (!who) return null;
+    const name = who.id === me.id ? 'DU' : who.name.toUpperCase();
+    return (
+      <div className="overlay solid-punish" role="status" aria-label="Straffet dricks">
+        <div className="panel punish">
+          <h2 className="display huge">SKÅL!</h2>
+          <p className="shout">
+            {name} SPARADE FÖR MYCKET – NU DRICKER {name} {who.id === me.id ? 'DITT' : 'SITT'} STRAFF{flash && flash.sips > 0 ? `: ${sipsText(flash.sips).toUpperCase()}` : ''}!
+          </p>
+        </div>
+      </div>
+    );
+  }
   const iAmPaused = paused.some((p) => p.id === me.id);
   const names = paused.map((p) => p.name.toUpperCase()).join(' OCH ');
   return (
@@ -114,6 +150,40 @@ export function PauseOverlay({ state, me, busy, act }: GameProps) {
           </p>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Regelkoll när delen är slut: regler som gällt en stund ("byt namn resten av delen", "de kommande 5 korten").
+ * Spelledaren för regeln och värden trycker på dem som bröt den (B96).
+ */
+export function RuleCheck({ state, me, view, busy, act }: GameProps) {
+  const rules = (state.rules ?? []).filter((r) => r.part === state.part);
+  if (rules.length === 0) return null;
+  const active = new Set(view.active);
+  return (
+    <div className="rule-check">
+      <h2 className="heading">Regelkoll</h2>
+      {rules.map((r) => (
+        <div key={r.id} className="card green rule-check-card">
+          {r.title && <h3 className="rule-title">{r.title}</h3>}
+          <p className="rule-text">{r.text}</p>
+          <GiveList
+            state={state}
+            players={state.players.filter((pl) => pl.ready)}
+            taken={r.taken}
+            sips={r.sips}
+            byId={r.byId}
+            mayGive={canGive(state, r.byId, me.id, { active })}
+            meId={me.id}
+            busy={busy}
+            prompt="Vem bröt regeln?"
+            onGive={(id) => act({ type: 'rule_take', ruleId: r.id, targetId: id })}
+            onUndo={(id) => act({ type: 'rule_untake', ruleId: r.id, targetId: id })}
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -255,7 +325,7 @@ export function PartIntro({ state }: GameProps) {
         </p>
         <p className="part-intro-info">
           {family
-            ? `${sips} minuspoäng per kort`
+            ? `${sips} poäng per kort`
             : `${sips} ${sips === 1 ? 'klunk' : 'klunkar'} per kort · max ${savedCap(state.part)} sparade`}
         </p>
       </div>
