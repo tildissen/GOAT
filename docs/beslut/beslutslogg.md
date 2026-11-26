@@ -833,3 +833,14 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Testat med personas på den yta som syns i Safari på iPhone 13 (390×664) och iPhone SE (375×553) i AW, Familjespel och vanligt spel: ingen skärm behövde scrollas. Ett par skärmar krymptes till cirka 73 % på iPhone SE.
   - Undantag utöver lobbyn: formulären där man skriver ("Skapa", "Joina", "Skriv dina kort") och användarvillkoren. Där kommer tangentbordet upp och täcker ändå halva skärmen, och text i krympta textfält får iPhone att zooma.
 - **Var i koden:** `Screen` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `Board` (`mini`) i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), "Allt ska rymmas" i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B108. "Börja om!" tar nya kort
+- **Beslut:** När man trycker "Börja om!" ska spelet undvika kort som redan har varit med i samma spel, tills de tar slut.
+- **Varför:** Varje ny omgång blandade en ny kortlek, men spelet kom inte ihåg vad man redan hade haft. Minigames (11 st) och "Vems är bilden?" (8 st) kom därför ofta igen redan i andra omgången.
+- **Tillägg (av Claude):**
+  - Spelet sparar vilka förvalda kort som har varit med (`playedIds`). Vid "Börja om!" byggs den nya kortleken av kort som inte har varit med.
+  - Har en sort tagit slut, dvs. det finns färre oanvända kort kvar än förra omgången behövde, får den sortens kort komma igen från början. Det gäller per sort och tillfälle, t.ex. AW:s minigames.
+  - Egna kort och utmaningskortet man drar räknas inte.
+  - Listan skickas inte till mobilerna.
+  - Testat med tolv omgångar i rad i vanligt spel, AW, Familjespel och Fest. I andra omgången kommer ingen "Vem i rummet?", utmaning eller trivia igen.
+- **Var i koden:** `freshDeck()` och `presetIds()` i [`src/lib/deck.ts`](../../src/lib/deck.ts), `startPlaying()` och `toPublic()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `performAction()` i [`src/lib/game-service.ts`](../../src/lib/game-service.ts).

@@ -1,6 +1,6 @@
 import 'server-only';
 import { randomBytes, randomUUID } from 'node:crypto';
-import { buildCustomDeck, buildDeck } from './deck';
+import { freshDeck } from './deck';
 import { addPlayer, applyAction, GameError, housekeeping, newGameState, newPlayer, cleanName, toPublic, type Ctx } from './engine';
 import { getStore, type GameRecord } from './store';
 import type { Action, GameMode, GameState, GameView, Occasion, Scoring } from './types';
@@ -134,11 +134,7 @@ export async function performAction(code: string, playerId: string, token: strin
         active,
         rng: Math.random,
         now: Date.now(),
-        deck: cards
-          ? record.state.mode === 'custom'
-            ? buildCustomDeck(cards, record.state.customCards, Math.random, record.state.occasion)
-            : buildDeck(cards, record.state.customCards, Math.random)
-          : undefined,
+        ...(cards ? freshDeck(record.state, cards, action.type === 'restart', Math.random) : {}),
       };
       return { state: applyAction(record.state, playerId, action, ctx) };
     },

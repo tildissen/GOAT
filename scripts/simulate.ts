@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { CONTENT_FILES, parseContent, type ContentFiles } from '../src/lib/content';
-import { buildCustomDeck, buildDeck, CARDS_PER_PART, PARTS } from '../src/lib/deck';
+import { buildCustomDeck, buildDeck, CARDS_PER_PART, freshDeck, PARTS, presetIds } from '../src/lib/deck';
 import {
   addPlayer,
   applyAction,
@@ -432,3 +432,26 @@ console.log('Poängtexter i alla kort: OK');
 assert.equal(cards.filter((c) => c.positive).length, 28, 'antal positiva frågor');
 assert.ok(cards.filter((c) => c.positive).every((c) => c.kind === 'vem'), 'positiv fråga som inte är Vem i rummet?');
 console.log('Positiva frågor: OK');
+// Börja om! tar andra kort än förra omgången, tills en sort tar slut (B108).
+for (const [mode, occasion] of [['classic', undefined], ['custom', 'aw'], ['custom', 'familj'], ['custom', 'fest']] as const) {
+  const rng = makeRng(7);
+  let played: string[] = [];
+  let deck = freshDeck({ mode, occasion, customCards: [], playedIds: [], deck: [] }, cards, false, rng).deck.deck;
+  played = presetIds(deck);
+  const kindOf = new Map(cards.map((c) => [String(c.id), c.kind]));
+  for (let round = 2; round <= 12; round++) {
+    const prev = new Set(presetIds(deck));
+    const next = freshDeck({ mode, occasion, customCards: [], playedIds: played, deck }, cards, true, rng);
+    deck = next.deck.deck;
+    assert.equal(deck.length, PARTS, 'omstart: fel antal delar');
+    if (mode === 'classic') deck.forEach((part) => assert.equal(part.length, CARDS_PER_PART, 'omstart: fel antal kort i en del'));
+    const ids = presetIds(deck);
+    // I andra omgången ska de stora sorterna (Vem i rummet?, utmaningar, trivia) vara helt nya.
+    if (round === 2) {
+      const repeats = ids.filter((id) => prev.has(id) && ['vem', 'utmaning', 'trivia'].includes(kindOf.get(id) ?? ''));
+      assert.equal(repeats.length, 0, `${mode}/${occasion}: samma kort direkt i nästa omgång: ${repeats.length}`);
+    }
+    played = [...new Set([...(next.playedBase ?? []), ...ids])];
+  }
+}
+console.log('Nya kort vid Börja om!: OK');
