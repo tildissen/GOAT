@@ -48,6 +48,8 @@ function parseOccasion(source: string, occasion: Occasion, file: string): Omit<C
     switch (type) {
       case 'vem':
         return { kind: 'vem', text: rest[0], players: 0, occasion };
+      case 'vem+':
+        return { kind: 'vem', text: rest[0], players: 0, occasion, positive: true };
       case 'direkt':
         return { kind: 'direkt', text: rest[0], players: 1, occasion };
       case 'solo':
@@ -71,7 +73,8 @@ export function parseContent(files: ContentFiles): Omit<CardRow, 'id'>[] {
   const cards: Omit<CardRow, 'id'>[] = [];
 
   for (const [cat, text] of lines(files.vem)) {
-    cards.push({ kind: 'vem', category: category(cat, 'vem'), text, players: 0 });
+    const positive = cat.startsWith('+');
+    cards.push({ kind: 'vem', category: category(cat.replace(/^\+/, ''), 'vem'), text, players: 0, ...(positive ? { positive: true } : {}) });
   }
   for (const [cat, text] of lines(files.direkt)) {
     cards.push({ kind: 'direkt', category: category(cat, 'direkt'), text, players: 1 });

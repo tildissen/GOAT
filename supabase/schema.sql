@@ -22,6 +22,8 @@ create table if not exists public.cards (
   active boolean not null default true,
   -- Tom = vanliga kort (och Fest). 'aw' eller 'familj' = förvalda kort för det tillfället i "Bygg eget spel".
   occasion text check (occasion in ('aw', 'familj')),
+  -- Vem i rummet?: true = positiv fråga, med poäng får den med flest röster poäng
+  positive boolean not null default false,
   created_at timestamptz not null default now()
 );
 
@@ -51,6 +53,9 @@ alter table public.cards add column if not exists occasion text check (occasion 
 alter table public.cards drop constraint if exists cards_kind_check;
 alter table public.cards add constraint cards_kind_check
   check (kind in ('vem', 'direkt', 'trivia', 'utmaning', 'minigame', 'bild', 'kaos'));
+
+-- Positiva Vem i rummet?-frågor lades till senare.
+alter table public.cards add column if not exists positive boolean not null default false;
 
 create index if not exists games_created_at_idx on public.games (created_at);
 

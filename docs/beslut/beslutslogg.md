@@ -684,7 +684,7 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Är värden borta längre än 25 sekunder kan vem som helst dela ut, så att spelet inte fastnar.
 - **Var i koden:** `canGive()`, `canTake()` och `isTakeCard()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `GiveList` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx).
 
-### B96. Regelkoll när delen är slut
+### B96. Regelkoll när delen är slut (**Ersatt av B106**)
 - **Beslut:** Regler som gäller en stund ("byt namn resten av delen", "de kommande 5 korten") räknas i en regelkoll när delen är slut, inte direkt på kortet.
 - **Varför:** Det blev konstigt när kortet sa "resten av delen" men man skulle dela ut poäng direkt, och det var oklart hur länge regeln gällde.
 - **Alternativ:** poäng direkt, men regeln syns · ta bort sådana kort.
@@ -790,3 +790,46 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Mätt på 360×640 och 390×844: alla huvudknappar ligger inom skärmen, "Fortsätt spela" och "Avsluta" överlappar inte, och etiketten är svart på vit.
 - **Inte ändrat:** Stör ej-skärmen, namnformuläret och den lilla "Hoppa över"-länken på selfiesidan. Valknapparna inne i korten kan fortfarande hamna under kanten på en liten mobil.
 - **Var i koden:** `ActionBar` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `.action-bar` och `.chip` i [`src/app/globals.css`](../../src/app/globals.css), `PartEnd` och `Finished` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `CardScreen` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), [`src/components/game/Lobby.tsx`](../../src/components/game/Lobby.tsx) och [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx).
+## 2026-11-26 – Svar på Claudes frågor
+
+### B105. Positiva frågor ger poäng, och några saker får vara som de är
+- **Beslut:**
+  1. Minus är en del av det roliga. Straffen är lika stora som vinsterna.
+  2. "Klar!" på en utmaning fungerar som idag: man trycker själv.
+  3. Positiva frågor ska ge positiva poäng.
+  4. Det räcker att värden ser vem spelledaren är. Ingen påminnelse.
+  6. Fest är bra som det är.
+- **Tillägg (av Claude):**
+  - **Positiva "Vem i rummet?"-frågor:** med poäng får den som får flest röster poäng i stället för att förlora ("fick flest röster – och får +2 poäng"). Med klunkar är allt som förut.
+  - Claude har valt ut 28 positiva frågor:
+    - 6 vanliga, t.ex. "Vem kommer att starta ett eget framgångsrikt företag?".
+    - 9 för AW, t.ex. "Vem bakar godast till fikat?" och "Vem blir VD först?".
+    - 13 för Familjespel, t.ex. "Vem har bäst humor?".
+  - Övriga frågor är negativa eller neutrala och gör att man förlorar poäng.
+  - I textfilerna markeras de med `+kategori|` (vanliga) och `vem+|` (AW och Familjespel).
+  - Skriver man ett eget "Vem i rummet?"-kort i ett poängspel väljer man "Dåligt – förlorar poäng" eller "Bra – får poäng".
+  - Databasen har fått kolumnen `positive`. Den är tillagd i Supabase via connectorn (migreringen `add_positive_vem`, 28 kort markerade, inget borttaget).
+- **Var i koden:** `positive` i [`src/lib/types.ts`](../../src/lib/types.ts), [`src/lib/content.ts`](../../src/lib/content.ts) och [`src/lib/deck.ts`](../../src/lib/deck.ts), `resolveVotes()` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `ResultCard` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `EgnaKort` i [`src/components/game/Intro.tsx`](../../src/components/game/Intro.tsx), [`supabase/schema.sql`](../../supabase/schema.sql), [`content/`](../../content/).
+
+### B106. Regelkollen kommer när som helst
+- **Beslut:** Regelkort kan komma när som helst i spelet. Regelkollen för regeln ska också komma när som helst: inte alltid efter ett visst antal kort, och inte alltid i slutet av delen eller spelet. Ersätter B96.
+- **Tillägg (av Claude):**
+  - När ett regelkort dras läggs ett **"Regelkoll!"-kort** in 2–6 kort senare, slumpat. Det kan hamna i nästa del.
+  - Korttexten säger inte längre hur länge regeln gäller. "Resten av delen" och "de kommande 5 korten" byts mot "tills regelkollen dyker upp", och under kortet står "det kan dröja några kort, ingen vet när".
+  - Så länge regeln gäller syns "Regel: Frågemästaren" under toppytan.
+  - På regelkoll-kortet trycker spelledaren för regeln eller värden på dem som bröt den. Sedan trycker hen Nästa, och regeln slutar gälla.
+  - Hinner spelet ta slut innan regelkollen kommer görs den på slutskärmen.
+  - Räknaren visar regelkoll-kortet också, t.ex. "5/11".
+- **Var i koden:** `untilCheck()`, `scheduleCheck()`, `deal()` och `next` i [`src/lib/engine.ts`](../../src/lib/engine.ts), `RuleCheckCard` och `ActiveRules` i [`src/components/game/Playing.tsx`](../../src/components/game/Playing.tsx), `RuleCheck` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+
+### B107. Allt ryms på skärmen utan att man scrollar
+- **Beslut:** Allt ska rymmas på skärmen utan att man behöver scrolla. Det bygger på det fasta knappfältet i B104: knappfältet räknas in, så inget hamnar bakom det. Lobbyn är ett undantag: är det många deltagare får värden scrolla för att trycka på Starta.
+- **Tillägg (av Claude):**
+  - Inne i korten är avstånden kortare och knapparna lägre.
+  - "Vem fick …?" och "Vem bröt regeln?" visar namnen i två kolumner.
+  - Röstresultat och val visas som korta etiketter bredvid varandra.
+  - När man väntar på någon annan visas ställningen som en rad med namn och siffror i stället för en lång lista.
+  - Blir en skärm ändå för hög krymps den automatiskt tills den får plats (som minst 60 %).
+  - Testat med personas på den yta som syns i Safari på iPhone 13 (390×664) och iPhone SE (375×553) i AW, Familjespel och vanligt spel: ingen skärm behövde scrollas. Ett par skärmar krymptes till cirka 73 % på iPhone SE.
+  - Undantag utöver lobbyn: formulären där man skriver ("Skapa", "Joina", "Skriv dina kort") och användarvillkoren. Där kommer tangentbordet upp och täcker ändå halva skärmen, och text i krympta textfält får iPhone att zooma.
+- **Var i koden:** `Screen` i [`src/components/ui.tsx`](../../src/components/ui.tsx), `Board` (`mini`) i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), "Allt ska rymmas" i [`src/app/globals.css`](../../src/app/globals.css).

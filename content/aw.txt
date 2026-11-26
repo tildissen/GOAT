@@ -2,6 +2,7 @@
 # Kollegor och vuxna, med alkohol – inget pinsamt eller sexuellt.
 # Format:
 #   vem|påstående              – Vem i rummet? (alla röstar)
+#   vem+|påstående             – positiv fråga: med poäng får den med flest röster poäng (B105)
 #   direkt|fråga               – fråga till den vars tur det är
 #   solo|utmaning              – utmaning till den vars tur det är (används också som utmaningskort)
 #   alla|utmaning              – utmaning för hela gruppen
@@ -17,24 +18,24 @@ vem|Vem skulle slåss om sista kanelbullen i fikarummet?
 vem|Vem skulle sova på kontoret om det var tillåtet?
 vem|Vem kommer alltid fem minuter sent till mötet?
 vem|Vem har det stökigaste skrivbordet?
-vem|Vem skulle bli bäst på att leda en kickoff?
+vem+|Vem skulle bli bäst på att leda en kickoff?
 vem|Vem glömmer oftast att slå av mikrofonen?
 vem|Vem har flest olästa mejl?
 vem|Vem skulle klara sig längst utan kaffe?
-vem|Vem startar eget företag först?
+vem+|Vem startar eget företag först?
 vem|Vem är bäst på att låtsas lyssna på ett möte?
-vem|Vem kommer ihåg allas födelsedagar?
+vem+|Vem kommer ihåg allas födelsedagar?
 vem|Vem tar alltid sista biten på fikabordet?
-vem|Vem skulle bli bäst som stå upp-komiker?
-vem|Vem har bäst spellista till en AW?
+vem+|Vem skulle bli bäst som stå upp-komiker?
+vem+|Vem har bäst spellista till en AW?
 vem|Vem är först med att föreslå en runda till?
-vem|Vem skulle vinna en karaoketävling?
+vem+|Vem skulle vinna en karaoketävling?
 vem|Vem planerar semestern redan i januari?
 vem|Vem skulle råka säga "älskar dig" när hen lägger på med chefen?
 vem|Vem har flest appar i telefonen?
-vem|Vem skulle överleva längst i en dokusåpa?
-vem|Vem bakar godast till fikat?
-vem|Vem blir VD först?
+vem+|Vem skulle överleva längst i en dokusåpa?
+vem+|Vem bakar godast till fikat?
+vem+|Vem blir VD först?
 
 direkt|Vilket är det konstigaste jobb du har haft?
 direkt|Vad ville du bli när du var liten?

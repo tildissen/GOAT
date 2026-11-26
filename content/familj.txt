@@ -2,6 +2,7 @@
 # Alla åldrar, alkoholfritt: man spelar om pluspoäng (B102). "får 2 minuspoäng" visas som "förlorar 2 poäng". Flest poäng vinner.
 # Format:
 #   vem|påstående              – Vem i rummet? (alla röstar)
+#   vem+|påstående             – positiv fråga: den med flest röster får poäng (B105)
 #   direkt|fråga               – fråga till den vars tur det är
 #   solo|utmaning              – utmaning till den vars tur det är (används också som utmaningskort)
 #   alla|utmaning              – utmaning för hela gruppen
@@ -13,27 +14,27 @@
 vem|Vem skulle klara sig längst utan mobil?
 vem|Vem äter mest godis i smyg?
 vem|Vem skulle bli kändis på TikTok först?
-vem|Vem skulle vinna en dansbattle?
-vem|Vem skulle bli bäst som rektor?
+vem+|Vem skulle vinna en dansbattle?
+vem+|Vem skulle bli bäst som rektor?
 vem|Vem somnar först på filmkvällen?
 vem|Vem tar längst tid på sig i badrummet?
-vem|Vem skulle klara sig längst på en öde ö?
+vem+|Vem skulle klara sig längst på en öde ö?
 vem|Vem är bäst på att hitta på ursäkter?
-vem|Vem skulle bli bäst som kock?
+vem+|Vem skulle bli bäst som kock?
 vem|Vem skrattar högst?
 vem|Vem tappar bort sina saker oftast?
-vem|Vem skulle vinna en tävling i att vara tyst längst?
-vem|Vem har bäst humor?
-vem|Vem skulle bli bäst på att ta hand om ett husdjur?
-vem|Vem skulle våga åka den läskigaste berg-och-dalbanan?
-vem|Vem är bäst på sällskapsspel?
+vem+|Vem skulle vinna en tävling i att vara tyst längst?
+vem+|Vem har bäst humor?
+vem+|Vem skulle bli bäst på att ta hand om ett husdjur?
+vem+|Vem skulle våga åka den läskigaste berg-och-dalbanan?
+vem+|Vem är bäst på sällskapsspel?
 vem|Vem blir surast när hen förlorar?
-vem|Vem skulle bli bäst som detektiv?
+vem+|Vem skulle bli bäst som detektiv?
 vem|Vem sjunger mest i duschen?
-vem|Vem skulle klara sig längst utan godis?
+vem+|Vem skulle klara sig längst utan godis?
 vem|Vem har flest strumpor utan par?
-vem|Vem blir astronaut först?
-vem|Vem skulle hitta på den bästa uppfinningen?
+vem+|Vem blir astronaut först?
+vem+|Vem skulle hitta på den bästa uppfinningen?
 vem|Vem är först uppe på morgonen?
 
 direkt|Vilken superkraft skulle du välja, och varför?

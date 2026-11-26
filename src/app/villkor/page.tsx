@@ -12,7 +12,7 @@ const UPDATED = '5 november 2026';
 
 export default function TermsPage() {
   return (
-    <Screen bg="cyan">
+    <Screen bg="cyan" scroll>
       <Link href="/" className="link-btn legal-back">
         ← Tillbaka
       </Link>

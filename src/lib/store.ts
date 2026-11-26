@@ -89,9 +89,13 @@ class SupabaseStore implements Store {
     const columns = 'id, kind, text, title, category, difficulty, answer, wrong_answers, players';
     let result: { data: unknown[] | null; error: { code?: string } | null } = await this.db
       .from('cards')
-      .select(`${columns}, occasion`)
+      .select(`${columns}, occasion, positive`)
       .eq('active', true)
       .limit(5000);
+    if (result.error?.code === '42703') {
+      // Kolumnen positive (B105) saknas – spela vidare utan positiva frågor.
+      result = await this.db.from('cards').select(`${columns}, occasion`).eq('active', true).limit(5000);
+    }
     if (result.error?.code === '42703') {
       // Databasen har inte kolumnen occasion än (schema.sql har inte körts om) – spela vidare med de vanliga korten.
       console.warn('cards.occasion saknas – kör supabase/schema.sql och seed.sql igen');

@@ -21,7 +21,6 @@ export function PartEnd(props: GameProps) {
       <div className="stack grow" style={{ justifyContent: 'center', gap: 36 }}>
         <h1 className={`display big name-font ${look.title}`}>Del {PART_WORDS[state.part - 1]} är klar!</h1>
         <p className="tagline">{look.tagline}</p>
-        <RuleCheck {...props} />
         {!isLeader && <p className="body-text">Väntar på att {nameOf(state, state.hostId)} bestämmer…</p>}
       </div>
       {isLeader && (
@@ -156,7 +155,8 @@ export function PauseOverlay({ state, me, busy, act }: GameProps) {
  * Spelledaren för regeln och värden trycker på dem som bröt den (B96).
  */
 export function RuleCheck({ state, me, view, busy, act }: GameProps) {
-  const rules = (state.rules ?? []).filter((r) => r.part === state.part);
+  // Regler vars regelkoll aldrig hann komma (spelet tog slut) räknas här (B106).
+  const rules = state.rules ?? [];
   if (rules.length === 0) return null;
   const active = new Set(view.active);
   return (

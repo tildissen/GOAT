@@ -38,7 +38,7 @@ export default function Lobby({ state, view, isLeader, busy, act, code }: GamePr
 
   const enough = state.players.length >= MIN_PLAYERS;
   return (
-    <Screen bg="cyan">
+    <Screen bg="cyan" scroll>
       <div className="code-card">
         <span className="label">Spelkod</span>
         <span className="code">{view.code}</span>

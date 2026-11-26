@@ -76,12 +76,24 @@ export function ChoiceButtons({
   );
 }
 
-export function Board({ state, active, meId }: { state: PublicState; active: string[]; meId: string }) {
+export function Board({ state, active, meId, mini = false }: { state: PublicState; active: string[]; meId: string; mini?: boolean }) {
   // Med pluspoäng leder den som har flest – hen står överst (B99, B102).
   const points = usesPoints(state);
   const players = [...state.players]
     .filter((p) => p.ready)
     .sort((a, b) => (points ? scoreOf(b) - scoreOf(a) : b.saved - a.saved || b.drank - a.drank));
+  // Kort ställning på en rad när man väntar på någon annan (B107), så att kortet får plats.
+  if (mini) {
+    return (
+      <div className="board-mini" aria-label="Ställning">
+        {players.map((p) => (
+          <span key={p.id} className={`board-chip${p.id === meId ? ' me' : ''}${active.includes(p.id) ? '' : ' offline'}`}>
+            {p.name} <strong>{points ? scoreOf(p) : p.drank}</strong>
+          </span>
+        ))}
+      </div>
+    );
+  }
   return (
     <div className={`board${players.length > 5 ? ' compact' : ''}`}>
       {players.map((p) => (

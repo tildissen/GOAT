@@ -866,3 +866,37 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
   gap: 12px;
   background: linear-gradient(to bottom, transparent, var(--bar-bg, transparent) 28%);
 }
+
+/* ---------- Allt ska rymmas på skärmen utan att man scrollar (B107) ----------
+   Kortare avstånd och lägre knappar inne i korten. Räcker det inte krymps skärmen (Screen i ui.tsx). */
+.card { padding: 22px 16px 18px; gap: 12px; }
+.card .card-body { gap: 10px; }
+.card .actions { gap: 8px; }
+.card .actions .btn { min-height: 46px; font-size: 17px; padding: 8px 16px; }
+.card .names { gap: 10px 12px; }
+.card .name-pill { min-height: 50px; font-size: 19px; flex: 0 1 calc(50% - 6px); min-width: calc(50% - 6px); border-radius: 20px; }
+.card .minigame-title { font-size: clamp(28px, 9vw, 40px); }
+.card .leader-line strong { font-size: clamp(24px, 7vw, 32px); }
+.card .rule-note { margin-top: 4px; font-size: 14px; }
+.card .photo { max-height: 30dvh; }
+.card .photo.voting { max-height: 22dvh; }
+.card .code-box { padding: 10px 16px; }
+.votes-list { gap: 4px; font-size: 15px; }
+.votes-list div { padding: 4px 12px; }
+/* Vem fick klunkarna/poängen? Två kolumner med namn, så att listan blir hälften så lång. */
+.take-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.take-row { gap: 4px; min-width: 0; }
+.take-name { padding: 8px 12px; min-height: 40px; font-size: 15px; min-width: 0; gap: 6px; }
+.take-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.take-undo { width: 34px; min-height: 40px; font-size: 18px; flex: none; }
+.board.compact .board-row { padding-top: 4px; padding-bottom: 4px; }
+.hud { padding-bottom: 8px; }
+/* Kort ställning när man väntar (B107) */
+.board-mini { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; width: 100%; }
+.board-chip { background: rgba(255, 255, 255, 0.55); border-radius: 999px; padding: 4px 10px; font-size: 14px; white-space: nowrap; }
+.board-chip.me { background: var(--white); }
+.board-chip.offline { opacity: 0.6; }
+/* Röstresultat och val som korta etiketter bredvid varandra (B107) */
+.votes-list.chips { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+.votes-list.chips div { font-size: 14px; }
+.card .option { min-height: 44px; padding: 6px 14px; font-size: 17px; }
