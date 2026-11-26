@@ -122,7 +122,6 @@ export function PauseOverlay({ state, me, busy, act }: GameProps) {
         <div className="panel error">
           <h2 className="display huge white">ERROR</h2>
           <p className="shout">{flashPlayer.name.toUpperCase()} SPARADE FÖR MÅNGA KLUNKAR – OCH HAR DRUCKIT DEM!</p>
-          <p className="shout">DET HÄR ÄR INTE DITT PENSIONSSPARANDE!</p>
         </div>
       </div>
     );

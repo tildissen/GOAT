@@ -714,3 +714,8 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Med poäng leder den som har minst, så den personen står nu överst. Tidigare stod flest minuspoäng överst.
   - Med fler än 5 spelare blir raderna lägre, så att sidan inte behöver scrolla lika mycket. När den scrollade hamnade toppytan under mobilens klocka.
 - **Var i koden:** `Board` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `.board.compact` i [`src/app/globals.css`](../../src/app/globals.css).
+
+### B100. Ingen pensionstext när personen redan har druckit
+- **Beslut:** När ERROR visas för att någon redan har druckit ska texten "DET HÄR ÄR INTE DITT PENSIONSSPARANDE!" inte vara med. Den passar bara medan personen fortfarande har klunkarna sparade.
+- **Tillägg (av Claude):** Den korta ERROR-skärmen (4 sekunder) visar nu bara "ERROR – OVVE SPARADE FÖR MÅNGA KLUNKAR – OCH HAR DRUCKIT DEM!". Den vanliga ERROR-skärmen, medan personen inte har druckit än, är oförändrad. Ändrar B98.
+- **Var i koden:** `PauseOverlay` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
