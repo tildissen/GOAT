@@ -1,4 +1,4 @@
-import { CARDS_PER_PART, PARTS, shuffle, type Rng } from './deck';
+import { CARDS_PER_PART, PARTS, presetIds, shuffle, type Rng } from './deck';
 import type { Action, Current, CustomCard, CustomKind, DeckCard, GameMode, GameState, Occasion, Scoring, Player, PublicState } from './types';
 
 export const MIN_PLAYERS = 3;
@@ -39,7 +39,10 @@ export interface Ctx {
   now: number;
   /** Ny kortlek – skickas med vid start och omstart. */
   deck?: { deck: DeckCard[][]; challengePool: DeckCard[] };
+  /** Kort som redan har spelats och fortfarande ska undvikas (räknat av servern vid omstart, B108). */
+  playedBase?: string[];
 }
+
 
 export function newPlayer(id: string, name: string, now: number): Player {
   return {
@@ -414,6 +417,8 @@ function startPlaying(s: GameState, ctx: Ctx) {
   if (!ctx.deck) throw new GameError('Kortleken saknas', 500);
   s.deck = ctx.deck.deck;
   s.challengePool = ctx.deck.challengePool;
+  // Kom ihåg vilka kort som har varit med, så att nästa Börja om! tar andra (B108).
+  s.playedIds = [...new Set([...(ctx.playedBase ?? s.playedIds ?? []), ...presetIds(s.deck)])];
   s.part = 1;
   s.cardIndex = 0;
   s.overlays = {};
@@ -816,8 +821,9 @@ export function housekeeping(input: GameState, ctx: Ctx): GameState | null {
 
 /** Tar bort sådant som inte ska synas för just den här spelaren. */
 export function toPublic(s: GameState, viewerId: string | null): PublicState {
-  const { deck, challengePool, ...rest } = s;
+  const { deck, challengePool, playedIds, ...rest } = s;
   void challengePool;
+  void playedIds;
   const pub: PublicState = structuredClone({
     ...rest,
     cardsInPart: deck[s.part - 1]?.length ?? CARDS_PER_PART,

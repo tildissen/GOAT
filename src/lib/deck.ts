@@ -1,4 +1,4 @@
-import type { CardRow, Category, CustomCard, DeckCard, Occasion } from './types';
+import type { CardRow, Category, CustomCard, DeckCard, GameState, Occasion } from './types';
 
 export const PARTS = 4;
 export const CARDS_PER_PART = 10;
@@ -231,3 +231,44 @@ export function buildDeck(allCards: CardRow[], customs: CustomCard[], rng: Rng) 
   const challengePool = utmaning.filter((c) => (c.players ?? 1) === 1).map((c) => toDeckCard(c, rng));
   return { deck, challengePool };
 }
+
+/** Förvalda kort i en kortlek (inte egna kort och inte regelkoll-kort). */
+export function presetIds(deck: DeckCard[][]): string[] {
+  return deck.flat().filter((c) => !c.custom && c.kind !== 'regelkoll').map((c) => c.id);
+}
+
+/**
+ * Bygger en ny kortlek. Vid Börja om! undviks kort som redan har varit med i spelet (B108).
+ * Har en sorts kort tagit slut (färre oanvända kvar än förra omgången behövde) får de komma igen.
+ */
+export function freshDeck(
+  state: Pick<GameState, 'mode' | 'occasion' | 'customCards' | 'playedIds' | 'deck'>,
+  cards: CardRow[],
+  restart: boolean,
+  rng: Rng,
+): { deck: ReturnType<typeof buildDeck>; playedBase?: string[] } {
+  const build = (pool: CardRow[]) =>
+    state.mode === 'custom'
+      ? buildCustomDeck(pool, state.customCards, rng, state.occasion)
+      : buildDeck(pool, state.customCards, rng);
+  if (!restart || !state.playedIds?.length) return { deck: build(cards), playedBase: restart ? [] : undefined };
+  const played = new Set(state.playedIds);
+  const lastRound = new Set(presetIds(state.deck));
+  const group = (c: CardRow) => `${c.kind}:${c.occasion ?? ''}`;
+  const used = new Map<string, number>();
+  const fresh = new Map<string, number>();
+  for (const c of cards) {
+    const g = group(c);
+    if (lastRound.has(String(c.id))) used.set(g, (used.get(g) ?? 0) + 1);
+    if (!played.has(String(c.id))) fresh.set(g, (fresh.get(g) ?? 0) + 1);
+  }
+  // Sorter där det inte finns nog med oanvända kort börjar om från början.
+  const exhausted = new Set([...used].filter(([g, n]) => (fresh.get(g) ?? 0) < n).map(([g]) => g));
+  const pool = cards.filter((c) => exhausted.has(group(c)) || !played.has(String(c.id)));
+  const playedBase = state.playedIds.filter((id) => {
+    const c = cards.find((x) => String(x.id) === id);
+    return c ? !exhausted.has(group(c)) : false;
+  });
+  return { deck: build(pool), playedBase };
+}
+

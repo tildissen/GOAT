@@ -135,6 +135,8 @@ export interface GameState {
   seq: number;
   /** Senaste valen som gjorts, så att alla ser vad någon valde (inget fusk). */
   events?: GameEvent[];
+  /** Id på förvalda kort som redan har varit med i det här spelet – Börja om! tar andra kort först (B108). */
+  playedIds?: string[];
   /** Regler som gäller en stund ("resten av delen", "de kommande 5 korten"). Räknas i regelkollen när delen är slut. */
   rules?: ActiveRule[];
 }
