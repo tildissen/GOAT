@@ -22,6 +22,11 @@ export function Screen({ bg, center, children }: { bg: Color; center?: boolean; 
   );
 }
 
+/** Fast knappfält längst ned: huvudknappen syns alltid, även på små mobiler, och innehållet skrollar bakom. */
+export function ActionBar({ children }: { children: ReactNode }) {
+  return <div className="action-bar">{children}</div>;
+}
+
 export function Avatar({ player, big }: { player: Pick<Player, 'name' | 'selfie'>; big?: boolean }) {
   const cls = `avatar${big ? ' big' : ''}`;
   if (player.selfie) {
