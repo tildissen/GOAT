@@ -206,7 +206,8 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       assert.ok(rule, 'regelkoll utan regel');
       const before = score(ids[1]);
       act(rule.byId, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] });
-      assert.equal(score(ids[1]), before + (points ? -rule.sips : rule.sips), 'regelkollen räknades fel');
+      if (points) assert.equal(score(ids[1]), before - rule.sips, 'regelkollen räknades fel');
+      else assert.equal(s.current!.pending![ids[1]], rule.sips, 'regelkollens klunkar väntar inte på ett val');
       const outsider = ids.find((id) => id !== ids[0] && id !== rule.byId);
       if (outsider) assert.throws(() => act(outsider, { type: 'rule_take', ruleId: rule.id, targetId: ids[1] }), GameError, 'vem som helst kunde dela ut i regelkollen');
       act(rule.byId, { type: 'next', seq: c.seq });
@@ -285,14 +286,37 @@ function play(seed: number, playerCount: number, mode: GameMode = 'classic', occ
       }
       // Gruppkort, minigames och kaoskort: spelledaren (den som drog kortet) och värden delar ut – ingen annan.
       // Utmaningar för alla: bara värden. Minigames och kaoskort: spelledaren och värden (B116).
-      if (isTakeCard(c) && pausedPlayers(s).length === 0 && rng() < 0.7) {
+      if (isTakeCard(c) && pausedPlayers(s).length === 0 && !c.taken?.[ids[1]] && rng() < 0.7) {
         const target = ids[1];
         const before = score(target);
         act(ids[0], { type: 'take', targetId: target });
         act(giverOf(s, c), { type: 'take', targetId: target });
         act(giverOf(s, c), { type: 'untake', targetId: target });
-        assert.equal(score(target), before + (points ? -c.sips : c.sips), 'poängen räknades fel');
         assert.equal(s.current!.taken![target], 1);
+        if (points) assert.equal(score(target), before - c.sips, 'poängen räknades fel');
+        else {
+          // Klunkar (B117): personen väljer själv – dricka, spara eller utmaningskort.
+          assert.equal(s.current!.pending![target], c.sips, 'utdelade klunkar väntar inte på ett val');
+          assert.equal(score(target), before, 'klunkarna räknades innan personen valt');
+          const savedBefore = s.players.find((pl) => pl.id === target)!.saved;
+          const choice = (['drink', 'save', 'challenge'] as const)[Math.floor(rng() * 3)];
+          act(target, { type: 'resolve_given', choice });
+          assert.ok(!s.current!.pending![target], 'valet tömde inte väntande klunkar');
+          if (choice === 'drink') assert.equal(score(target), before + c.sips, 'drack inte');
+          if (choice === 'save') assert.equal(s.players.find((pl) => pl.id === target)!.saved, savedBefore + c.sips, 'sparade inte');
+          if (choice === 'challenge') { assert.ok(s.overlays[target], 'inget utmaningskort'); act(target, { type: 'dismiss_overlay' }); }
+          assert.throws(() => act(target, { type: 'resolve_given', choice: 'drink' }), GameError, 'kunde välja två gånger');
+          // Ett till som inte väljs: dricks automatiskt när kortet går vidare.
+          if (pausedPlayers(s).length === 0 && rng() < 0.5) {
+            act(ids[0], { type: 'take', targetId: target });
+            const d = s.players.find((pl) => pl.id === target)!.drank;
+            if (pausedPlayers(s).length === 0) {
+              act(ids[0], { type: 'next', seq: c.seq });
+              assert.equal(s.players.find((pl) => pl.id === target)!.drank, d + c.sips, 'ovalda klunkar dracks inte');
+              continue;
+            }
+          }
+        }
         const outsider = ids.find((id) => id !== ids[0] && id !== giverOf(s, c));
         if (isGroupChallenge(c.card) && c.turnId !== ids[0]) assert.throws(() => act(c.turnId, { type: 'take', targetId: target }), GameError, 'den som drog en utmaning för alla kunde dela ut');
         if (outsider) assert.throws(() => act(outsider, { type: 'take', targetId: target }), GameError, 'vem som helst kunde dela ut');

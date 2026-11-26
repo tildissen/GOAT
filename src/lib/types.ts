@@ -83,6 +83,10 @@ export interface Current {
   triviaPick?: number | null;
   /** Gruppkort, minigames och kaoskort: hur många gånger varje spelare har fått kortets klunkar/minuspoäng. */
   taken?: Record<string, number>;
+  /** Klunkar någon har fått av värden/spelledaren men inte valt vad hen gör med än (B117). */
+  pending?: Record<string, number>;
+  /** Vad var och en valde för de klunkar hen fick – så att värden kan ångra rätt sak. */
+  givenChoice?: Record<string, Choice>;
 }
 
 export interface Overlay {
@@ -192,6 +196,7 @@ export type Action =
   | { type: 'trivia_answer'; index: number }
   | { type: 'take'; targetId: string }
   | { type: 'untake'; targetId: string }
+  | { type: 'resolve_given'; choice: 'drink' | 'save' | 'challenge' }
   | { type: 'rule_take'; ruleId: string; targetId: string }
   | { type: 'rule_untake'; ruleId: string; targetId: string }
   | { type: 'dismiss_overlay' }
