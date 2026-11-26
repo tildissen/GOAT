@@ -96,32 +96,35 @@ export function Ended({ state, me }: GameProps) {
 /** ERROR: någon har sparat för många klunkar – spelet står still. */
 export function PauseOverlay({ state, me, busy, act }: GameProps) {
   const paused = pausedPlayers(state);
-  // ERROR syns hos alla minst 4 sekunder, även om personen hinner dricka innan ens mobil har hämtat läget (B98).
+  // När någon dricker sitt straff efter ERROR ser alla en grön skärm i 4 sekunder – även de som missade ERROR (B101).
   const events = state.events ?? [];
-  const latestError = [...events].reverse().find((e) => e.kind === 'error');
+  const latest = [...events].reverse().find((e) => e.kind === 'punish');
   const seen = useRef<number | null>(null);
-  const [flash, setFlash] = useState<string | null>(null);
+  const [flash, setFlash] = useState<{ id: string; sips: number } | null>(null);
   useEffect(() => {
-    const id = latestError?.id ?? 0;
+    const id = latest?.id ?? 0;
     if (seen.current === null) {
       seen.current = id;
       return;
     }
-    if (!latestError || id <= seen.current) return;
+    if (!latest || id <= seen.current) return;
     seen.current = id;
-    setFlash(latestError.actorId);
+    setFlash({ id: latest.actorId, sips: Number(latest.text.match(/\d+/)?.[0] ?? 0) });
     const t = setTimeout(() => setFlash(null), 4000);
     return () => clearTimeout(t);
-  }, [latestError?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [latest?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const flashPlayer = flash && !paused.some((p) => p.id === flash) ? state.players.find((p) => p.id === flash) : undefined;
-  if (paused.length === 0 && !flashPlayer) return null;
-  if (paused.length === 0 && flashPlayer) {
+  if (paused.length === 0) {
+    const who = flash ? state.players.find((p) => p.id === flash.id) : undefined;
+    if (!who) return null;
+    const name = who.id === me.id ? 'DU' : who.name.toUpperCase();
     return (
-      <div className="overlay solid-error" role="alertdialog" aria-label="ERROR">
-        <div className="panel error">
-          <h2 className="display huge white">ERROR</h2>
-          <p className="shout">{flashPlayer.name.toUpperCase()} SPARADE FÖR MÅNGA KLUNKAR – OCH HAR DRUCKIT DEM!</p>
+      <div className="overlay solid-punish" role="status" aria-label="Straffet dricks">
+        <div className="panel punish">
+          <h2 className="display huge">SKÅL!</h2>
+          <p className="shout">
+            {name} SPARADE FÖR MYCKET – NU DRICKER {name} {who.id === me.id ? 'DITT' : 'SITT'} STRAFF{flash && flash.sips > 0 ? `: ${sipsText(flash.sips).toUpperCase()}` : ''}!
+          </p>
         </div>
       </div>
     );

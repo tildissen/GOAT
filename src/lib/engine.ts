@@ -147,7 +147,7 @@ const MAX_EVENTS = 8;
 const nameOfId = (s: GameState, id: string) => s.players.find((p) => p.id === id)?.name ?? '?';
 
 /** Sparar vad någon valde så att alla andra kan se det. */
-function logEvent(s: GameState, actorId: string, text: string, kind?: 'error') {
+function logEvent(s: GameState, actorId: string, text: string, kind?: 'error' | 'punish') {
   const events = s.events ?? [];
   const id = (events[events.length - 1]?.id ?? 0) + 1;
   s.events = [...events, { id, actorId, text, ...(kind ? { kind } : {}) }].slice(-MAX_EVENTS);
@@ -551,7 +551,15 @@ export function applyAction(input: GameState, playerId: string, action: Action, 
       break;
     }
     case 'drink_saved': {
-      if (me.saved > 0) logEvent(s, playerId, usesPoints(s) ? `tog sina ${me.saved} sparade` : `drack sina ${me.saved} sparade klunkar`);
+      // Drack hen efter ERROR är det ett straff – alla får se en grön skärm (B101).
+      const punished = me.saved >= savedCap(s.part);
+      if (me.saved > 0)
+        logEvent(
+          s,
+          playerId,
+          usesPoints(s) ? `tog sina ${me.saved} sparade` : `drack sina ${me.saved} sparade klunkar`,
+          punished ? 'punish' : undefined,
+        );
       me.drank += me.saved;
       me.saved = 0;
       break;

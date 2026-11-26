@@ -715,7 +715,17 @@ Senaste beslutet står sist. Se [README.md](README.md) för hur loggen fungerar.
   - Med fler än 5 spelare blir raderna lägre, så att sidan inte behöver scrolla lika mycket. När den scrollade hamnade toppytan under mobilens klocka.
 - **Var i koden:** `Board` i [`src/components/game/shared.tsx`](../../src/components/game/shared.tsx), `.board.compact` i [`src/app/globals.css`](../../src/app/globals.css).
 
-### B100. Ingen pensionstext när personen redan har druckit
+### B100. Ingen pensionstext när personen redan har druckit (**Ersatt av B101**)
 - **Beslut:** När ERROR visas för att någon redan har druckit ska texten "DET HÄR ÄR INTE DITT PENSIONSSPARANDE!" inte vara med. Den passar bara medan personen fortfarande har klunkarna sparade.
 - **Tillägg (av Claude):** Den korta ERROR-skärmen (4 sekunder) visar nu bara "ERROR – OVVE SPARADE FÖR MÅNGA KLUNKAR – OCH HAR DRUCKIT DEM!". Den vanliga ERROR-skärmen, medan personen inte har druckit än, är oförändrad. Ändrar B98.
 - **Var i koden:** `PauseOverlay` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx).
+
+### B101. Grön skärm när någon dricker sitt straff
+- **Beslut:** Det ska bli större och tydligare när någon dricker efter ERROR. Det blir en grön skärm med texten "XXX sparade för mycket, nu dricker XXX sitt straff". Ersätter den korta röda ERROR-skärmen i B98 och B100.
+- **Tillägg (av Claude):**
+  - När personen trycker "Jag har druckit" ser alla i 4 sekunder: **SKÅL!** OVVE SPARADE FÖR MYCKET – NU DRICKER OVVE SITT STRAFF: 4 KLUNKAR!
+  - Personen själv ser "DU SPARADE FÖR MYCKET – NU DRICKER DU DITT STRAFF".
+  - Även de som missade den röda ERROR-skärmen ser den gröna, eftersom den sparas som en händelse.
+  - Claude använder namnet i stället för "han", eftersom spelet inte vet vilket pronomen spelarna har.
+  - Den vanliga röda ERROR-skärmen, medan personen inte har druckit än, är oförändrad.
+- **Var i koden:** `PauseOverlay` i [`src/components/game/Screens.tsx`](../../src/components/game/Screens.tsx), `drink_saved` och `logEvent()` (händelsen `punish`) i [`src/lib/engine.ts`](../../src/lib/engine.ts), `.overlay.solid-punish` i [`src/app/globals.css`](../../src/app/globals.css).

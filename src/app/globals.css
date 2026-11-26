@@ -842,3 +842,7 @@ button.hud-block { background: none; border: 0; padding: 0; cursor: pointer; tex
 .board.compact .board-row { padding-top: 6px; padding-bottom: 6px; }
 .board.compact .avatar { width: 36px; height: 36px; font-size: 15px; }
 .board.compact .board-row .stat { font-size: 14px; }
+
+/* Grön skärm när någon dricker sitt straff efter ERROR (B101) */
+.overlay.solid-punish { background: var(--green); z-index: 59; animation: card-in 0.3s ease; }
+.panel.punish { background: transparent; color: var(--black); box-shadow: none; text-align: center; }

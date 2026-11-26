@@ -150,8 +150,8 @@ export interface GameEvent {
   actorId: string;
   /** T.ex. "drack 2 klunkar" – namnet sätts framför i appen. */
   text: string;
-  /** 'error' = någon nådde sparataket. Då visas ERROR hos alla en stund, även om hen dricker direkt. */
-  kind?: 'error';
+  /** 'error' = någon nådde sparataket. 'punish' = hen drack sina sparade efter ERROR – då visas en grön skärm hos alla (B101). */
+  kind?: 'error' | 'punish';
 }
 
 /** Det klienterna får se: framtida kort skickas aldrig ut. */
